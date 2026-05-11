@@ -1,0 +1,15 @@
+{
+  "name": "calorie-checker",
+  "version": "1.0.0",
+  "description": "外食チェーンのカロリー計算サイト",
+  "private": true,
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static HTML site - no build required'",
+    "lint": "echo 'No linting configured for static HTML'"
+  }
+}

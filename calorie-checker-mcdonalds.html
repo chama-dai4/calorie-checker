@@ -592,7 +592,7 @@ const MENU_DATA = {
     { id: 'burger', name: 'バーガー' },
     { id: 'side',   name: 'サイドメニュー' },
     { id: 'drink',  name: 'ドリンク' },
-    { id: 'cafe',   name: 'マックカフェ' },
+    { id: 'cafe',   name: 'マック��フェ' },
   ],
   items: {
     burger: [
@@ -791,7 +791,7 @@ const MENU_DATA = {
       { n: 'ホットカフェモカ(テイクアウト用) (S)', k: 181, p: 6.6, f: 6.5, c: 23.9 },
       { n: 'ホットカフェラテ (M)', k: 147, p: 7.2, f: 8.2, c: 10.7 },
       { n: 'ホットカフェラテ (S)', k: 95, p: 4.7, f: 5.3, c: 6.9 },
-      { n: 'ホットカフェラテ(テイクアウト用) (M)', k: 162, p: 8.0, f: 9.0, c: 11.8 },
+      { n: 'ホットカフェラテ(テイクアウ��用) (M)', k: 162, p: 8.0, f: 9.0, c: 11.8 },
       { n: 'ホットカフェラテ(テイクアウト用) (S)', k: 116, p: 5.7, f: 6.5, c: 8.5 },
       { n: 'ホットキャラメルラテ (M)', k: 195, p: 6.6, f: 7.5, c: 25.2 },
       { n: 'ホットキャラメルラテ (S)', k: 126, p: 4.2, f: 4.7, c: 16.6 },
@@ -935,5 +935,11 @@ renderGenreTabs();
 renderMenu();
 updateTotals();
 </script>
+
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+
 </body>
 </html>
