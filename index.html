@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="マクドナルド、スターバックス、サイゼリヤなど、外食チェーンのメニューを選ぶだけで合計カロリーと栄養素(たんぱく質・脂質・炭水化物)が分かるサービスです。">
+<title>カロリーチェッカー | 外食チェーンのカロリー計算サイト</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light only;
+    --bg: #ffffff;
+    --bg-alt: #fafafa;
+    --ink: #0a0a0a;
+    --muted: #6b6b6b;
+    --muted-light: #9b9b9b;
+    --line: #e8e8e8;
+    --line-strong: #d4d4d4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #ffffff;
+    color-scheme: light only;
+  }
+  body {
+    background: #ffffff;
+    color: #0a0a0a;
+    font-family: 'Noto Sans JP', 'Inter', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ===== Top nav ===== */
+  .topnav {
+    border-bottom: 1px solid var(--line);
+    padding: 14px 0;
+  }
+  .topnav-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .brand {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+  .nav-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* ===== Hero (minimal) ===== */
+  .hero {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 56px 24px 36px;
+  }
+  .hero h1 {
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .hero p {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 540px;
+  }
+  @media (max-width: 600px) {
+    .hero { padding: 36px 20px 28px; }
+    .hero h1 { font-size: 26px; }
+    .hero p { font-size: 13px; }
+  }
+
+  /* ===== Section ===== */
+  .section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+  @media (max-width: 600px) {
+    .section { padding: 0 20px 40px; }
+  }
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .section-head h2 {
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+  }
+  .section-head .count {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* ===== Chain list (simple rows) ===== */
+  .chain-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .chain-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 4px;
+    border-bottom: 1px solid var(--line);
+    transition: all 0.15s;
+    gap: 16px;
+  }
+  .chain-row.available {
+    cursor: pointer;
+  }
+  .chain-row.available:hover {
+    background: var(--bg-alt);
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .chain-row.coming-soon { cursor: default; }
+  .chain-row .left { flex: 1; min-width: 0; }
+  .chain-row .name {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    letter-spacing: -0.005em;
+  }
+  .chain-row.coming-soon .name { color: var(--muted); }
+  .chain-row .meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: var(--muted-light);
+    letter-spacing: 0.04em;
+  }
+  .chain-row .right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .status-badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted-light);
+  }
+  .chain-row.available .status-badge { color: #0a8b3a; }
+  .chain-row.available .status-badge .dot { background: #0a8b3a; }
+
+  .arrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    transition: transform 0.15s;
+    opacity: 0;
+  }
+  .chain-row.available .arrow { opacity: 1; }
+  .chain-row.available:hover .arrow { transform: translateX(3px); }
+
+  /* ===== Footer ===== */
+  .footer {
+    border-top: 1px solid var(--line);
+    padding: 28px 24px;
+    margin-top: 20px;
+  }
+  .footer-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .footer-text {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 500px;
+  }
+  .footer-links {
+    display: flex;
+    gap: 18px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .footer-links a:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand"><a href="./index.html">Calorie Checker</a></div>
+    <div class="nav-meta">外食カロリー計算</div>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>外食前に、<br>カロリーをサッと確認。</h1>
+  <p>チェーン店のメニューを選ぶだけで、合計カロリー・たんぱく質・脂質・炭水化物が一目で分かります。</p>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>チェーン店</h2>
+    <span class="count">1 / 6</span>
+  </div>
+  <div class="chain-list">
+
+    <a href="./calorie-checker-mcdonalds.html" class="chain-row available">
+      <div class="left">
+        <div class="name">マクドナルド</div>
+        <div class="meta">200 items</div>
+      </div>
+      <div class="right">
+        <span class="status-badge"><span class="dot"></span>公開中</span>
+        <span class="arrow">→</span>
+      </div>
+    </a>
+
+    <div class="chain-row coming-soon">
+      <div class="left">
+        <div class="name">スターバックス</div>
+        <div class="meta">追加予定</div>
+      </div>
+      <div class="right">
+        <span class="status-badge"><span class="dot"></span>Coming soon</span>
+        <span class="arrow">→</span>
+      </div>
+    </div>
+
+    <div class="chain-row coming-soon">
+      <div class="left">
+        <div class="name">すき家</div>
+        <div class="meta">追加予定</div>
+      </div>
+      <div class="right">
+        <span class="status-badge"><span class="dot"></span>Coming soon</span>
+        <span class="arrow">→</span>
+      </div>
+    </div>
+
+    <div class="chain-row coming-soon">
+      <div class="left">
+        <div class="name">サイゼリヤ</div>
+        <div class="meta">追加予定</div>
+      </div>
+      <div class="right">
+        <span class="status-badge"><span class="dot"></span>Coming soon</span>
+        <span class="arrow">→</span>
+      </div>
+    </div>
+
+    <div class="chain-row coming-soon">
+      <div class="left">
+        <div class="name">モスバーガー</div>
+        <div class="meta">追加予定</div>
+      </div>
+      <div class="right">
+        <span class="status-badge"><span class="dot"></span>Coming soon</span>
+        <span class="arrow">→</span>
+      </div>
+    </div>
+
+    <div class="chain-row coming-soon">
+      <div class="left">
+        <div class="name">吉野家</div>
+        <div class="meta">追加予定</div>
+      </div>
+      <div class="right">
+        <span class="status-badge"><span class="dot"></span>Coming soon</span>
+        <span class="arrow">→</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <p class="footer-text">
+      数値は各社の公式情報を参照した参考値です。本サービスは各チェーン店と提携・関係ありません。
+    </p>
+    <div class="footer-links">
+      <a href="#">プライバシーポリシー</a>
+      <a href="#">お問い合わせ</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

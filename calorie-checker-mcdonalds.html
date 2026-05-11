@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="マクドナルドのメニューを選ぶだけで、合計カロリー・たんぱく質・脂質・炭水化物が分かります。バーガー、サイドメニュー、ドリンク、マックカフェのすべてに対応。">
+<title>マクドナルドのカロリー計算 | カロリーチェッカー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light only;
+    --bg: #ffffff;
+    --bg-alt: #fafafa;
+    --ink: #0a0a0a;
+    --muted: #6b6b6b;
+    --line: #e8e8e8;
+    --line-strong: #d4d4d4;
+    --accent-soft: #f4f4f4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #ffffff;
+    color-scheme: light only;
+  }
+  body {
+    background: #ffffff;
+    color: #0a0a0a;
+    font-family: 'Noto Sans JP', 'Inter', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ===== Top nav ===== */
+  .topnav {
+    border-bottom: 1px solid var(--line);
+    padding: 14px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 50;
+  }
+  .topnav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .brand {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+  .other-chains-link {
+    font-size: 12px;
+    color: var(--muted);
+    border: 1px solid var(--line-strong);
+    padding: 5px 12px;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+  .other-chains-link:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  /* ===== Layout ===== */
+  .wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 24px 0;
+  }
+  @media (max-width: 760px) {
+    .wrapper { padding: 20px 20px 0; }
+  }
+
+  /* ===== Header ===== */
+  .header {
+    margin-bottom: 28px;
+  }
+  .breadcrumb {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .breadcrumb a { color: var(--muted); }
+  .breadcrumb a:hover { color: var(--ink); }
+  .breadcrumb .sep { margin: 0 6px; opacity: 0.5; }
+  h1 {
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  @media (max-width: 760px) {
+    h1 { font-size: 26px; }
+    .subtitle { font-size: 13px; }
+  }
+
+  /* ===== Main layout - 2 column on PC ===== */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 40px;
+    align-items: start;
+    padding-bottom: 60px;
+  }
+  @media (max-width: 900px) {
+    .main-layout {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding-bottom: 220px; /* スマホはモバイル合計バー分の余白 */
+    }
+  }
+
+  .left-col { min-width: 0; }
+  .right-col { position: sticky; top: 80px; }
+  @media (max-width: 900px) {
+    .right-col { display: none; } /* スマホでは下部固定バーに */
+  }
+
+  /* ===== Genre tabs ===== */
+  .genre-bar {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .genre-bar::-webkit-scrollbar { display: none; }
+  .genre-tab {
+    flex: 0 0 auto;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 16px 12px;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+  }
+  .genre-tab:first-child { padding-left: 0; }
+  .genre-tab:hover { color: var(--ink); }
+  .genre-tab.active {
+    color: var(--ink);
+    font-weight: 600;
+    border-bottom-color: var(--ink);
+  }
+  .genre-tab .num {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    margin-left: 5px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* ===== Search ===== */
+  .search-wrap {
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .search-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    padding: 10px 14px 10px 36px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    transition: border-color 0.15s;
+  }
+  .search-input::placeholder { color: var(--muted); }
+  .search-input:focus { outline: none; border-color: var(--ink); }
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px; height: 14px;
+    color: var(--muted);
+  }
+
+  /* ===== Menu list ===== */
+  .menu-stack {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--line);
+  }
+  .menu-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 4px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: background 0.12s;
+    gap: 12px;
+  }
+  .menu-row:hover { background: var(--bg-alt); }
+  .menu-row.selected { background: var(--accent-soft); }
+  .menu-row .info { flex: 1; min-width: 0; }
+  .menu-row .name {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .menu-row .pfc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .menu-row .pfc .label-jp {
+    font-weight: 400;
+  }
+  .menu-row .right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .menu-row .kcal {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+    min-width: 56px;
+    text-align: right;
+  }
+  .menu-row .kcal .u {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 2px;
+  }
+  .menu-row .check {
+    width: 18px; height: 18px;
+    border: 1px solid var(--line-strong);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .menu-row.selected .check {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .menu-row .check svg {
+    width: 11px; height: 11px;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .menu-row.selected .check svg { opacity: 1; }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* ===== Right column - Total card (PC) ===== */
+  .total-card-pc {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px;
+    background: var(--bg);
+  }
+  .total-card-pc .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .total-card-pc .count-line {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .total-card-pc .kcal-big {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 52px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin-bottom: 4px;
+  }
+  .total-card-pc .kcal-big .u {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 6px;
+    letter-spacing: 0;
+  }
+  .total-card-pc .divider {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 20px 0 16px;
+  }
+  .nutri-list {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    margin-bottom: 20px;
+  }
+  .nutri-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .nutri-row .name {
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .nutri-row .value {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .nutri-row .value .u {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 2px;
+  }
+  .clear-btn-pc {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 9px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .clear-btn-pc:hover:not(:disabled) {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: white;
+  }
+  .clear-btn-pc:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* ===== Bottom total bar (Mobile only) ===== */
+  .total-card-mobile {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--line-strong);
+    padding: 14px 20px 16px;
+    z-index: 10;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.04);
+  }
+  @media (max-width: 900px) {
+    .total-card-mobile { display: block; }
+  }
+  .total-card-mobile .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 12px;
+  }
+  .total-card-mobile .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .total-card-mobile .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .total-card-mobile .count {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .total-card-mobile .kcal-num {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+  .total-card-mobile .kcal-num .u {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 4px;
+  }
+  .total-card-mobile .nutrients {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .total-card-mobile .n-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .total-card-mobile .n-cell .n-l {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .total-card-mobile .n-cell .n-v {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .total-card-mobile .n-cell .n-v .u {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 1px;
+  }
+  .total-card-mobile .clear-btn-m {
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .total-card-mobile .clear-btn-m:disabled {
+    opacity: 0.3;
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .footer a { color: var(--muted); text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand"><a href="./index.html">Calorie Checker</a></div>
+    <a href="./index.html" class="other-chains-link">他のチェーン店 →</a>
+  </div>
+</nav>
+
+<div class="wrapper">
+
+  <header class="header">
+    <div class="breadcrumb">
+      <a href="./index.html">ホーム</a><span class="sep">/</span><a href="./index.html">チェーン店一覧</a><span class="sep">/</span>マクドナルド
+    </div>
+    <h1>マクドナルド</h1>
+    <p class="subtitle">メニューを選ぶだけで、合計カロリーと栄養素が分かります。</p>
+  </header>
+
+  <div class="main-layout">
+
+    <div class="left-col">
+
+      <div class="genre-bar" id="genreTabs"></div>
+
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="7" cy="7" r="5"/>
+          <path d="m11 11 3 3"/>
+        </svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="メニュー名で検索">
+      </div>
+
+      <div class="menu-stack" id="menuStack"></div>
+
+      <div class="footer">
+        数値は <a href="https://www.mcdonalds.co.jp/" target="_blank" rel="noopener">日本マクドナルド公式サイト</a> の成分情報を参照した参考値です。<br>
+        本サービスはマクドナルドと提携・関係ありません。最新かつ正確な情報は公式サイトをご確認ください。<br>
+        カスタマイズや店舗・時期により実際の数値とは異なる場合があります。
+      </div>
+
+    </div>
+
+    <aside class="right-col">
+      <div class="total-card-pc">
+        <div class="label">合計</div>
+        <div class="count-line"><span id="selCountPc">0</span> 品 選択中</div>
+        <div class="kcal-big"><span id="kcalPc">0</span><span class="u">kcal</span></div>
+        <hr class="divider">
+        <div class="nutri-list">
+          <div class="nutri-row">
+            <span class="name">たんぱく質</span>
+            <span class="value"><span id="pPc">0</span><span class="u">g</span></span>
+          </div>
+          <div class="nutri-row">
+            <span class="name">脂質</span>
+            <span class="value"><span id="fPc">0</span><span class="u">g</span></span>
+          </div>
+          <div class="nutri-row">
+            <span class="name">炭水化物</span>
+            <span class="value"><span id="cPc">0</span><span class="u">g</span></span>
+          </div>
+        </div>
+        <button class="clear-btn-pc" id="clearBtnPc" disabled>選択をクリア</button>
+      </div>
+    </aside>
+
+  </div>
+
+</div>
+
+<div class="total-card-mobile">
+  <div class="top">
+    <div class="meta">
+      <div class="label">合計</div>
+      <div class="count"><span id="selCountM">0</span> 品 選択中</div>
+    </div>
+    <div class="kcal-num"><span id="kcalM">0</span><span class="u">kcal</span></div>
+  </div>
+  <div class="nutrients">
+    <div class="n-cell">
+      <div class="n-l">たんぱく質</div>
+      <div class="n-v"><span id="pM">0</span><span class="u">g</span></div>
+    </div>
+    <div class="n-cell">
+      <div class="n-l">脂質</div>
+      <div class="n-v"><span id="fM">0</span><span class="u">g</span></div>
+    </div>
+    <div class="n-cell">
+      <div class="n-l">炭水化物</div>
+      <div class="n-v"><span id="cM">0</span><span class="u">g</span></div>
+    </div>
+    <button class="clear-btn-m" id="clearBtnM" disabled>クリア</button>
+  </div>
+</div>
+
+<script>
+const MENU_DATA = {
+  name: 'マクドナルド',
+  genres: [
+    { id: 'burger', name: 'バーガー' },
+    { id: 'side',   name: 'サイドメニュー' },
+    { id: 'drink',  name: 'ドリンク' },
+    { id: 'cafe',   name: 'マックカフェ' },
+  ],
+  items: {
+    burger: [
+      { n: 'えびフィレオ', k: 408, p: 11.4, f: 18.6, c: 49.5 },
+      { n: 'てりやきチキンフィレオ', k: 496, p: 20.1, f: 23.0, c: 52.8 },
+      { n: 'てりやきマックバーガー', k: 477, p: 14.5, f: 30.2, c: 37.5 },
+      { n: 'エグチ(エッグチーズバーガー)', k: 390, p: 22.4, f: 19.0, c: 31.2 },
+      { n: 'エッグマックマフィン', k: 310, p: 18.6, f: 13.6, c: 27.2 },
+      { n: 'ソーセージエッグマフィン', k: 477, p: 21.9, f: 30.6, c: 27.3 },
+      { n: 'ソーセージマフィン', k: 397, p: 15.5, f: 25.1, c: 27.1 },
+      { n: 'タルタル油淋鶏風チキンタツタ', k: 421, p: 18.0, f: 19.7, c: 43.8 },
+      { n: 'ダブルチーズバーガー', k: 459, p: 26.4, f: 25.1, c: 31.8 },
+      { n: 'チーズチキンタツタ', k: 423, p: 20.5, f: 20.3, c: 40.7 },
+      { n: 'チーズバーガー', k: 310, p: 15.9, f: 13.5, c: 31.0 },
+      { n: 'チキチー(マックチキンチーズ)', k: 433, p: 16.4, f: 23.2, c: 40.3 },
+      { n: 'チキンタツタ', k: 373, p: 17.6, f: 16.2, c: 39.9 },
+      { n: 'チキンマックマフィン', k: 398, p: 15.0, f: 20.4, c: 38.4 },
+      { n: 'ハンバーガー', k: 259, p: 13.0, f: 9.5, c: 30.3 },
+      { n: 'バターパット', k: 60, p: 0.0, f: 6.6, c: 0.0 },
+      { n: 'ビッグマック', k: 525, p: 26.1, f: 28.0, c: 42.1 },
+      { n: 'フィレオフィッシュ', k: 338, p: 15.0, f: 14.2, c: 37.4 },
+      { n: 'ベーコンエッグマックサンド', k: 294, p: 16.3, f: 12.6, c: 27.9 },
+      { n: 'ベーコンレタスバーガー', k: 362, p: 17.4, f: 19.4, c: 30.1 },
+      { n: 'ホットケーキ', k: 323, p: 8.3, f: 9.3, c: 53.5 },
+      { n: 'ホットケーキシロップ', k: 121, p: 0.0, f: 0.0, c: 30.3 },
+      { n: 'マックグリドル ソーセージ', k: 414, p: 10.5, f: 23.4, c: 40.4 },
+      { n: 'マックグリドル ソーセージエッグ', k: 545, p: 19.8, f: 32.9, c: 41.3 },
+      { n: 'マックグリドル ベーコンエッグ', k: 382, p: 15.6, f: 16.7, c: 41.3 },
+      { n: 'マックチキン', k: 383, p: 13.5, f: 19.2, c: 39.5 },
+      { n: 'マックポーク', k: 401, p: 15.1, f: 22.7, c: 34.3 },
+      { n: 'メガマフィン', k: 693, p: 30.0, f: 49.3, c: 31.2 },
+      { n: '倍えびフィレオ', k: 582, p: 17.5, f: 26.7, c: 68.7 },
+      { n: '倍てりやきチキンフィレオ', k: 769, p: 35.0, f: 36.4, c: 76.3 },
+      { n: '倍てりやきマックバーガー', k: 731, p: 23.9, f: 50.7, c: 45.6 },
+      { n: '倍エグチ(倍エッグチーズバーガー)', k: 489, p: 29.9, f: 26.6, c: 31.2 },
+      { n: '倍ダブルチーズバーガー', k: 657, p: 41.5, f: 40.3, c: 31.8 },
+      { n: '倍チーズバーガー', k: 409, p: 23.5, f: 21.1, c: 31.0 },
+      { n: '倍チキチー(倍マックチキンチーズ)', k: 593, p: 24.7, f: 32.8, c: 50.4 },
+      { n: '倍チキンフィレオ', k: 725, p: 34.6, f: 37.1, c: 63.8 },
+      { n: '倍ハンバーガー', k: 358, p: 20.6, f: 17.1, c: 30.3 },
+      { n: '倍ビッグマック', k: 723, p: 41.3, f: 43.1, c: 42.1 },
+      { n: '倍フィレオフィッシュ', k: 453, p: 23.4, f: 19.1, c: 46.9 },
+      { n: '倍ベーコンレタスバーガー', k: 461, p: 25.0, f: 27.0, c: 30.1 },
+      { n: '倍マックチキン', k: 542, p: 21.9, f: 28.8, c: 49.7 },
+      { n: '倍マックポーク', k: 628, p: 24.3, f: 43.2, c: 35.8 },
+      { n: '炙り醤油風 たまごベーコンダブル肉厚ビーフ', k: 685, p: 40.0, f: 41.5, c: 37.3 },
+      { n: '炙り醤油風 たまごベーコン肉厚ビーフ', k: 511, p: 30.8, f: 26.2, c: 37.5 },
+      { n: '炙り醤油風 ダブル肉厚ビーフ', k: 620, p: 38.1, f: 35.6, c: 37.6 },
+      { n: 'チーズチーズてりやきマックバーガー', k: 578, p: 20.4, f: 38.2, c: 38.9 },
+      { n: 'チーズチーズダブルチーズバーガー', k: 561, p: 32.3, f: 33.2, c: 33.1 },
+    ],
+    side: [
+      { n: 'えだまめコーン', k: 83, p: 5.2, f: 3.0, c: 9.6 },
+      { n: 'りんご&クリーム', k: 31, p: 0.2, f: 1.5, c: 4.2 },
+      { n: 'ケチャップ', k: 23, p: 0.4, f: 0.1, c: 5.5 },
+      { n: 'コク旨焼肉ソース', k: 34, p: 0.3, f: 1.0, c: 6.3 },
+      { n: 'サイドサラダ', k: 10, p: 0.5, f: 0.1, c: 2.3 },
+      { n: 'シャカシャカポテト じゃがバタシーズニング', k: 9, p: 0.3, f: 0.3, c: 1.4 },
+      { n: 'シャカチキ', k: 246, p: 14.7, f: 13.3, c: 16.9 },
+      { n: 'シャカチキ チェダーチーズ味シーズニング', k: 8, p: 0.3, f: 0.1, c: 1.3 },
+      { n: 'ソフトツイスト', k: 146, p: 4.0, f: 3.7, c: 24.2 },
+      { n: 'チキンマックナゲット 15ピース', k: 786, p: 46.0, f: 47.8, c: 43.2 },
+      { n: 'チキンマックナゲット 5ピース', k: 262, p: 15.3, f: 15.9, c: 14.4 },
+      { n: 'バーベキューソース', k: 33, p: 0.2, f: 0.2, c: 7.6 },
+      { n: 'ハッシュポテト', k: 157, p: 1.4, f: 10.2, c: 14.8 },
+      { n: 'プチパンケーキ', k: 161, p: 3.8, f: 4.4, c: 26.4 },
+      { n: 'ベーコンポテトパイ', k: 230, p: 3.5, f: 13.7, c: 23.2 },
+      { n: 'ホットアップルパイ', k: 211, p: 2.1, f: 10.9, c: 26.2 },
+      { n: 'マスタードソース', k: 43, p: 0.4, f: 2.2, c: 5.4 },
+      { n: 'マックフライポテト L', k: 515, p: 7.0, f: 25.0, c: 66.0 },
+      { n: 'マックフライポテト M', k: 409, p: 5.5, f: 19.8, c: 52.4 },
+      { n: 'マックフライポテト S', k: 224, p: 3.0, f: 10.9, c: 28.7 },
+      { n: 'マックフルーリー オレオクッキー', k: 233, p: 5.9, f: 6.7, c: 37.4 },
+      { n: 'マックフルーリー 超オレオクッキー', k: 352, p: 7.9, f: 10.7, c: 56.6 },
+      { n: '塩レモンタルタルソース', k: 91, p: 0.2, f: 9.5, c: 1.2 },
+      { n: '焙煎胡麻ドレッシング(カロリーハーフ)', k: 27, p: 0.4, f: 1.7, c: 2.5 },
+    ],
+    drink: [
+      { n: 'Qoo 白ぶどう (L)', k: 192, p: 0.0, f: 0.0, c: 48.9 },
+      { n: 'Qoo 白ぶどう (M)', k: 149, p: 0.0, f: 0.0, c: 37.9 },
+      { n: 'Qoo 白ぶどう (S)', k: 96, p: 0.0, f: 0.0, c: 24.4 },
+      { n: 'Qoo 白ぶどう (ジャンボ)', k: 297, p: 0.0, f: 0.0, c: 75.7 },
+      { n: 'アールグレイ アイスティー(ストレート) (L)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: 'アールグレイ アイスティー(ストレート) (M)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: 'アールグレイ アイスティー(ストレート) (S)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: 'アールグレイ アイスティー(ミルク) (L)', k: 9, p: 0.2, f: 0.9, c: 0.1 },
+      { n: 'アールグレイ アイスティー(ミルク) (M)', k: 9, p: 0.2, f: 0.9, c: 0.1 },
+      { n: 'アールグレイ アイスティー(ミルク) (S)', k: 9, p: 0.2, f: 0.9, c: 0.1 },
+      { n: 'アールグレイ アイスティー(レモン) (L)', k: 1, p: 0.0, f: 0.0, c: 0.3 },
+      { n: 'アールグレイ アイスティー(レモン) (M)', k: 1, p: 0.0, f: 0.0, c: 0.3 },
+      { n: 'アールグレイ アイスティー(レモン) (S)', k: 1, p: 0.0, f: 0.0, c: 0.3 },
+      { n: 'アイスカフェラテ (M)', k: 103, p: 5.1, f: 5.7, c: 7.6 },
+      { n: 'アイスカフェラテ (S)', k: 72, p: 3.5, f: 4.0, c: 5.3 },
+      { n: 'アイスキャラメルラテ (M)', k: 155, p: 5.1, f: 5.7, c: 20.6 },
+      { n: 'アイスキャラメルラテ (S)', k: 124, p: 3.6, f: 4.0, c: 18.2 },
+      { n: 'カフェラテ (M)', k: 116, p: 5.7, f: 6.5, c: 8.6 },
+      { n: 'カフェラテ (S)', k: 82, p: 4.0, f: 4.6, c: 6.0 },
+      { n: 'ガムシロップ', k: 19, p: 0.0, f: 0.0, c: 4.7 },
+      { n: 'キャラメルラテ (M)', k: 169, p: 5.8, f: 6.5, c: 21.5 },
+      { n: 'キャラメルラテ (S)', k: 134, p: 4.1, f: 4.6, c: 19.0 },
+      { n: 'グリマスシェイク ブルーベリーヨーグルト味 (M)', k: 361, p: 6.8, f: 5.7, c: 70.7 },
+      { n: 'グリマスシェイク ブルーベリーヨーグルト味 (S)', k: 218, p: 4.2, f: 3.6, c: 42.4 },
+      { n: 'コーヒーフレッシュ', k: 9, p: 0.2, f: 0.9, c: 0.1 },
+      { n: 'コカ・コーラ ゼロ (L)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: 'コカ・コーラ ゼロ (M)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: 'コカ・コーラ ゼロ (S)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: 'コカ・コーラ ゼロ (ジャンボ)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: 'コカ・コーラ (L)', k: 188, p: 0.0, f: 0.0, c: 47.2 },
+      { n: 'コカ・コーラ (M)', k: 145, p: 0.0, f: 0.0, c: 36.5 },
+      { n: 'コカ・コーラ (S)', k: 94, p: 0.0, f: 0.0, c: 23.5 },
+      { n: 'コカ・コーラ (ジャンボ)', k: 291, p: 0.0, f: 0.0, c: 73.0 },
+      { n: 'サントリー黒烏龍茶 濃いめ', k: 5, p: 0.0, f: 0.0, c: 1.0 },
+      { n: 'シュガー', k: 12, p: 0.0, f: 0.0, c: 3.0 },
+      { n: 'スプライト (L)', k: 166, p: 0.0, f: 0.0, c: 41.5 },
+      { n: 'スプライト (M)', k: 128, p: 0.0, f: 0.0, c: 32.1 },
+      { n: 'スプライト (S)', k: 83, p: 0.0, f: 0.0, c: 20.7 },
+      { n: 'スプライト (ジャンボ)', k: 257, p: 0.0, f: 0.0, c: 64.2 },
+      { n: 'ファンタ グレープ (L)', k: 212, p: 0.0, f: 0.0, c: 52.9 },
+      { n: 'ファンタ グレープ (M)', k: 164, p: 0.0, f: 0.0, c: 40.9 },
+      { n: 'ファンタ グレープ (S)', k: 106, p: 0.0, f: 0.0, c: 26.5 },
+      { n: 'ファンタ グレープ (ジャンボ)', k: 328, p: 0.0, f: 0.0, c: 82.0 },
+      { n: 'ファンタ メロン (L)', k: 212, p: 0.0, f: 0.0, c: 52.9 },
+      { n: 'ファンタ メロン (M)', k: 164, p: 0.0, f: 0.0, c: 40.9 },
+      { n: 'ファンタ メロン (S)', k: 106, p: 0.0, f: 0.0, c: 26.5 },
+      { n: 'ファンタ メロン (ジャンボ)', k: 328, p: 0.0, f: 0.0, c: 82.0 },
+      { n: 'プレミアムローストアイスコーヒー (L)', k: 12, p: 0.6, f: 0.0, c: 2.1 },
+      { n: 'プレミアムローストアイスコーヒー (M)', k: 9, p: 0.5, f: 0.0, c: 1.6 },
+      { n: 'プレミアムローストアイスコーヒー (S)', k: 6, p: 0.3, f: 0.0, c: 1.1 },
+      { n: 'プレミアムローストコーヒー (M)', k: 12, p: 0.6, f: 0.0, c: 2.1 },
+      { n: 'プレミアムローストコーヒー (S)', k: 7, p: 0.4, f: 0.0, c: 1.2 },
+      { n: 'ホットティー(ストレート) (M)', k: 3, p: 0.3, f: 0.0, c: 0.3 },
+      { n: 'ホットティー(ストレート) (S)', k: 2, p: 0.2, f: 0.0, c: 0.2 },
+      { n: 'ホットティー(ミルク) (M)', k: 12, p: 0.5, f: 0.9, c: 0.4 },
+      { n: 'ホットティー(ミルク) (S)', k: 11, p: 0.3, f: 0.9, c: 0.3 },
+      { n: 'ホットティー(レモン) (M)', k: 4, p: 0.3, f: 0.0, c: 0.6 },
+      { n: 'ホットティー(レモン) (S)', k: 3, p: 0.2, f: 0.0, c: 0.5 },
+      { n: 'マックシェイク ストロベリー (L)', k: 466, p: 8.3, f: 7.0, c: 92.6 },
+      { n: 'マックシェイク ストロベリー (M)', k: 375, p: 6.8, f: 5.7, c: 74.1 },
+      { n: 'マックシェイク ストロベリー (S)', k: 226, p: 4.2, f: 3.6, c: 44.3 },
+      { n: 'マックシェイク チョコレート (L)', k: 477, p: 9.5, f: 7.7, c: 93.6 },
+      { n: 'マックシェイク チョコレート (M)', k: 383, p: 7.8, f: 6.2, c: 74.8 },
+      { n: 'マックシェイク チョコレート (S)', k: 231, p: 4.8, f: 3.9, c: 44.6 },
+      { n: 'マックシェイク バニラ (L)', k: 456, p: 8.3, f: 6.9, c: 90.2 },
+      { n: 'マックシェイク バニラ (M)', k: 367, p: 6.8, f: 5.7, c: 72.2 },
+      { n: 'マックシェイク バニラ (S)', k: 222, p: 4.2, f: 3.6, c: 43.2 },
+      { n: 'マックフィズ 和かんきつヨーグルト味', k: 173, p: 0.0, f: 0.0, c: 43.3 },
+      { n: 'マックフロート グレープ', k: 211, p: 2.9, f: 2.9, c: 43.4 },
+      { n: 'マックフロート コーク', k: 199, p: 2.9, f: 2.9, c: 40.4 },
+      { n: 'マックフロート コーヒー', k: 111, p: 3.2, f: 2.9, c: 17.9 },
+      { n: 'マックフロート メロン', k: 211, p: 2.9, f: 2.9, c: 43.4 },
+      { n: 'マックフロート 和かんきつヨーグルト味', k: 278, p: 2.9, f: 2.9, c: 60.2 },
+      { n: 'ミニッツメイド アップル100', k: 96, p: 0.0, f: 0.0, c: 23.7 },
+      { n: 'ミニッツメイド オレンジ (S)', k: 102, p: 1.5, f: 0.0, c: 24.0 },
+      { n: 'ミルク', k: 138, p: 6.8, f: 7.8, c: 9.9 },
+      { n: 'リキッドレモン', k: 1, p: 0.0, f: 0.0, c: 0.3 },
+      { n: '爽健美茶 (L)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: '爽健美茶 (M)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: '爽健美茶 (S)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: '爽健美茶 (ジャンボ)', k: 0, p: 0.0, f: 0.0, c: 0.0 },
+      { n: '野菜生活100 (L)', k: 156, p: 1.1, f: 0.6, c: 36.6 },
+      { n: '野菜生活100 (M)', k: 121, p: 0.8, f: 0.5, c: 28.3 },
+      { n: '野菜生活100 (S)', k: 78, p: 0.5, f: 0.3, c: 18.3 },
+    ],
+    cafe: [
+      { n: 'アイスアメリカーノ (L)', k: 3, p: 0.2, f: 0.0, c: 0.5 },
+      { n: 'アイスアメリカーノ (M)', k: 2, p: 0.1, f: 0.0, c: 0.4 },
+      { n: 'アイスカフェモカ (L)', k: 286, p: 8.3, f: 12.9, c: 34.1 },
+      { n: 'アイスカフェモカ (M)', k: 216, p: 6.3, f: 9.7, c: 25.8 },
+      { n: 'アイスカフェラテ (L)', k: 106, p: 5.2, f: 5.9, c: 7.9 },
+      { n: 'アイスカフェラテ (M)', k: 87, p: 4.3, f: 4.8, c: 6.4 },
+      { n: 'アイスキャラメルラテ (L)', k: 268, p: 5.6, f: 10.8, c: 37.0 },
+      { n: 'アイスキャラメルラテ (M)', k: 206, p: 4.4, f: 8.3, c: 28.4 },
+      { n: 'アイスチョコレート (L)', k: 340, p: 9.3, f: 13.5, c: 45.1 },
+      { n: 'アイスチョコレート (M)', k: 251, p: 7.0, f: 10.2, c: 32.9 },
+      { n: 'アメリカーノ (M)', k: 2, p: 0.1, f: 0.0, c: 0.4 },
+      { n: 'アメリカーノ (S)', k: 2, p: 0.1, f: 0.0, c: 0.3 },
+      { n: 'エクストラショット', k: 2, p: 0.1, f: 0.0, c: 0.3 },
+      { n: 'エクストラシロップ キャラメル', k: 39, p: 0.0, f: 0.0, c: 9.7 },
+      { n: 'エスプレッソ (S)', k: 2, p: 0.1, f: 0.0, c: 0.3 },
+      { n: 'エスプレッソフラッペ', k: 239, p: 2.4, f: 11.2, c: 32.3 },
+      { n: 'カプチーノ (M)', k: 127, p: 6.1, f: 6.9, c: 9.8 },
+      { n: 'カプチーノ (S)', k: 89, p: 4.3, f: 4.8, c: 7.1 },
+      { n: 'カプチーノ(テイクアウト用) (M)', k: 135, p: 6.5, f: 7.3, c: 10.4 },
+      { n: 'カプチーノ(テイクアウト用) (S)', k: 91, p: 4.4, f: 4.9, c: 7.2 },
+      { n: 'グリーンスムージー', k: 104, p: 0.9, f: 0.7, c: 24.2 },
+      { n: 'チョコフラッペ オレオクッキー', k: 384, p: 7.9, f: 12.6, c: 61.0 },
+      { n: 'トリプルチョコ&キャラメルスコーン', k: 297, p: 5.4, f: 15.9, c: 33.1 },
+      { n: 'ニトロブリューコーヒー アイスブラック', k: 6, p: 0.3, f: 0.0, c: 1.1 },
+      { n: 'ニトロブリューコーヒー アイスミルク', k: 73, p: 3.6, f: 3.9, c: 5.6 },
+      { n: 'ハローキティのジューシーいちごスムージー', k: 209, p: 0.0, f: 0.0, c: 52.5 },
+      { n: 'プリンケーキ', k: 179, p: 2.1, f: 10.1, c: 19.8 },
+      { n: 'ホイップクリーム', k: 67, p: 0.8, f: 4.3, c: 6.3 },
+      { n: 'ホットカフェモカ (M)', k: 264, p: 9.5, f: 9.3, c: 35.3 },
+      { n: 'ホットカフェモカ (S)', k: 171, p: 6.1, f: 5.9, c: 23.2 },
+      { n: 'ホットカフェモカ(テイクアウト用) (M)', k: 274, p: 10.0, f: 9.9, c: 36.0 },
+      { n: 'ホットカフェモカ(テイクアウト用) (S)', k: 181, p: 6.6, f: 6.5, c: 23.9 },
+      { n: 'ホットカフェラテ (M)', k: 147, p: 7.2, f: 8.2, c: 10.7 },
+      { n: 'ホットカフェラテ (S)', k: 95, p: 4.7, f: 5.3, c: 6.9 },
+      { n: 'ホットカフェラテ(テイクアウト用) (M)', k: 162, p: 8.0, f: 9.0, c: 11.8 },
+      { n: 'ホットカフェラテ(テイクアウト用) (S)', k: 116, p: 5.7, f: 6.5, c: 8.5 },
+      { n: 'ホットキャラメルラテ (M)', k: 195, p: 6.6, f: 7.5, c: 25.2 },
+      { n: 'ホットキャラメルラテ (S)', k: 126, p: 4.2, f: 4.7, c: 16.6 },
+      { n: 'ホットキャラメルラテ(テイクアウト用) (M)', k: 213, p: 7.2, f: 8.2, c: 27.4 },
+      { n: 'ホットキャラメルラテ(テイクアウト用) (S)', k: 152, p: 5.2, f: 5.9, c: 19.3 },
+      { n: 'ホットチョコレート (M)', k: 253, p: 8.9, f: 8.8, c: 34.3 },
+      { n: 'ホットチョコレート (S)', k: 168, p: 5.9, f: 5.8, c: 22.8 },
+      { n: 'ホットチョコレート(テイクアウト用) (M)', k: 255, p: 9.0, f: 8.9, c: 34.4 },
+      { n: 'ホットチョコレート(テイクアウト用) (S)', k: 168, p: 5.9, f: 5.8, c: 22.8 },
+      { n: 'ポムポムプリンのクリーミープリンフラッペ', k: 369, p: 4.5, f: 10.9, c: 63.5 },
+      { n: 'マカロン チョコレート', k: 82, p: 1.5, f: 4.2, c: 9.5 },
+    ]
+  }
+};
+
+const state = { genre: 'burger', search: '', selected: new Map() };
+
+function getKey(genre, name) { return `${genre}|${name}`; }
+
+function renderGenreTabs() {
+  const tabs = document.getElementById('genreTabs');
+  tabs.innerHTML = '';
+  MENU_DATA.genres.forEach(g => {
+    const count = (MENU_DATA.items[g.id] || []).length;
+    const b = document.createElement('button');
+    b.className = 'genre-tab' + (g.id === state.genre ? ' active' : '');
+    b.innerHTML = `${g.name}<span class="num">${count}</span>`;
+    b.addEventListener('click', () => {
+      state.genre = g.id;
+      state.search = '';
+      document.getElementById('searchInput').value = '';
+      renderGenreTabs();
+      renderMenu();
+    });
+    tabs.appendChild(b);
+  });
+}
+
+const CHECK_SVG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 8 3.5 3.5L13 5"/></svg>';
+
+function renderMenu() {
+  const stack = document.getElementById('menuStack');
+  stack.innerHTML = '';
+  const items = MENU_DATA.items[state.genre] || [];
+  const filtered = state.search
+    ? items.filter(it => it.n.toLowerCase().includes(state.search.toLowerCase()))
+    : items;
+
+  if (filtered.length === 0) {
+    stack.innerHTML = `<div class="empty-state">該当するメニューがありません</div>`;
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  filtered.forEach(item => {
+    const key = getKey(state.genre, item.n);
+    const isSelected = state.selected.has(key);
+    const div = document.createElement('div');
+    div.className = 'menu-row' + (isSelected ? ' selected' : '');
+    div.innerHTML = `
+      <div class="check">${CHECK_SVG}</div>
+      <div class="info">
+        <div class="name">${item.n}</div>
+        <div class="pfc">たんぱく質 ${item.p}g · 脂質 ${item.f}g · 炭水化物 ${item.c}g</div>
+      </div>
+      <div class="right">
+        <div class="kcal">${item.k}<span class="u">kcal</span></div>
+      </div>
+    `;
+    div.addEventListener('click', () => toggleSelect(item, key));
+    frag.appendChild(div);
+  });
+  stack.appendChild(frag);
+}
+
+function toggleSelect(item, key) {
+  if (state.selected.has(key)) state.selected.delete(key);
+  else state.selected.set(key, { ...item, key });
+  renderMenu();
+  updateTotals();
+}
+
+function clearSelection() {
+  state.selected.clear();
+  renderMenu();
+  updateTotals();
+}
+
+function updateTotals() {
+  let k=0, p=0, f=0, c=0;
+  state.selected.forEach(it => { k+=it.k; p+=it.p; f+=it.f; c+=it.c; });
+  const kRounded = Math.round(k);
+  const pStr = p.toFixed(1);
+  const fStr = f.toFixed(1);
+  const cStr = c.toFixed(1);
+  const count = state.selected.size;
+
+  // PC側
+  animateNum('kcalPc', kRounded);
+  document.getElementById('pPc').textContent = pStr;
+  document.getElementById('fPc').textContent = fStr;
+  document.getElementById('cPc').textContent = cStr;
+  document.getElementById('selCountPc').textContent = count;
+  document.getElementById('clearBtnPc').disabled = count === 0;
+
+  // モバイル側
+  animateNum('kcalM', kRounded);
+  document.getElementById('pM').textContent = pStr;
+  document.getElementById('fM').textContent = fStr;
+  document.getElementById('cM').textContent = cStr;
+  document.getElementById('selCountM').textContent = count;
+  document.getElementById('clearBtnM').disabled = count === 0;
+}
+
+function animateNum(id, target) {
+  const el = document.getElementById(id);
+  const start = parseInt(el.textContent.replace(/,/g,'')) || 0;
+  const dur = 280;
+  const t0 = performance.now();
+  function step(t) {
+    const pr = Math.min((t - t0) / dur, 1);
+    el.textContent = Math.round(start + (target - start) * pr);
+    if (pr < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    state.search = e.target.value;
+    renderMenu();
+  }, 120);
+});
+
+document.getElementById('clearBtnPc').addEventListener('click', clearSelection);
+document.getElementById('clearBtnM').addEventListener('click', clearSelection);
+
+renderGenreTabs();
+renderMenu();
+updateTotals();
+</script>
+</body>
+</html>
