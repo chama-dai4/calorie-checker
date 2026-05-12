@@ -62,6 +62,7 @@ export default function Home() {
                   {Icon && <Icon size={32} strokeWidth={1.5} />}
                 </div>
                 <div className={styles.cardBody}>
+                  <div className={styles.cardNameEn}>{cat.nameEn}</div>
                   <div className={styles.cardName}>{cat.name}</div>
                   <div className={styles.cardMeta}>
                     {cat.chains.length} 店舗
