@@ -1,0 +1,69 @@
+import Link from "next/link";
+import styles from "./page.module.css";
+
+export const metadata = {
+  title: "プライバシーポリシー | カロリーチェッカー",
+  description: "カロリーチェッカーのプライバシーポリシーです。",
+};
+
+export default function Privacy() {
+  return (
+    <>
+      <nav className={styles.topnav}>
+        <div className={styles.topnavInner}>
+          <Link href="/" className="brand-name-large">Calorie Checker</Link>
+          <Link href="/" className={styles.backLink}>← ホームに戻る</Link>
+        </div>
+      </nav>
+
+      <main className={styles.main}>
+        <div className={styles.breadcrumb}>
+          <Link href="/">ホーム</Link>
+          <span className={styles.sep}>/</span>プライバシーポリシー
+        </div>
+
+        <h1>プライバシーポリシー</h1>
+        <p className={styles.lead}>本ポリシーは、当サイト「カロリーチェッカー」における、訪問者の個人情報および利用情報の取扱方針を定めるものです。</p>
+
+        <h2>1. 個人情報の取得について</h2>
+        <p>当サイトは、お問い合わせフォーム等を通じて、お名前・メールアドレス・お問い合わせ内容などの個人情報を取得することがあります。取得した情報は、お問い合わせへの対応以外の目的では使用しません。</p>
+
+        <h2>2. アクセス解析ツールについて</h2>
+        <p>当サイトでは、サイトの利用状況を把握するためGoogleアナリティクスを利用する場合があります。Googleアナリティクスはトラフィックデータの収集のためにCookieを使用しています。このトラフィックデータは匿名で収集されており、個人を特定するものではありません。Cookie機能はブラウザの設定により無効にすることが可能です。</p>
+
+        <h2>3. 広告配信について</h2>
+        <p>当サイトでは、第三者配信の広告サービス(Google AdSense等)を利用する予定です。広告配信事業者は、ユーザーの興味に応じた広告を表示するためにCookieを使用することがあります。</p>
+
+        <h2>4. 表示される情報について</h2>
+        <p>当サイトに掲載されているカロリーおよび栄養成分情報は、各チェーン店が公式に公開している情報を参照した参考値です。最新かつ正確な情報については、必ず各公式サイトでご確認ください。</p>
+
+        <h2>5. 著作権・商標について</h2>
+        <p>当サイトに掲載されている各チェーン店の名称・商品名等は、各社の商標または登録商標です。当サイトは各チェーン店と提携・関係するものではありません。</p>
+
+        <h2>6. 免責事項</h2>
+        <p>当サイトに掲載する情報については正確性に細心の注意を払っておりますが、情報の正確性・完全性・有用性等について、いかなる保証も行うものではありません。当サイトの情報を用いた判断・行動によって生じた、いかなる損害についても、当サイトは一切の責任を負いません。</p>
+
+        <h2>7. プライバシーポリシーの変更について</h2>
+        <p>当サイトは、必要に応じて本ポリシーの内容を変更することがあります。変更後のプライバシーポリシーは、当サイトに掲載した時点から効力を生じるものとします。</p>
+
+        <h2>8. お問い合わせ先</h2>
+        <p>本ポリシーに関するお問い合わせは、<Link href="/contact">お問い合わせページ</Link>よりお願いいたします。</p>
+
+        <div className={styles.updated}>
+          制定日:2026年5月11日<br />
+          最終更新日:2026年5月11日<br />
+          運営者:CHAMANO
+        </div>
+      </main>
+
+      <footer className={styles.footer}>
+        <div className={styles.footerLinks}>
+          <Link href="/">ホーム</Link>
+          <Link href="/blog">ブログ</Link>
+          <Link href="/about">運営者情報</Link>
+          <Link href="/contact">お問い合わせ</Link>
+        </div>
+      </footer>
+    </>
+  );
+}
