@@ -2,8 +2,10 @@ import { getMenusByChain } from "@/lib/microcms";
 import StarbucksClient from "./StarbucksClient";
 
 export const metadata = {
-  title: "スターバックスのカロリー計算 | カロリーチェッカー",
-  description: "スターバックスのメニューを選んで、ミルクの種類やカスタマイズを指定するだけで、合計カロリー・たんぱく質・脂質・炭水化物が分かります。",
+  title: "【ミルク・カスタマイズ対応】スタバのカロリー計算ツール | カロリーチェッカー",
+  description:
+    "スターバックスの全メニュー・ミルク7種類・カスタマイズに対応。フラペチーノ、ラテ、フードのカロリーや脂質を選ぶだけで計算。豆乳・オーツミルク・無脂肪乳など低カロリーな選び方も。",
+  keywords: ["スタバ カロリー", "スターバックス カロリー", "スタバ カスタマイズ カロリー", "フラペチーノ カロリー", "スタバ ミルク 種類"],
 };
 
 export const revalidate = 3600;

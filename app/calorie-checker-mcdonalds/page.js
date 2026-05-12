@@ -3,8 +3,10 @@ import { getMenusByChain } from "@/lib/microcms";
 import McdonaldsClient from "./McdonaldsClient";
 
 export const metadata = {
-  title: "マクドナルドのカロリー計算 | カロリーチェッカー",
-  description: "マクドナルドのメニューを選ぶだけで、合計カロリー・たんぱく質・脂質・炭水化物が分かります。",
+  title: "【全メニュー対応】マクドナルドのカロリー計算・一覧表 | カロリーチェッカー",
+  description:
+    "マクドナルドの全200メニューから選ぶだけで、合計カロリー・たんぱく質・脂質・炭水化物を瞬時に計算。ビッグマック、ポテト、シェイクなど人気メニューのカロリーが一目で分かる無料ツールです。",
+  keywords: ["マクドナルド カロリー", "マック カロリー", "ビッグマック カロリー", "マクドナルド 栄養成分", "マクドナルド カロリー 計算"],
 };
 
 export const revalidate = 3600;
