@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Beef, Coffee, Pizza, Soup, Fish, Wheat, UtensilsCrossed } from "lucide-react";
 import styles from "./page.module.css";
+import { CATEGORIES, getAvailableCount } from "@/lib/chains";
 
 export const metadata = {
   title: "カロリーチェッカー | 外食チェーンのカロリー計算サイト",
@@ -7,14 +9,16 @@ export const metadata = {
     "マクドナルド、スターバックス、サイゼリヤなど、外食チェーンのメニューを選ぶだけで合計カロリーと栄養素(たんぱく質・脂質・炭水化物)が分かるサービスです。",
 };
 
-const chains = [
-  { name: "マクドナルド", meta: "200 items", href: "/calorie-checker-mcdonalds", status: "公開中", available: true },
-  { name: "スターバックス", meta: "追加予定", status: "Coming soon", available: false },
-  { name: "すき家", meta: "追加予定", status: "Coming soon", available: false },
-  { name: "サイゼリヤ", meta: "追加予定", status: "Coming soon", available: false },
-  { name: "モスバーガー", meta: "追加予定", status: "Coming soon", available: false },
-  { name: "吉野家", meta: "追加予定", status: "Coming soon", available: false },
-];
+// アイコン名から実コンポーネントへのマッピング
+const ICONS = {
+  Beef,
+  Coffee,
+  Pizza,
+  Soup,
+  Fish,
+  Wheat,
+  UtensilsCrossed,
+};
 
 export default function Home() {
   return (
@@ -39,48 +43,39 @@ export default function Home() {
 
       <section className={styles.section}>
         <div className={styles.sectionHead}>
-          <h2>チェーン店</h2>
-          <span className={styles.count}>1 / 6</span>
+          <h2>カテゴリから探す</h2>
         </div>
-        <div className={styles.chainList}>
-          {chains.map((chain) =>
-            chain.available ? (
+
+        <div className={styles.categoryGrid}>
+          {CATEGORIES.map((cat) => {
+            const Icon = ICONS[cat.iconName];
+            const availableCount = getAvailableCount(cat);
+            const hasAvailable = availableCount > 0;
+
+            return (
               <Link
-                key={chain.name}
-                href={chain.href}
-                className={`${styles.chainRow} ${styles.available}`}
+                key={cat.slug}
+                href={`/category/${cat.slug}`}
+                className={`${styles.categoryCard} ${hasAvailable ? styles.cardActive : ""}`}
               >
-                <div className={styles.left}>
-                  <div className={styles.name}>{chain.name}</div>
-                  <div className={styles.meta}>{chain.meta}</div>
+                <div className={styles.iconWrap}>
+                  {Icon && <Icon size={32} strokeWidth={1.5} />}
                 </div>
-                <div className={styles.right}>
-                  <span className={styles.statusBadge}>
-                    <span className={styles.dot}></span>
-                    {chain.status}
-                  </span>
-                  <span className={styles.arrow}>→</span>
+                <div className={styles.cardBody}>
+                  <div className={styles.cardName}>{cat.name}</div>
+                  <div className={styles.cardMeta}>
+                    {cat.chains.length} 店舗
+                    {hasAvailable && (
+                      <span className={styles.availableMark}>
+                        <span className={styles.availableDot}></span>
+                        {availableCount} 公開中
+                      </span>
+                    )}
+                  </div>
                 </div>
               </Link>
-            ) : (
-              <div
-                key={chain.name}
-                className={`${styles.chainRow} ${styles.comingSoon}`}
-              >
-                <div className={styles.left}>
-                  <div className={styles.name}>{chain.name}</div>
-                  <div className={styles.meta}>{chain.meta}</div>
-                </div>
-                <div className={styles.right}>
-                  <span className={styles.statusBadge}>
-                    <span className={styles.dot}></span>
-                    {chain.status}
-                  </span>
-                  <span className={styles.arrow}>→</span>
-                </div>
-              </div>
-            )
-          )}
+            );
+          })}
         </div>
       </section>
 
