@@ -1,0 +1,196 @@
+/* ========== サイドバー全体 ========== */
+.sidebar {
+  position: sticky;
+  top: 88px;
+  align-self: start;
+  width: 260px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.sidebarInner {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-right: 8px;
+}
+
+/* スクロールバーのスタイル */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 2px;
+}
+
+/* ========== 各セクション共通 ========== */
+.section {
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+.section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sectionLabel {
+  font-family: 'Inter', 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+/* ========== 目次セクション ========== */
+.tocList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tocItem {
+  position: relative;
+}
+
+.tocItemH3 {
+  padding-left: 12px;
+}
+
+.tocLink {
+  display: block;
+  padding: 7px 0 7px 12px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  margin-left: -2px;
+  transition: all 0.2s ease;
+}
+
+.tocLink:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.tocItemActive .tocLink {
+  color: var(--ink);
+  font-weight: 500;
+  border-left-color: var(--ink);
+}
+
+/* ========== 著者セクション ========== */
+.authorBlock {
+  text-align: center;
+}
+
+.authorAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 12px;
+  border: 1px solid var(--line);
+  background: var(--bg-alt);
+}
+.authorAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.authorName {
+  font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.authorRole {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.authorLink {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 2px;
+  transition: opacity 0.2s ease;
+}
+.authorLink:hover {
+  opacity: 0.6;
+  text-decoration: none;
+}
+
+/* ========== シェアセクション ========== */
+.shareList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shareItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.shareItem:hover {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: white;
+  text-decoration: none;
+}
+
+.shareIcon {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: var(--bg-alt);
+  color: var(--ink);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.shareItem:hover .shareIcon {
+  background: white;
+  color: var(--ink);
+}
+
+/* ========== レスポンシブ：タブレット以下は非表示 ========== */
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+}

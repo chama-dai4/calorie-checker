@@ -9,12 +9,7 @@ export const metadata = {
 export default function About() {
   return (
     <>
-<nav className={styles.topnav}>
-  <div className={styles.topnavInner}>
-    <Link href="/" className="brand-name-large">Calorie Checker</Link>
-    <Link href="/" className={styles.backLink}>← ホームに戻る</Link>
-  </div>
-</nav>
+
 
       <main className={styles.main}>
         <div className={styles.breadcrumb}>

@@ -303,13 +303,14 @@ export default function StarbucksClient({ menus }) {
 
   return (
     <>
-      <nav className={styles.topnav}>
+
+<nav className={styles.topnav}>
         <div className={styles.topnavInner}>
           <Link href="/" className="brand-name-large">Calorie Checker</Link>
-          <Link href="/" className={styles.otherChainsLink}>他のチェーン店 →</Link>
+          <Link href="/" className={styles.backLink}>← ホームに戻る</Link>
         </div>
       </nav>
-
+      
       <div className={styles.wrapper}>
         <header className={styles.header}>
           <div className={styles.breadcrumb}>

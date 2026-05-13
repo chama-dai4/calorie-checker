@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getBlogPosts } from "@/lib/microcms";
 import PostCard from "@/components/PostCard";
 import styles from "./page.module.css";
+import GlobalNav from "@/components/GlobalNav";
 
 export const metadata = {
   title: "ブログ | カロリーチェッカー",
@@ -16,12 +17,7 @@ export default async function BlogPage() {
 
   return (
     <>
-      <nav className={styles.topnav}>
-        <div className={styles.topnavInner}>
-          <Link href="/" className="brand-name-large">Calorie Checker</Link>
-          <Link href="/" className={styles.backLink}>← ホームに戻る</Link>
-        </div>
-      </nav>
+<GlobalNav />
 
       <main className={styles.main}>
         <div className={styles.breadcrumb}>

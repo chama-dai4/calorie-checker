@@ -46,12 +46,7 @@ export default async function CategoryPage({ params }) {
 
   return (
     <>
-      <nav className={styles.topnav}>
-        <div className={styles.topnavInner}>
-          <Link href="/" className="brand-name-large">Calorie Checker</Link>
-          <Link href="/" className={styles.backLink}>← ホームに戻る</Link>
-        </div>
-      </nav>
+
 
       <div className={styles.wrapper}>
         <header className={styles.header}>

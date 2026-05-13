@@ -1,9 +1,15 @@
 .topnav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(140%) blur(8px);
+  -webkit-backdrop-filter: saturate(140%) blur(8px);
   border-bottom: 1px solid var(--line);
   padding: 14px 0;
 }
 .topnavInner {
-  max-width: 1000px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
@@ -525,5 +531,65 @@
   .relatedGrid {
     grid-template-columns: 1fr;
     gap: 16px;
+  }
+}
+/* ========== サイドバー対応：2カラムレイアウト ========== */
+.layoutWrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  gap: 80px;
+  align-items: flex-start;
+}
+
+/* 記事本体（メインカラム） */
+.layoutWrap > .article {
+  flex: 1;
+  min-width: 0;
+  max-width: 720px;
+  padding: 56px 0 96px;
+  margin: 0;
+}
+
+/* ========== モバイル用目次（PCではサイドバーがあるので非表示） ========== */
+.mobileToc {
+  display: block;
+}
+
+/* ========== レスポンシブ：タブレット ========== */
+@media (max-width: 1100px) {
+  .layoutWrap {
+    gap: 48px;
+    padding: 0 24px;
+  }
+}
+
+/* ========== レスポンシブ：900px以下（サイドバーが消える） ========== */
+@media (max-width: 900px) {
+  .layoutWrap {
+    display: block;
+    padding: 0 24px;
+  }
+  .layoutWrap > .article {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+/* ========== PCではモバイル用目次を非表示（サイドバーで表示するので） ========== */
+@media (min-width: 901px) {
+  .mobileToc {
+    display: none;
+  }
+}
+
+/* ========== レスポンシブ：モバイル ========== */
+@media (max-width: 600px) {
+  .layoutWrap {
+    padding: 0 20px;
+  }
+  .layoutWrap > .article {
+    padding: 40px 0 64px;
   }
 }
