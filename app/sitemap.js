@@ -25,6 +25,12 @@ export default async function sitemap() {
       priority: 0.9,
     },
     {
+      url: `${SITE_URL}/calorie-checker-yoshinoya`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: `${SITE_URL}/blog`,
       lastModified: new Date(),
       changeFrequency: "daily",

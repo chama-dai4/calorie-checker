@@ -23,12 +23,7 @@ const ICONS = {
 export default function Home() {
   return (
     <>
-      <nav className={styles.topnav}>
-        <div className={styles.topnavInner}>
-          <Link href="/" className="brand-name-large">Calorie Checker</Link>
-          <div className={styles.navMeta}>外食カロリー計算</div>
-        </div>
-      </nav>
+
 
       <section className={styles.hero}>
         <h1>
