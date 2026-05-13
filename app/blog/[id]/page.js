@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBlogPost, getBlogPosts } from "@/lib/microcms";
+import BlogBlocks from "@/components/BlogBlocks";
+import TableOfContents from "@/components/TableOfContents";
+import ReadingProgress from "@/components/ReadingProgress";
+import { calculateReadingTime, generateTableOfContents } from "@/lib/blogUtils";
 import styles from "./page.module.css";
 
 export const revalidate = 3600;
@@ -14,9 +18,11 @@ export async function generateMetadata({ params }) {
   const { id } = await params;
   try {
     const post = await getBlogPost(id);
+    const title = post.seoTitle || post.title;
+    const description = post.seoDescription || post.excerpt || `${post.title}についての記事です。`;
     return {
-      title: `${post.title} | カロリーチェッカー`,
-      description: post.excerpt || `${post.title}についての記事です。`,
+      title: `${title} | カロリーチェッカー`,
+      description,
     };
   } catch {
     return { title: "記事 | カロリーチェッカー" };
@@ -33,7 +39,28 @@ export default async function BlogPostPage({ params }) {
     notFound();
   }
 
-  // 関連記事を取得(同じカテゴリの他の記事を最大3件)
+  // タグを配列に正規化
+  const tags = (() => {
+    if (!post.tags) return [];
+    if (Array.isArray(post.tags)) return post.tags.filter(Boolean);
+    if (typeof post.tags === "string") {
+      return post.tags.split(",").map((t) => t.trim()).filter(Boolean);
+    }
+    return [];
+  })();
+
+  // 本文の表示判定
+  const hasBlocks = post.blocks && post.blocks.length > 0;
+  const hasContent = post.content && post.content.trim().length > 0;
+
+  // 目次データを生成（blocksがある場合のみ）
+  const tocItems = hasBlocks ? generateTableOfContents(post.blocks) : [];
+  const hasToc = tocItems.length >= 2; // 見出し2個以上で目次表示
+
+  // 読了時間を計算
+  const readingTime = hasBlocks ? calculateReadingTime(post.blocks) : 1;
+
+  // 関連記事を取得
   let relatedPosts = [];
   try {
     const allPosts = await getBlogPosts();
@@ -46,6 +73,8 @@ export default async function BlogPostPage({ params }) {
 
   return (
     <>
+      <ReadingProgress />
+
       <nav className={styles.topnav}>
         <div className={styles.topnavInner}>
           <Link href="/" className="brand-name-large">Calorie Checker</Link>
@@ -70,10 +99,23 @@ export default async function BlogPostPage({ params }) {
               </div>
             )}
             <time className={styles.publishDate}>{formatDate(post.publishedAt)}</time>
+            {hasBlocks && (
+              <span className={styles.readingTime}>
+                <span className={styles.readingTimeIcon}>○</span>
+                読了 約{readingTime}分
+              </span>
+            )}
           </div>
           <h1 className={styles.articleTitle}>{post.title}</h1>
           {post.excerpt && (
             <p className={styles.articleLead}>{post.excerpt}</p>
+          )}
+          {tags.length > 0 && (
+            <div className={styles.tags}>
+              {tags.map((tag) => (
+                <span key={tag} className={styles.tag}>#{tag}</span>
+              ))}
+            </div>
           )}
           <div className={styles.divider}></div>
         </header>
@@ -84,10 +126,18 @@ export default async function BlogPostPage({ params }) {
           </div>
         )}
 
-        <div
-          className={styles.content}
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        {hasToc && <TableOfContents items={tocItems} />}
+
+        {hasBlocks ? (
+          <div className={styles.blocksWrapper}>
+            <BlogBlocks blocks={post.blocks} tocItems={tocItems} />
+          </div>
+        ) : hasContent ? (
+          <div
+            className={styles.content}
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        ) : null}
 
         <div className={styles.articleFooter}>
           <div className={styles.footerMeta}>

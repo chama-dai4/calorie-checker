@@ -3,7 +3,7 @@
   padding: 14px 0;
 }
 .topnavInner {
-  max-width: 740px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
@@ -19,7 +19,7 @@
 }
 
 .article {
-  max-width: 740px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 60px 24px 80px;
 }
@@ -439,4 +439,68 @@
 }
 .footerLinks a:hover {
   color: var(--ink);
+}
+/* ========== タグ ========== */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.tag {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--bg-alt);
+  padding: 4px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.02em;
+  transition: all 0.15s;
+}
+.tag:hover {
+  color: var(--ink);
+  background: var(--line);
+}
+
+/* ========== ブロック表示時のラッパー ========== */
+.blocksWrapper {
+  max-width: 100%;
+}
+/* ========== 読了時間表示 ========== */
+.readingTime {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  padding-left: 14px;
+  border-left: 1px solid var(--line);
+}
+.readingTimeIcon {
+  font-size: 8px;
+  color: var(--muted-light);
+  line-height: 1;
+}
+
+/* ========== フェードインアニメーション ========== */
+.article {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== 見出しへのスムーズスクロール時のオフセット ========== */
+:global(.blocksWrapper) h2,
+:global(.blocksWrapper) h3 {
+  scroll-margin-top: 80px;
 }

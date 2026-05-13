@@ -1,0 +1,448 @@
+/* ========== ブロック全体 ========== */
+.blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+@media (max-width: 760px) {
+  .blocks {
+    gap: 24px;
+  }
+}
+
+/* ========== 見出し ========== */
+.heading2 {
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  margin: 16px 0 4px;
+  color: var(--ink);
+}
+.heading3 {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  margin: 12px 0 0;
+  color: var(--ink);
+  position: relative;
+  padding-left: 14px;
+}
+.heading3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  background: var(--ink);
+  border-radius: 2px;
+}
+@media (max-width: 760px) {
+  .heading2 { font-size: 20px; }
+  .heading3 { font-size: 16px; }
+}
+
+/* ========== リッチテキスト ========== */
+.richText {
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--ink);
+}
+.richText p {
+  margin: 0 0 14px;
+}
+.richText p:last-child {
+  margin-bottom: 0;
+}
+.richText a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.richText a:hover {
+  text-decoration-thickness: 2px;
+}
+.richText strong, .richText b {
+  font-weight: 700;
+}
+.richText ul, .richText ol {
+  margin: 0 0 14px;
+  padding-left: 24px;
+}
+.richText li {
+  margin-bottom: 6px;
+}
+.richText img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 16px 0;
+}
+.richText blockquote {
+  border-left: 3px solid var(--ink);
+  padding: 4px 0 4px 16px;
+  margin: 16px 0;
+  color: var(--muted);
+}
+.richText code {
+  background: var(--bg-alt);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 13px;
+}
+.richText pre {
+  background: var(--bg-alt);
+  padding: 14px 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 16px 0;
+}
+@media (max-width: 760px) {
+  .richText { font-size: 14px; }
+}
+
+/* ========== 画像 ========== */
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+}
+.caption {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ========== CTAボタン ========== */
+.cta {
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.ctaTitle {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: white;
+  padding: 11px 22px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: none;
+}
+.ctaButton:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.ctaArrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  transition: transform 0.2s ease;
+}
+.ctaButton:hover .ctaArrow {
+  transform: translateX(3px);
+}
+
+/* ========== ポイントボックス（callout） ========== */
+.callout {
+  border-radius: 8px;
+  padding: 16px 18px;
+  border: 1px solid;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.calloutHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.calloutIcon {
+  font-size: 16px;
+  line-height: 1;
+}
+.calloutTitle {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.005em;
+}
+.calloutContent {
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.callout_info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
+}
+.callout_tip {
+  background: #f5f3ff;
+  border-color: #ddd6fe;
+  color: #5b21b6;
+}
+.callout_warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+.callout_success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+/* ========== 比較表 ========== */
+.tableWrap {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tableTitle {
+  font-weight: 600;
+  font-size: 13px;
+  padding: 12px 16px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--line);
+  letter-spacing: 0.02em;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th {
+  text-align: left;
+  font-weight: 600;
+  padding: 10px 16px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.table tr:last-child td {
+  border-bottom: none;
+}
+.table tr:hover td {
+  background: var(--bg-alt);
+}
+
+/* ========== Q&A ========== */
+.faq {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg);
+}
+.faqQuestion, .faqAnswer {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.faqQuestion {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.faqAnswer {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+.faqMark {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  margin-top: 1px;
+}
+.faqQuestion .faqMark {
+  background: var(--ink);
+  color: white;
+}
+.faqAnswer .faqMark {
+  background: var(--bg-alt);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.faqText {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ========== 引用 ========== */
+.quote {
+  border-left: 3px solid var(--ink);
+  padding: 8px 0 8px 20px;
+  margin: 0;
+  font-style: italic;
+}
+.quoteText {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ink);
+}
+.quoteSource {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+/* ========== 区切り線 ========== */
+.divider {
+  border: none;
+  margin: 16px 0;
+}
+.divider_default {
+  border-top: 1px solid var(--line);
+}
+.divider_dotted {
+  border-top: 1px dashed var(--line-strong);
+}
+.divider_double {
+  border-top: 3px double var(--line-strong);
+}
+
+/* ========== 関連リンク ========== */
+.relatedLink {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px 18px;
+  background: var(--bg);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+.relatedLink:hover {
+  border-color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  text-decoration: none;
+}
+.relatedLinkLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.relatedLinkText {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.relatedLinkArrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: var(--muted);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.relatedLink:hover .relatedLinkArrow {
+  transform: translateX(3px);
+  color: var(--ink);
+}
+/* ========== ハイライト（マーカー）スタイル ========== */
+.richText mark,
+.richText :global(.marker) {
+  background: linear-gradient(to top, #fef3c7 50%, transparent 50%);
+  padding: 0 2px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ========== リッチエディタの色付き太字（オプション） ========== */
+.richText strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ========== 見出しスクロール時のオフセット ========== */
+.heading2,
+.heading3 {
+  scroll-margin-top: 80px;
+}
+
+/* ========== ブロック全体に微妙なフェードイン ========== */
+.blocks > * {
+  opacity: 0;
+  animation: blockFadeIn 0.6s ease-out forwards;
+}
+
+.blocks > *:nth-child(1) { animation-delay: 0.05s; }
+.blocks > *:nth-child(2) { animation-delay: 0.10s; }
+.blocks > *:nth-child(3) { animation-delay: 0.15s; }
+.blocks > *:nth-child(4) { animation-delay: 0.20s; }
+.blocks > *:nth-child(5) { animation-delay: 0.25s; }
+.blocks > *:nth-child(n+6) { animation-delay: 0.30s; }
+
+@keyframes blockFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

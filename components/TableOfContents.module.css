@@ -1,0 +1,122 @@
+/* ========== 目次コンテナ ========== */
+.toc {
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 22px 24px;
+  margin: 32px 0 48px;
+}
+
+/* ========== ヘッダー ========== */
+.tocHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.tocLabel {
+  font-family: 'Inter', 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tocTitle {
+  font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+}
+
+/* ========== リスト ========== */
+.tocList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: toc-counter;
+}
+
+/* ========== 項目 ========== */
+.tocItem {
+  counter-increment: toc-counter;
+  margin: 0;
+  position: relative;
+}
+
+.tocItemH2 {
+  padding-left: 0;
+}
+.tocItemH3 {
+  padding-left: 18px;
+}
+
+/* ========== リンク ========== */
+.tocLink {
+  display: block;
+  padding: 8px 0 8px 22px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s ease, padding-left 0.2s ease;
+  border-left: 2px solid transparent;
+  margin-left: -2px;
+}
+
+.tocItemH2 .tocLink::before {
+  content: counter(toc-counter, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 8px;
+  font-family: 'Space Grotesk', 'Inter', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--muted-light);
+  letter-spacing: 0.04em;
+}
+
+.tocItemH3 .tocLink::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  font-size: 11px;
+  color: var(--muted-light);
+}
+
+.tocLink:hover {
+  color: var(--ink);
+  padding-left: 26px;
+}
+
+/* ========== アクティブ状態 ========== */
+.tocLinkActive {
+  color: var(--ink);
+  font-weight: 500;
+  border-left-color: var(--ink);
+  padding-left: 26px;
+}
+.tocLinkActive::before {
+  color: var(--ink) !important;
+  font-weight: 600 !important;
+}
+
+/* ========== レスポンシブ ========== */
+@media (max-width: 760px) {
+  .toc {
+    padding: 18px 20px;
+    margin: 24px 0 36px;
+  }
+  .tocLink {
+    font-size: 12px;
+    padding: 7px 0 7px 22px;
+  }
+  .tocTitle {
+    font-size: 13px;
+  }
+}
