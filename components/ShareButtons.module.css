@@ -1,0 +1,99 @@
+/* ========== シェアボタン全体 ========== */
+.shareWrapper {
+  margin: 56px 0 32px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-alt);
+}
+
+.shareLabel {
+  font-family: 'Inter', 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+/* ========== ボタン群 ========== */
+.shareButtons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ========== 個別ボタン ========== */
+.shareButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+}
+
+.shareButton:hover {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+}
+
+/* ========== アイコン ========== */
+.shareIcon {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: var(--bg-alt);
+  color: var(--ink);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.shareButton:hover .shareIcon {
+  background: white;
+  color: var(--ink);
+}
+
+/* ========== テキスト ========== */
+.shareText {
+  white-space: nowrap;
+}
+
+/* ========== レスポンシブ ========== */
+@media (max-width: 600px) {
+  .shareWrapper {
+    margin: 40px 0 24px;
+    padding: 20px 16px;
+  }
+  .shareButton {
+    font-size: 11px;
+    padding: 9px 14px;
+  }
+  .shareIcon {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,130 @@
+/* ========== カード全体 ========== */
+.authorCard {
+  margin: 56px 0 32px;
+  padding: 28px 32px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+/* ========== ラベル ========== */
+.authorLabel {
+  font-family: 'Inter', 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* ========== ボディ部分（アバター + 情報） ========== */
+.authorBody {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* ========== アバター ========== */
+.authorAvatar {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.authorAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ========== 情報部分 ========== */
+.authorInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ========== 名前 ========== */
+.authorName {
+  font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+/* ========== 役割 ========== */
+.authorRole {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* ========== 自己紹介文 ========== */
+.authorBio {
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--ink);
+  margin: 0 0 16px;
+}
+
+/* ========== リンク ========== */
+.authorLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 500;
+  text-decoration: none;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--ink);
+  transition: all 0.2s ease;
+}
+.authorLink:hover {
+  gap: 10px;
+  text-decoration: none;
+}
+.authorArrow {
+  font-family: 'Inter', sans-serif;
+  transition: transform 0.2s ease;
+}
+.authorLink:hover .authorArrow {
+  transform: translateX(2px);
+}
+
+/* ========== レスポンシブ（モバイル） ========== */
+@media (max-width: 600px) {
+  .authorCard {
+    margin: 40px 0 24px;
+    padding: 22px 20px;
+  }
+  .authorBody {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+  .authorAvatar {
+    width: 80px;
+    height: 80px;
+  }
+  .authorName {
+    font-size: 16px;
+  }
+  .authorBio {
+    font-size: 13px;
+    text-align: left;
+  }
+}

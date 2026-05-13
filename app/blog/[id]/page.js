@@ -4,6 +4,9 @@ import { getBlogPost, getBlogPosts } from "@/lib/microcms";
 import BlogBlocks from "@/components/BlogBlocks";
 import TableOfContents from "@/components/TableOfContents";
 import ReadingProgress from "@/components/ReadingProgress";
+import ShareButtons from "@/components/ShareButtons";
+import AuthorCard from "@/components/AuthorCard";
+import PostCard from "@/components/PostCard";
 import { calculateReadingTime, generateTableOfContents } from "@/lib/blogUtils";
 import styles from "./page.module.css";
 
@@ -39,7 +42,6 @@ export default async function BlogPostPage({ params }) {
     notFound();
   }
 
-  // タグを配列に正規化
   const tags = (() => {
     if (!post.tags) return [];
     if (Array.isArray(post.tags)) return post.tags.filter(Boolean);
@@ -49,24 +51,16 @@ export default async function BlogPostPage({ params }) {
     return [];
   })();
 
-  // 本文の表示判定
   const hasBlocks = post.blocks && post.blocks.length > 0;
   const hasContent = post.content && post.content.trim().length > 0;
-
-  // 目次データを生成（blocksがある場合のみ）
   const tocItems = hasBlocks ? generateTableOfContents(post.blocks) : [];
-  const hasToc = tocItems.length >= 2; // 見出し2個以上で目次表示
-
-  // 読了時間を計算
+  const hasToc = tocItems.length >= 2;
   const readingTime = hasBlocks ? calculateReadingTime(post.blocks) : 1;
 
-  // 関連記事を取得
   let relatedPosts = [];
   try {
     const allPosts = await getBlogPosts();
-    relatedPosts = allPosts.contents
-      .filter((p) => p.id !== post.id)
-      .slice(0, 3);
+    relatedPosts = allPosts.contents.filter((p) => p.id !== post.id).slice(0, 3);
   } catch {
     relatedPosts = [];
   }
@@ -139,6 +133,10 @@ export default async function BlogPostPage({ params }) {
           />
         ) : null}
 
+        <ShareButtons url={`https://www.calorie-check.com/blog/${id}`} title={post.title} />
+
+        <AuthorCard />
+
         <div className={styles.articleFooter}>
           <div className={styles.footerMeta}>
             <span className={styles.metaLabel}>Posted on</span>
@@ -161,22 +159,9 @@ export default async function BlogPostPage({ params }) {
               <span className={styles.relatedLabel}>Related</span>
               <h3 className={styles.relatedTitle}>他の記事を読む</h3>
             </div>
-            <div className={styles.relatedList}>
-              {relatedPosts.map((p, idx) => (
-                <Link key={p.id} href={`/blog/${p.id}`} className={styles.relatedCard}>
-                  <div className={styles.relatedNum}>
-                    {String(idx + 1).padStart(2, "0")}
-                  </div>
-                  <div className={styles.relatedBody}>
-                    {p.category && (
-                      <div className={styles.relatedCategory}>
-                        {Array.isArray(p.category) ? p.category[0] : p.category}
-                      </div>
-                    )}
-                    <div className={styles.relatedCardTitle}>{p.title}</div>
-                    <div className={styles.relatedDate}>{formatDate(p.publishedAt)}</div>
-                  </div>
-                </Link>
+            <div className={styles.relatedGrid}>
+              {relatedPosts.map((p) => (
+                <PostCard key={p.id} post={p} variant="compact" />
               ))}
             </div>
           </section>
