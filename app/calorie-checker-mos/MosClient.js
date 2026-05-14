@@ -281,7 +281,7 @@ export default function MosClient({ menus }) {
           <div className={styles.breadcrumb}>
             <Link href="/">ホーム</Link>
             <span className={styles.sep}>/</span>
-            <Link href="/">チェーン店一覧</Link>
+            <Link href="/category/burger">ハンバーガー</Link>
             <span className={styles.sep}>/</span>モスバーガー
           </div>
           <h1>モスバーガー</h1>

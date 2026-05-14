@@ -279,10 +279,10 @@ export default function YoshinoyaClient({ menus }) {
 
       <div className={styles.wrapper}>
         <header className={styles.header}>
-          <div className={styles.breadcrumb}>
+<div className={styles.breadcrumb}>
             <Link href="/">ホーム</Link>
             <span className={styles.sep}>/</span>
-            <Link href="/">チェーン店一覧</Link>
+            <Link href="/category/gyudon">牛丼</Link>
             <span className={styles.sep}>/</span>吉野家
           </div>
           <h1>吉野家</h1>

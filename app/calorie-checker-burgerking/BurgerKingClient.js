@@ -282,7 +282,7 @@ export default function BurgerKingClient({ menus }) {
           <div className={styles.breadcrumb}>
             <Link href="/">ホーム</Link>
             <span className={styles.sep}>/</span>
-            <Link href="/">チェーン店一覧</Link>
+            <Link href="/category/burger">ハンバーガー</Link>
             <span className={styles.sep}>/</span>バーガーキング
           </div>
           <h1>バーガーキング</h1>
