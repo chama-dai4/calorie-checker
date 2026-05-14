@@ -268,7 +268,7 @@ export default function MosClient({ menus }) {
   };
 
   return (
-    <>
+    <div className="page-fade-in">
       <nav className={styles.topnav}>
         <div className={styles.topnavInner}>
           <Link href="/" className="brand-name-large">Calorie Checker</Link>
@@ -613,6 +613,6 @@ export default function MosClient({ menus }) {
           © 2026 CHAMANO. All rights reserved.
         </div>
       </footer>
-    </>
+    </div>
   );
 }

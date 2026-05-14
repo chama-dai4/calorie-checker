@@ -22,7 +22,7 @@ const ICONS = {
 
 export default function Home() {
   return (
-    <>
+    <div className="page-fade-in">
 
 
       <section className={styles.hero}>
@@ -94,6 +94,6 @@ export default function Home() {
           © 2026 CHAMANO. All rights reserved.
         </div>
       </footer>
-    </>
+    </div>
   );
 }

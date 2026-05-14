@@ -60,3 +60,25 @@ a {
     font-size: 18px;
   }
 }
+/* ========== ページフェードインアニメーション（ブログと同じ） ========== */
+.page-fade-in {
+  animation: pageFadeInUp 0.5s ease-out;
+}
+
+@keyframes pageFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* アクセシビリティ：アニメーション無効化を尊重 */
+@media (prefers-reduced-motion: reduce) {
+  .page-fade-in {
+    animation: none;
+  }
+}

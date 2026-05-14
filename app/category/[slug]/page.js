@@ -45,7 +45,7 @@ export default async function CategoryPage({ params }) {
   const comingSoonChains = category.chains.filter((c) => !c.available);
 
   return (
-    <>
+    <div className="page-fade-in">
 
 
       <div className={styles.wrapper}>
@@ -128,6 +128,6 @@ export default async function CategoryPage({ params }) {
           © 2026 CHAMANO. All rights reserved.
         </div>
       </footer>
-    </>
+    </div>
   );
 }
