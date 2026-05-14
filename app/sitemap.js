@@ -19,6 +19,18 @@ export default async function sitemap() {
       priority: 0.9,
     },
     {
+      url: `${SITE_URL}/calorie-checker-mos`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/calorie-checker-burgerking`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: `${SITE_URL}/calorie-checker-starbucks`,
       lastModified: new Date(),
       changeFrequency: "weekly",

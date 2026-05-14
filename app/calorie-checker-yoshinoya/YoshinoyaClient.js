@@ -5,12 +5,11 @@ import Link from "next/link";
 import styles from "./page.module.css";
 
 // === 大区分の定義 ===
-// 各大区分に含まれるサブカテゴリ（microCMSのcategoryフィールドの値）
 const GROUPS = [
   {
     id: "main",
     label: "主要メニュー",
-    categories: ["丼", "重・特別丼", "皿（おかず）", "定食", "朝定食", "から揚げ系", "黒カレー", "油そばセット", "お子様セット"],
+    categories: ["丼", "重・特別丼", "皿(おかず)", "定食", "朝定食", "から揚げ系", "黒カレー", "油そばセット", "お子様セット"],
   },
   {
     id: "side",
@@ -24,14 +23,12 @@ const GROUPS = [
   },
 ];
 
-// セレクトフィールドが配列か文字列で返ることへの対応
 function fieldMatches(field, value) {
   if (!field) return false;
   if (Array.isArray(field)) return field.includes(value);
   return field === value;
 }
 
-// 数値をスムーズにカウントアップする小さなコンポーネント
 function AnimatedNumber({ value, duration = 280 }) {
   const [displayValue, setDisplayValue] = useState(value);
   const previousValueRef = useRef(value);
@@ -62,13 +59,13 @@ function AnimatedNumber({ value, duration = 280 }) {
   return <>{isInteger ? Math.round(displayValue) : displayValue.toFixed(1)}</>;
 }
 
-// === メインコンポーネント ===
 export default function YoshinoyaClient({ menus }) {
   const [activeGroup, setActiveGroup] = useState("main");
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [selections, setSelections] = useState({});
   const [modalState, setModalState] = useState(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const currentGroup = GROUPS.find((g) => g.id === activeGroup);
 
@@ -153,6 +150,22 @@ export default function YoshinoyaClient({ menus }) {
     };
   }, [selections, menus]);
 
+  const selectedItems = useMemo(() => {
+    return Object.entries(selections)
+      .map(([itemId, sel]) => {
+        const item = menus.find((m) => m.id === itemId);
+        if (!item) return null;
+        const n = calcItemNutrition(item, sel.sizeName);
+        return {
+          id: itemId,
+          name: item.name,
+          sizeName: sel.sizeName,
+          calorie: Math.round(n.kcal),
+        };
+      })
+      .filter(Boolean);
+  }, [selections, menus]);
+
   const getDefaultSize = (item) => {
     if (!item.sizeVariations) return null;
     try {
@@ -201,7 +214,10 @@ export default function YoshinoyaClient({ menus }) {
     setSelections(next);
   };
 
-  const clearSelection = () => setSelections({});
+  const clearSelection = () => {
+    setSelections({});
+    setSheetOpen(false);
+  };
 
   const closeModal = () => setModalState(null);
 
@@ -411,48 +427,139 @@ export default function YoshinoyaClient({ menus }) {
                 選択をクリア
               </button>
             </div>
+
+            {selectedItems.length > 0 && (
+              <div className={styles.selectedListCard}>
+                <div className={styles.selectedListLabel}>選択中のメニュー</div>
+                <div className={styles.selectedList}>
+                  {selectedItems.map((it) => (
+                    <div key={it.id} className={styles.selectedItem}>
+                      <div className={styles.selectedItemInfo}>
+                        <div className={styles.selectedItemName}>{it.name}</div>
+                        <div className={styles.selectedItemMeta}>
+                          {it.sizeName && <span>{it.sizeName} · </span>}
+                          <span>{it.calorie} kcal</span>
+                        </div>
+                      </div>
+                      <button
+                        className={styles.removeBtn}
+                        onClick={() => removeSelection(it.id)}
+                        aria-label={`${it.name}を解除`}
+                      >
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path d="m4 4 8 8M12 4l-8 8" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </aside>
         </div>
       </div>
 
       <div className={styles.totalCardMobile}>
-        <div className={styles.mobileTop}>
-          <div className={styles.mobileMeta}>
-            <div className={styles.mobileLabel}>合計</div>
-            <div className={styles.mobileCount}>{totals.count} 品 選択中</div>
-          </div>
-          <div className={styles.kcalNum}>
-            <AnimatedNumber value={totals.calorie} />
-            <span className={styles.u}>kcal</span>
-          </div>
-        </div>
-        <div className={styles.nutrients}>
-          <div className={styles.nCell}>
-            <div className={styles.nL}>たんぱく質</div>
-            <div className={styles.nV}>
-              <AnimatedNumber value={totals.protein} />
-              <span className={styles.u}>g</span>
+        <button
+          className={styles.mobileExpandBtn}
+          onClick={() => setSheetOpen(true)}
+          disabled={totals.count === 0}
+        >
+          <div className={styles.mobileTop}>
+            <div className={styles.mobileMeta}>
+              <div className={styles.mobileLabel}>合計</div>
+              <div className={styles.mobileCount}>
+                {totals.count} 品 選択中{totals.count > 0 && <span className={styles.expandHint}> · タップで詳細</span>}
+              </div>
+            </div>
+            <div className={styles.kcalNum}>
+              <AnimatedNumber value={totals.calorie} />
+              <span className={styles.u}>kcal</span>
             </div>
           </div>
-          <div className={styles.nCell}>
-            <div className={styles.nL}>脂質</div>
-            <div className={styles.nV}>
-              <AnimatedNumber value={totals.fat} />
-              <span className={styles.u}>g</span>
+          <div className={styles.nutrients}>
+            <div className={styles.nCell}>
+              <div className={styles.nL}>たんぱく質</div>
+              <div className={styles.nV}>
+                <AnimatedNumber value={totals.protein} />
+                <span className={styles.u}>g</span>
+              </div>
+            </div>
+            <div className={styles.nCell}>
+              <div className={styles.nL}>脂質</div>
+              <div className={styles.nV}>
+                <AnimatedNumber value={totals.fat} />
+                <span className={styles.u}>g</span>
+              </div>
+            </div>
+            <div className={styles.nCell}>
+              <div className={styles.nL}>炭水化物</div>
+              <div className={styles.nV}>
+                <AnimatedNumber value={totals.carbohydrate} />
+                <span className={styles.u}>g</span>
+              </div>
             </div>
           </div>
-          <div className={styles.nCell}>
-            <div className={styles.nL}>炭水化物</div>
-            <div className={styles.nV}>
-              <AnimatedNumber value={totals.carbohydrate} />
-              <span className={styles.u}>g</span>
-            </div>
-          </div>
-          <button className={styles.clearBtnM} onClick={clearSelection} disabled={totals.count === 0}>
-            クリア
-          </button>
-        </div>
+        </button>
       </div>
+
+      {sheetOpen && (
+        <div className={styles.sheetOverlay} onClick={() => setSheetOpen(false)}>
+          <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.sheetHeader}>
+              <div className={styles.sheetTitle}>選択中のメニュー</div>
+              <button className={styles.sheetCloseBtn} onClick={() => setSheetOpen(false)} aria-label="閉じる">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="m4 4 8 8M12 4l-8 8" />
+                </svg>
+              </button>
+            </div>
+            <div className={styles.sheetBody}>
+              {selectedItems.length === 0 ? (
+                <div className={styles.sheetEmpty}>選択されたメニューはありません</div>
+              ) : (
+                selectedItems.map((it) => (
+                  <div key={it.id} className={styles.sheetItem}>
+                    <div className={styles.sheetItemInfo}>
+                      <div className={styles.sheetItemName}>{it.name}</div>
+                      <div className={styles.sheetItemMeta}>
+                        {it.sizeName && <span>{it.sizeName} · </span>}
+                        <span>{it.calorie} kcal</span>
+                      </div>
+                    </div>
+                    <button
+                      className={styles.removeBtn}
+                      onClick={() => removeSelection(it.id)}
+                      aria-label={`${it.name}を解除`}
+                    >
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="m4 4 8 8M12 4l-8 8" />
+                      </svg>
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className={styles.sheetFooter}>
+              <div className={styles.sheetTotalLine}>
+                <span>合計</span>
+                <span className={styles.sheetTotalKcal}>
+                  <AnimatedNumber value={totals.calorie} />
+                  <span className={styles.u}>kcal</span>
+                </span>
+              </div>
+              <div className={styles.sheetNutri}>
+                <div>たんぱく質 <strong><AnimatedNumber value={totals.protein} /></strong>g</div>
+                <div>脂質 <strong><AnimatedNumber value={totals.fat} /></strong>g</div>
+                <div>炭水化物 <strong><AnimatedNumber value={totals.carbohydrate} /></strong>g</div>
+              </div>
+              <button className={styles.sheetClearBtn} onClick={clearSelection} disabled={totals.count === 0}>
+                選択をクリア
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {modalState && modalItem && (
         <div className={styles.modalOverlay} onClick={closeModal}>
