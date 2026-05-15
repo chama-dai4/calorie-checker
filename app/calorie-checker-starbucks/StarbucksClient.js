@@ -9,8 +9,6 @@ import { localizedHref } from "@/lib/i18n/getLocale";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // === ジャンル定義 ===
-// id: 商品データの category または subCategory と照合する値
-// labelKey: 辞書の category セクションのキー
 const GENRES = [
   { id: "季節のおすすめ", labelKey: "季節のおすすめ", type: "category" },
   { id: "コーヒー", labelKey: "コーヒー", type: "category" },
@@ -19,6 +17,9 @@ const GENRES = [
   { id: "ティー | TEAVANA™", labelKey: "ティー", type: "category" },
   { id: "フード", labelKey: "フード", type: "subCategory" },
 ];
+
+// サイズ表示順
+const SIZE_ORDER = ["ショート", "トール", "グランデ", "ベンティ"];
 
 function fieldMatches(field, value) {
   if (!field) return false;
@@ -54,6 +55,52 @@ function AnimatedNumber({ value, duration = 280 }) {
 
   const isInteger = Number.isInteger(value);
   return <>{isInteger ? Math.round(displayValue) : displayValue.toFixed(1)}</>;
+}
+
+// 商品名から温度を判定(「(ホット)」「(アイス)」付きならその温度)
+function detectTempFromName(name) {
+  if (!name) return null;
+  if (name.includes("（ホット）") || name.includes("(ホット)")) return "ホット";
+  if (name.includes("（アイス）") || name.includes("(アイス)")) return "アイス";
+  return null;
+}
+
+// tempSizeVariations をパース
+function parseTempSizeVariations(jsonStr) {
+  if (!jsonStr) return [];
+  try {
+    const parsed = JSON.parse(jsonStr);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+// 商品から「選べるサイズリスト」を取得
+function getAvailableSizes(item) {
+  const variations = parseTempSizeVariations(item.tempSizeVariations);
+  const sizes = new Set();
+  variations.forEach(v => {
+    if (v.size) sizes.add(v.size);
+  });
+  const sizeArr = SIZE_ORDER.filter(s => sizes.has(s));
+  return sizeArr;
+}
+
+// 該当のサイズ・温度バリエーションを取得
+function findVariation(item, size, temp) {
+  const variations = parseTempSizeVariations(item.tempSizeVariations);
+  // 完全一致を試す
+  let found = variations.find(v => v.size === size && v.temperature === temp);
+  if (found) return found;
+  // サイズだけ一致
+  found = variations.find(v => v.size === size);
+  if (found) return found;
+  // 温度だけ一致
+  found = variations.find(v => v.temperature === temp);
+  if (found) return found;
+  // 最初の1件
+  return variations[0] || null;
 }
 
 export default function StarbucksClient({ menus, locale = "ja" }) {
@@ -93,27 +140,70 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
     return counts;
   }, [menus]);
 
-  const calcItemNutrition = (item, milkType, customizations) => {
-    let kcal = item.calorie || 0;
-    let protein = item.protein || 0;
-    let fat = item.fat || 0;
-    let carb = item.carbohydrate || 0;
+  // カロリー計算(サイズ × ミルク比率近似)
+  const calcItemNutrition = (item, selectedSize, milkType, customizations) => {
+    // 1) ベースカロリー: 選択サイズの値 or 既存値
+    let baseKcal = item.calorie || 0;
+    let baseProtein = item.protein || 0;
+    let baseFat = item.fat || 0;
+    let baseCarb = item.carbohydrate || 0;
+
+    // 商品名から温度を判定(該当があればそれに固定、無ければ"ホット"優先)
+    const fixedTemp = detectTempFromName(item.name);
+    const effectiveTemp = fixedTemp || "ホット";
+
+    // tempSizeVariations から、選択サイズ・温度の値を取得
+    if (item.hasSizeOption && selectedSize) {
+      const variation = findVariation(item, selectedSize, effectiveTemp);
+      if (variation) {
+        baseKcal = Number(variation.calorie) || baseKcal;
+        baseProtein = Number(variation.protein) || baseProtein;
+        baseFat = Number(variation.fat) || baseFat;
+        baseCarb = Number(variation.carb) || baseCarb;
+      }
+    }
+
+    // 2) ミルク差分(Tallベース) → サイズ比で補正
+    let kcal = baseKcal;
+    let protein = baseProtein;
+    let fat = baseFat;
+    let carb = baseCarb;
 
     if (item.hasMilkOption && milkType && item.milkVariations) {
       try {
         const variations = JSON.parse(item.milkVariations);
         const selected = variations.find((v) => v.type === milkType);
-        if (selected) {
-          kcal = Number(selected.kcal) || 0;
-          protein = Number(selected.protein) || 0;
-          fat = Number(selected.fat) || 0;
-          carb = Number(selected.carb) || 0;
+        const defaultMilk = variations.find((v) => v.type === "ミルク") || variations[0];
+        if (selected && defaultMilk) {
+          // Tallベースのデフォルトカロリー(item.calorie はもともと Tall ホット値)
+          const tallBaseKcal = Number(item.calorie) || 0;
+          // サイズ補正比率
+          const sizeRatio = tallBaseKcal > 0 ? baseKcal / tallBaseKcal : 1;
+          // ミルク差分(Tall基準) × サイズ比
+          const diffKcal = (Number(selected.kcal) || 0) - (Number(defaultMilk.kcal) || 0);
+          const diffProtein = (Number(selected.protein) || 0) - (Number(defaultMilk.protein) || 0);
+          const diffFat = (Number(selected.fat) || 0) - (Number(defaultMilk.fat) || 0);
+          const diffCarb = (Number(selected.carb) || 0) - (Number(defaultMilk.carb) || 0);
+          // サイズ選択なし or デフォルトミルク → 既存ロジック(直接値を使う)
+          if (!item.hasSizeOption || !selectedSize) {
+            kcal = Number(selected.kcal) || baseKcal;
+            protein = Number(selected.protein) || baseProtein;
+            fat = Number(selected.fat) || baseFat;
+            carb = Number(selected.carb) || baseCarb;
+          } else {
+            // サイズ × ミルク = ベース + 差分×比率
+            kcal = baseKcal + diffKcal * sizeRatio;
+            protein = baseProtein + diffProtein * sizeRatio;
+            fat = baseFat + diffFat * sizeRatio;
+            carb = baseCarb + diffCarb * sizeRatio;
+          }
         }
       } catch (e) {
         // JSON パース失敗時は基本値のまま
       }
     }
 
+    // 3) カスタマイズ加算(サイズ無関係に単純加算)
     if (customizations) {
       Object.entries(customizations).forEach(([customId, count]) => {
         if (count <= 0) return;
@@ -135,7 +225,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
     Object.entries(selections).forEach(([itemId, sel]) => {
       const item = menus.find((m) => m.id === itemId);
       if (!item) return;
-      const n = calcItemNutrition(item, sel.milkType, sel.customizations);
+      const n = calcItemNutrition(item, sel.size, sel.milkType, sel.customizations);
       calorie += n.kcal;
       protein += n.protein;
       fat += n.fat;
@@ -156,13 +246,14 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
       .map(([itemId, sel]) => {
         const item = menus.find((m) => m.id === itemId);
         if (!item) return null;
-        const n = calcItemNutrition(item, sel.milkType, sel.customizations);
+        const n = calcItemNutrition(item, sel.size, sel.milkType, sel.customizations);
         const customCount = sel.customizations
           ? Object.values(sel.customizations).reduce((a, b) => a + b, 0)
           : 0;
         return {
           id: itemId,
           name: item.name,
+          size: sel.size,
           milkType: sel.milkType,
           customCount,
           calorie: Math.round(n.kcal),
@@ -180,47 +271,30 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
         if (next[item.id]) {
           delete next[item.id];
         } else {
-          next[item.id] = { milkType: null, customizations: {} };
+          next[item.id] = { size: null, milkType: null, customizations: {} };
         }
         return next;
       });
       return;
     }
 
-    if (selections[item.id]) {
-      const current = selections[item.id];
-      if (item.hasMilkOption) {
-        setModalState({
-          step: 'milk',
-          itemId: item.id,
-          tempMilkType: current.milkType || 'ミルク',
-          tempCustomizations: { ...(current.customizations || {}) },
-        });
-      } else {
-        setModalState({
-          step: 'custom',
-          itemId: item.id,
-          tempMilkType: null,
-          tempCustomizations: { ...(current.customizations || {}) },
-        });
-      }
-    } else {
-      if (item.hasMilkOption) {
-        setModalState({
-          step: 'milk',
-          itemId: item.id,
-          tempMilkType: 'ミルク',
-          tempCustomizations: {},
-        });
-      } else {
-        setModalState({
-          step: 'custom',
-          itemId: item.id,
-          tempMilkType: null,
-          tempCustomizations: {},
-        });
-      }
-    }
+    const current = selections[item.id];
+    const hasSize = item.hasSizeOption;
+    const hasMilk = item.hasMilkOption;
+
+    // 開始ステップを決定
+    let startStep;
+    if (hasSize) startStep = 'size';
+    else if (hasMilk) startStep = 'milk';
+    else startStep = 'custom';
+
+    setModalState({
+      step: startStep,
+      itemId: item.id,
+      tempSize: current?.size || (hasSize ? 'トール' : null),
+      tempMilkType: current?.milkType || (hasMilk ? 'ミルク' : null),
+      tempCustomizations: { ...(current?.customizations || {}) },
+    });
   };
 
   const removeSelection = (itemId) => {
@@ -236,16 +310,48 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
 
   const closeModal = () => setModalState(null);
 
+  const handleSizeSelect = (size) => {
+    setModalState((prev) => ({ ...prev, tempSize: size }));
+  };
+
   const handleMilkSelect = (milkType) => {
     setModalState((prev) => ({ ...prev, tempMilkType: milkType }));
   };
 
-  const goToCustomStep = () => {
-    setModalState((prev) => ({ ...prev, step: 'custom' }));
+  const goToNextStep = () => {
+    setModalState((prev) => {
+      const item = menus.find((m) => m.id === prev.itemId);
+      if (!item) return prev;
+      const hasMilk = item.hasMilkOption;
+      // 現在 size → milk or custom
+      if (prev.step === 'size') {
+        return { ...prev, step: hasMilk ? 'milk' : 'custom' };
+      }
+      // 現在 milk → custom
+      if (prev.step === 'milk') {
+        return { ...prev, step: 'custom' };
+      }
+      return prev;
+    });
   };
 
-  const goBackToMilkStep = () => {
-    setModalState((prev) => ({ ...prev, step: 'milk' }));
+  const goToPrevStep = () => {
+    setModalState((prev) => {
+      const item = menus.find((m) => m.id === prev.itemId);
+      if (!item) return prev;
+      const hasSize = item.hasSizeOption;
+      const hasMilk = item.hasMilkOption;
+      // 現在 custom → milk(あれば) or size(あれば)
+      if (prev.step === 'custom') {
+        if (hasMilk) return { ...prev, step: 'milk' };
+        if (hasSize) return { ...prev, step: 'size' };
+      }
+      // 現在 milk → size(あれば)
+      if (prev.step === 'milk') {
+        if (hasSize) return { ...prev, step: 'size' };
+      }
+      return prev;
+    });
   };
 
   const updateCustomCount = (customId, delta) => {
@@ -267,6 +373,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
     setSelections((prev) => ({
       ...prev,
       [modalState.itemId]: {
+        size: modalState.tempSize,
         milkType: modalState.tempMilkType,
         customizations: modalState.tempCustomizations,
       },
@@ -290,6 +397,11 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
   const modalItem = modalState ? menus.find((m) => m.id === modalState.itemId) : null;
   const isEditing = modalState && selections[modalState.itemId];
 
+  const modalSizes = useMemo(() => {
+    if (!modalItem || !modalItem.hasSizeOption) return [];
+    return getAvailableSizes(modalItem);
+  }, [modalItem]);
+
   const modalMilks = useMemo(() => {
     if (!modalItem || !modalItem.hasMilkOption || !modalItem.milkVariations) return [];
     try {
@@ -302,8 +414,6 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
   // 言語別のリンク先
   const homeHref = localizedHref("/", locale);
   const categoryHref = localizedHref("/category/cafe", locale);
-
-  // チェーン名の表示（英語版は併記）
   const chainDisplayName = tChain("スターバックス");
 
   return (
@@ -368,7 +478,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
                   const sel = selections[item.id];
                   const isSelected = !!sel;
                   const itemNutri = isSelected
-                    ? calcItemNutrition(item, sel.milkType, sel.customizations)
+                    ? calcItemNutrition(item, sel.size, sel.milkType, sel.customizations)
                     : { kcal: item.calorie, protein: item.protein, fat: item.fat, carb: item.carbohydrate };
                   const customCount = sel?.customizations
                     ? Object.values(sel.customizations).reduce((a, b) => a + b, 0)
@@ -389,8 +499,11 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
                         <div className={styles.pfc}>
                           {t("chain.protein")} {Math.round(itemNutri.protein * 10) / 10}g · {t("chain.fat")} {Math.round(itemNutri.fat * 10) / 10}g · {t("chain.carbs")} {Math.round(itemNutri.carb * 10) / 10}g
                         </div>
+                        {isSelected && sel.size && (
+                          <span className={styles.milkBadge}>{t("chain.sizeLabel")} {sel.size}</span>
+                        )}
                         {isSelected && sel.milkType && (
-                          <span className={styles.milkBadge}>{t("chain.milkLabel")} {sel.milkType}</span>
+                          <span className={styles.milkBadge} style={{ marginLeft: 6 }}>{t("chain.milkLabel")} {sel.milkType}</span>
                         )}
                         {isSelected && customCount > 0 && (
                           <span className={styles.milkBadge} style={{ marginLeft: 6 }}>
@@ -410,7 +523,6 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
             </div>
 
             <div className={styles.pageFooter}>
-              ※ {t("chain.starbucksSizeNote")}<br />
               {t("chain.disclaimerPrefix")}<a href="https://www.starbucks.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Starbucks Japan " : "スターバックス コーヒー ジャパン"}{t("chain.officialSite")}</a>{t("chain.disclaimerSuffix")}<br />
               {t("chain.disclaimerAffiliation")}{locale === "en" ? "Starbucks Japan" : "スターバックス"}{t("chain.disclaimerAffiliationSuffix")}
             </div>
@@ -462,6 +574,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
                       <div className={styles.selectedItemInfo}>
                         <div className={styles.selectedItemName}>{it.name}</div>
                         <div className={styles.selectedItemMeta}>
+                          {it.size && <span>{it.size} · </span>}
                           {it.milkType && <span>{it.milkType} · </span>}
                           {it.customCount > 0 && <span>{t("chain.customCount")} {it.customCount}{t("chain.customCountUnit")} · </span>}
                           <span>{it.calorie} kcal</span>
@@ -549,6 +662,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
                     <div className={styles.sheetItemInfo}>
                       <div className={styles.sheetItemName}>{it.name}</div>
                       <div className={styles.sheetItemMeta}>
+                        {it.size && <span>{it.size} · </span>}
                         {it.milkType && <span>{it.milkType} · </span>}
                         {it.customCount > 0 && <span>{t("chain.customCount")} {it.customCount}{t("chain.customCountUnit")} · </span>}
                         <span>{it.calorie} kcal</span>
@@ -588,6 +702,51 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
         </div>
       )}
 
+      {/* === Step 1: サイズ選択モーダル === */}
+      {modalState && modalState.step === 'size' && modalItem && (
+        <div className={styles.modalOverlay} onClick={closeModal}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div className={styles.modalTitle}>{modalItem.name}</div>
+              <div className={styles.modalSubtitle}>{t("chain.chooseSize")}</div>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.milkList}>
+                {modalSizes.map((size) => {
+                  const fixedTemp = detectTempFromName(modalItem.name) || "ホット";
+                  const v = findVariation(modalItem, size, fixedTemp);
+                  return (
+                    <div
+                      key={size}
+                      className={`${styles.milkOption} ${modalState.tempSize === size ? styles.selected : ''}`}
+                      onClick={() => handleSizeSelect(size)}
+                    >
+                      <span className={styles.milkName}>{size}</span>
+                      <span className={styles.milkKcal}>{v ? `${Math.round(v.calorie)} kcal` : ''}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              {isEditing && (
+                <button className={styles.modalBtn} onClick={deleteFromModal} style={{ marginRight: 'auto', color: '#c33', borderColor: '#e7baba' }}>
+                  {t("chain.removeSelection")}
+                </button>
+              )}
+              <button className={styles.modalBtn} onClick={closeModal}>{t("chain.cancel")}</button>
+              {/* 次へ: ミルクあり→ミルクへ、なし→カスタムへ、いずれもなければ完了 */}
+              {(modalItem.hasMilkOption || true) ? (
+                <button className={styles.modalBtnPrimary} onClick={goToNextStep}>{t("chain.next")}</button>
+              ) : (
+                <button className={styles.modalBtnPrimary} onClick={confirmModal}>{t("chain.done")}</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* === Step 2: ミルク選択モーダル === */}
       {modalState && modalState.step === 'milk' && modalItem && (
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -610,18 +769,24 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
               </div>
             </div>
             <div className={styles.modalFooter}>
-              {isEditing && (
+              {modalItem.hasSizeOption && (
+                <button className={styles.modalBtn} onClick={goToPrevStep} style={{ marginRight: 'auto' }}>
+                  {t("chain.backToSize")}
+                </button>
+              )}
+              {!modalItem.hasSizeOption && isEditing && (
                 <button className={styles.modalBtn} onClick={deleteFromModal} style={{ marginRight: 'auto', color: '#c33', borderColor: '#e7baba' }}>
                   {t("chain.removeSelection")}
                 </button>
               )}
               <button className={styles.modalBtn} onClick={closeModal}>{t("chain.cancel")}</button>
-              <button className={styles.modalBtnPrimary} onClick={goToCustomStep}>{t("chain.next")}</button>
+              <button className={styles.modalBtnPrimary} onClick={goToNextStep}>{t("chain.next")}</button>
             </div>
           </div>
         </div>
       )}
 
+      {/* === Step 3: カスタマイズモーダル === */}
       {modalState && modalState.step === 'custom' && modalItem && (
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -669,12 +834,12 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
               })}
             </div>
             <div className={styles.modalFooter}>
-              {modalItem.hasMilkOption && (
-                <button className={styles.modalBtn} onClick={goBackToMilkStep} style={{ marginRight: 'auto' }}>
-                  {t("chain.backToMilk")}
+              {(modalItem.hasMilkOption || modalItem.hasSizeOption) && (
+                <button className={styles.modalBtn} onClick={goToPrevStep} style={{ marginRight: 'auto' }}>
+                  {modalItem.hasMilkOption ? t("chain.backToMilk") : t("chain.backToSize")}
                 </button>
               )}
-              {!modalItem.hasMilkOption && isEditing && (
+              {!modalItem.hasMilkOption && !modalItem.hasSizeOption && isEditing && (
                 <button className={styles.modalBtn} onClick={deleteFromModal} style={{ marginRight: 'auto', color: '#c33', borderColor: '#e7baba' }}>
                   {t("chain.removeSelection")}
                 </button>
