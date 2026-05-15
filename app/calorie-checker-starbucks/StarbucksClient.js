@@ -410,6 +410,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
             </div>
 
             <div className={styles.pageFooter}>
+              ※ {t("chain.starbucksSizeNote")}<br />
               {t("chain.disclaimerPrefix")}<a href="https://www.starbucks.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Starbucks Japan " : "スターバックス コーヒー ジャパン"}{t("chain.officialSite")}</a>{t("chain.disclaimerSuffix")}<br />
               {t("chain.disclaimerAffiliation")}{locale === "en" ? "Starbucks Japan" : "スターバックス"}{t("chain.disclaimerAffiliationSuffix")}
             </div>
