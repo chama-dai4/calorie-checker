@@ -12,14 +12,17 @@ export async function generateMetadata({ params }) {
   const category = getCategoryBySlug(slug);
 
   if (!category) {
-    return { title: "ページが見つかりません | カロリーチェッカー" };
+    return { title: "Page Not Found | Calorie Checker" };
   }
 
+  const categoryNameEn = category.nameEn;
+  const descriptionEn = category.descriptionEn || `${categoryNameEn} chains in Japan`;
+
   return {
-    title: `${category.name}チェーン店一覧 | カロリーチェッカー`,
-    description: `${category.name}のチェーン店メニューのカロリー・栄養素を計算できます。`,
+    title: `${categoryNameEn} Chains in Japan | Calorie Checker`,
+    description: `Calculate calories and nutrition for menu items at ${categoryNameEn} chain restaurants in Japan. ${descriptionEn}.`,
     alternates: {
-      canonical: `https://www.calorie-check.com/category/${slug}`,
+      canonical: `https://www.calorie-check.com/en/category/${slug}`,
       languages: {
         "ja": `https://www.calorie-check.com/category/${slug}`,
         "en": `https://www.calorie-check.com/en/category/${slug}`,
@@ -29,7 +32,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function CategoryPage({ params }) {
+export default async function CategoryEnPage({ params }) {
   const { slug } = await params;
-  return <CategoryContent slug={slug} locale="ja" />;
+  return <CategoryContent slug={slug} locale="en" />;
 }

@@ -3,22 +3,25 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { localizedHref } from "@/lib/i18n/getLocale";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // === 大区分の定義 ===
 const GROUPS = [
   {
     id: "main",
-    label: "主要メニュー",
+    labelKey: "group.main",
     categories: ["丼", "重・特別丼", "皿(おかず)", "定食", "朝定食", "から揚げ系", "黒カレー", "油そばセット", "お子様セット"],
   },
   {
     id: "side",
-    label: "サイド",
+    labelKey: "group.side",
     categories: ["サラダ", "汁物", "トッピング", "ご飯・ドレッシング"],
   },
   {
     id: "takeout",
-    label: "テイクアウト",
+    labelKey: "group.takeout",
     categories: ["テイクアウト専門"],
   },
 ];
@@ -59,7 +62,9 @@ function AnimatedNumber({ value, duration = 280 }) {
   return <>{isInteger ? Math.round(displayValue) : displayValue.toFixed(1)}</>;
 }
 
-export default function YoshinoyaClient({ menus }) {
+export default function YoshinoyaClient({ menus, locale = "ja" }) {
+  const { t, tCategory, tChain } = useTranslation(locale);
+
   const [activeGroup, setActiveGroup] = useState("main");
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
@@ -122,14 +127,12 @@ export default function YoshinoyaClient({ menus }) {
         // JSON パース失敗時は基本値のまま
       }
     }
-
     return { kcal, protein, fat, carb };
   };
 
   const totals = useMemo(() => {
     let calorie = 0, protein = 0, fat = 0, carb = 0;
     let count = 0;
-
     Object.entries(selections).forEach(([itemId, sel]) => {
       const item = menus.find((m) => m.id === itemId);
       if (!item) return;
@@ -140,7 +143,6 @@ export default function YoshinoyaClient({ menus }) {
       carb += n.carb;
       count += 1;
     });
-
     return {
       calorie: Math.round(calorie),
       protein: Math.round(protein * 10) / 10,
@@ -166,6 +168,7 @@ export default function YoshinoyaClient({ menus }) {
       .filter(Boolean);
   }, [selections, menus]);
 
+  // デフォルトサイズ: 並盛 → 単品 → 最初のサイズ
   const getDefaultSize = (item) => {
     if (!item.sizeVariations) return null;
     try {
@@ -193,7 +196,6 @@ export default function YoshinoyaClient({ menus }) {
       });
       return;
     }
-
     if (selections[item.id]) {
       const current = selections[item.id];
       setModalState({
@@ -220,7 +222,6 @@ export default function YoshinoyaClient({ menus }) {
   };
 
   const closeModal = () => setModalState(null);
-
   const handleSizeSelect = (sizeName) => {
     setModalState((prev) => ({ ...prev, tempSizeName: sizeName }));
   };
@@ -268,29 +269,40 @@ export default function YoshinoyaClient({ menus }) {
     setSearch("");
   };
 
+  // 言語別のリンク先
+  const homeHref = localizedHref("/", locale);
+  const categoryHref = localizedHref("/category/gyudon", locale);
+
+  // チェーン名の表示（英語版は併記）
+  const chainDisplayName = tChain("吉野家");
+
   return (
     <div className="page-fade-in">
       <nav className={styles.topnav}>
         <div className={styles.topnavInner}>
-          <Link href="/" className="brand-name-large">Calorie Checker</Link>
-          <Link href="/" className={styles.backLink}>← ホームに戻る</Link>
+          <Link href={homeHref} className="brand-name-large">Calorie Checker</Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Link href={homeHref} className={styles.backLink}>{t("common.backToHome")}</Link>
+            <LanguageSwitcher />
+          </div>
         </div>
       </nav>
 
       <div className={styles.wrapper}>
         <header className={styles.header}>
-<div className={styles.breadcrumb}>
-            <Link href="/">ホーム</Link>
+          <div className={styles.breadcrumb}>
+            <Link href={homeHref}>{t("common.home")}</Link>
             <span className={styles.sep}>/</span>
-            <Link href="/category/gyudon">牛丼</Link>
-            <span className={styles.sep}>/</span>吉野家
+            <Link href={categoryHref}>{tCategory("牛丼")}</Link>
+            <span className={styles.sep}>/</span>{chainDisplayName}
           </div>
-          <h1>吉野家</h1>
-          <p className={styles.subtitle}>メニューを選んでサイズを指定。合計カロリーが分かります。</p>
+          <h1>{chainDisplayName}</h1>
+          <p className={styles.subtitle}>{t("chain.subtitleWithSize")}</p>
         </header>
 
         <div className={styles.mainLayout}>
           <div className={styles.leftCol}>
+
             <div className={styles.genreBar}>
               {GROUPS.map((g) => (
                 <button
@@ -298,7 +310,7 @@ export default function YoshinoyaClient({ menus }) {
                   className={`${styles.genreTab} ${activeGroup === g.id ? styles.active : ""}`}
                   onClick={() => handleGroupChange(g.id)}
                 >
-                  {g.label}
+                  {t(g.labelKey)}
                   <span className={styles.num}>{groupCounts[g.id] || 0}</span>
                 </button>
               ))}
@@ -309,7 +321,7 @@ export default function YoshinoyaClient({ menus }) {
                 className={`${styles.subCatChip} ${activeCategory === "all" ? styles.subCatActive : ""}`}
                 onClick={() => setActiveCategory("all")}
               >
-                すべて <span className={styles.subCatNum}>{categoryCounts["all"] || 0}</span>
+                {t("chain.all")} <span className={styles.subCatNum}>{categoryCounts["all"] || 0}</span>
               </button>
               {currentGroup.categories.map((cat) => {
                 const count = categoryCounts[cat] || 0;
@@ -320,7 +332,7 @@ export default function YoshinoyaClient({ menus }) {
                     className={`${styles.subCatChip} ${activeCategory === cat ? styles.subCatActive : ""}`}
                     onClick={() => setActiveCategory(cat)}
                   >
-                    {cat} <span className={styles.subCatNum}>{count}</span>
+                    {tCategory(cat)} <span className={styles.subCatNum}>{count}</span>
                   </button>
                 );
               })}
@@ -334,7 +346,7 @@ export default function YoshinoyaClient({ menus }) {
               <input
                 type="text"
                 className={styles.searchInput}
-                placeholder="メニュー名で検索"
+                placeholder={t("chain.searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -342,7 +354,7 @@ export default function YoshinoyaClient({ menus }) {
 
             <div className={styles.menuStack}>
               {visibleMenus.length === 0 ? (
-                <div className={styles.emptyState}>該当するメニューがありません</div>
+                <div className={styles.emptyState}>{t("chain.noResults")}</div>
               ) : (
                 visibleMenus.map((item) => {
                   const sel = selections[item.id];
@@ -350,7 +362,6 @@ export default function YoshinoyaClient({ menus }) {
                   const itemNutri = isSelected
                     ? calcItemNutrition(item, sel.sizeName)
                     : { kcal: item.calorie, protein: item.protein, fat: item.fat, carb: item.carbohydrate };
-
                   return (
                     <div
                       key={item.id}
@@ -365,13 +376,13 @@ export default function YoshinoyaClient({ menus }) {
                       <div className={styles.info}>
                         <div className={styles.name}>{item.name}</div>
                         <div className={styles.pfc}>
-                          たんぱく質 {Math.round(itemNutri.protein * 10) / 10}g · 脂質 {Math.round(itemNutri.fat * 10) / 10}g · 炭水化物 {Math.round(itemNutri.carb * 10) / 10}g
+                          {t("chain.protein")} {Math.round(itemNutri.protein * 10) / 10}g · {t("chain.fat")} {Math.round(itemNutri.fat * 10) / 10}g · {t("chain.carbs")} {Math.round(itemNutri.carb * 10) / 10}g
                         </div>
                         {isSelected && sel.sizeName && (
-                          <span className={styles.sizeBadge}>サイズ: {sel.sizeName}</span>
+                          <span className={styles.sizeBadge}>{t("chain.sizeLabel")} {sel.sizeName}</span>
                         )}
                         {item.hasSizeOption && !isSelected && (
-                          <span className={styles.sizeHint}>サイズ選択あり</span>
+                          <span className={styles.sizeHint}>{t("chain.sizeOptionsAvailable")}</span>
                         )}
                       </div>
                       <div className={styles.right}>
@@ -386,15 +397,15 @@ export default function YoshinoyaClient({ menus }) {
             </div>
 
             <div className={styles.pageFooter}>
-              数値は <a href="https://www.yoshinoya.com/" target="_blank" rel="noopener">吉野家公式サイト</a> の成分情報を参照した参考値です。<br />
-              本サービスは吉野家と提携・関係ありません。最新かつ正確な情報は公式サイトをご確認ください。
+              {t("chain.disclaimerPrefix")}<a href="https://www.yoshinoya.com/" target="_blank" rel="noopener">{locale === "en" ? "Yoshinoya " : "吉野家"}{t("chain.officialSite")}</a>{t("chain.disclaimerSuffix")}<br />
+              {t("chain.disclaimerAffiliation")}{locale === "en" ? "Yoshinoya" : "吉野家"}{t("chain.disclaimerAffiliationSuffix")}
             </div>
           </div>
 
           <aside className={styles.rightCol}>
             <div className={styles.totalCardPc}>
-              <div className={styles.label}>合計</div>
-              <div className={styles.countLine}>{totals.count} 品 選択中</div>
+              <div className={styles.label}>{t("chain.total")}</div>
+              <div className={styles.countLine}>{totals.count} {t("chain.itemsSelected")}</div>
               <div className={styles.kcalBig}>
                 <AnimatedNumber value={totals.calorie} />
                 <span className={styles.u}>kcal</span>
@@ -402,21 +413,21 @@ export default function YoshinoyaClient({ menus }) {
               <hr className={styles.divider} />
               <div className={styles.nutriList}>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>たんぱく質</span>
+                  <span className={styles.nutriName}>{t("chain.protein")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.protein} />
                     <span className={styles.u}>g</span>
                   </span>
                 </div>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>脂質</span>
+                  <span className={styles.nutriName}>{t("chain.fat")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.fat} />
                     <span className={styles.u}>g</span>
                   </span>
                 </div>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>炭水化物</span>
+                  <span className={styles.nutriName}>{t("chain.carbs")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.carbohydrate} />
                     <span className={styles.u}>g</span>
@@ -424,13 +435,13 @@ export default function YoshinoyaClient({ menus }) {
                 </div>
               </div>
               <button className={styles.clearBtnPc} onClick={clearSelection} disabled={totals.count === 0}>
-                選択をクリア
+                {t("chain.clearSelection")}
               </button>
             </div>
 
             {selectedItems.length > 0 && (
               <div className={styles.selectedListCard}>
-                <div className={styles.selectedListLabel}>選択中のメニュー</div>
+                <div className={styles.selectedListLabel}>{t("chain.selectedItems")}</div>
                 <div className={styles.selectedList}>
                   {selectedItems.map((it) => (
                     <div key={it.id} className={styles.selectedItem}>
@@ -444,7 +455,7 @@ export default function YoshinoyaClient({ menus }) {
                       <button
                         className={styles.removeBtn}
                         onClick={() => removeSelection(it.id)}
-                        aria-label={`${it.name}を解除`}
+                        aria-label={`${it.name}${t("chain.removeAria")}`}
                       >
                         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                           <path d="m4 4 8 8M12 4l-8 8" />
@@ -467,9 +478,9 @@ export default function YoshinoyaClient({ menus }) {
         >
           <div className={styles.mobileTop}>
             <div className={styles.mobileMeta}>
-              <div className={styles.mobileLabel}>合計</div>
+              <div className={styles.mobileLabel}>{t("chain.total")}</div>
               <div className={styles.mobileCount}>
-                {totals.count} 品 選択中{totals.count > 0 && <span className={styles.expandHint}> · タップで詳細</span>}
+                {totals.count} {t("chain.itemsSelected")}{totals.count > 0 && <span className={styles.expandHint}>{t("chain.tapForDetails")}</span>}
               </div>
             </div>
             <div className={styles.kcalNum}>
@@ -479,21 +490,21 @@ export default function YoshinoyaClient({ menus }) {
           </div>
           <div className={styles.nutrients}>
             <div className={styles.nCell}>
-              <div className={styles.nL}>たんぱく質</div>
+              <div className={styles.nL}>{t("chain.protein")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.protein} />
                 <span className={styles.u}>g</span>
               </div>
             </div>
             <div className={styles.nCell}>
-              <div className={styles.nL}>脂質</div>
+              <div className={styles.nL}>{t("chain.fat")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.fat} />
                 <span className={styles.u}>g</span>
               </div>
             </div>
             <div className={styles.nCell}>
-              <div className={styles.nL}>炭水化物</div>
+              <div className={styles.nL}>{t("chain.carbs")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.carbohydrate} />
                 <span className={styles.u}>g</span>
@@ -507,8 +518,8 @@ export default function YoshinoyaClient({ menus }) {
         <div className={styles.sheetOverlay} onClick={() => setSheetOpen(false)}>
           <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
             <div className={styles.sheetHeader}>
-              <div className={styles.sheetTitle}>選択中のメニュー</div>
-              <button className={styles.sheetCloseBtn} onClick={() => setSheetOpen(false)} aria-label="閉じる">
+              <div className={styles.sheetTitle}>{t("chain.selectedItems")}</div>
+              <button className={styles.sheetCloseBtn} onClick={() => setSheetOpen(false)} aria-label={t("chain.close")}>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="m4 4 8 8M12 4l-8 8" />
                 </svg>
@@ -516,7 +527,7 @@ export default function YoshinoyaClient({ menus }) {
             </div>
             <div className={styles.sheetBody}>
               {selectedItems.length === 0 ? (
-                <div className={styles.sheetEmpty}>選択されたメニューはありません</div>
+                <div className={styles.sheetEmpty}>{t("chain.noSelectedItems")}</div>
               ) : (
                 selectedItems.map((it) => (
                   <div key={it.id} className={styles.sheetItem}>
@@ -530,7 +541,7 @@ export default function YoshinoyaClient({ menus }) {
                     <button
                       className={styles.removeBtn}
                       onClick={() => removeSelection(it.id)}
-                      aria-label={`${it.name}を解除`}
+                      aria-label={`${it.name}${t("chain.removeAria")}`}
                     >
                       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                         <path d="m4 4 8 8M12 4l-8 8" />
@@ -542,19 +553,19 @@ export default function YoshinoyaClient({ menus }) {
             </div>
             <div className={styles.sheetFooter}>
               <div className={styles.sheetTotalLine}>
-                <span>合計</span>
+                <span>{t("chain.total")}</span>
                 <span className={styles.sheetTotalKcal}>
                   <AnimatedNumber value={totals.calorie} />
                   <span className={styles.u}>kcal</span>
                 </span>
               </div>
               <div className={styles.sheetNutri}>
-                <div>たんぱく質 <strong><AnimatedNumber value={totals.protein} /></strong>g</div>
-                <div>脂質 <strong><AnimatedNumber value={totals.fat} /></strong>g</div>
-                <div>炭水化物 <strong><AnimatedNumber value={totals.carbohydrate} /></strong>g</div>
+                <div>{t("chain.protein")} <strong><AnimatedNumber value={totals.protein} /></strong>g</div>
+                <div>{t("chain.fat")} <strong><AnimatedNumber value={totals.fat} /></strong>g</div>
+                <div>{t("chain.carbs")} <strong><AnimatedNumber value={totals.carbohydrate} /></strong>g</div>
               </div>
               <button className={styles.sheetClearBtn} onClick={clearSelection} disabled={totals.count === 0}>
-                選択をクリア
+                {t("chain.clearSelection")}
               </button>
             </div>
           </div>
@@ -566,7 +577,7 @@ export default function YoshinoyaClient({ menus }) {
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitle}>{modalItem.name}</div>
-              <div className={styles.modalSubtitle}>サイズを選択してください</div>
+              <div className={styles.modalSubtitle}>{t("chain.chooseSize")}</div>
             </div>
             <div className={styles.modalBody}>
               <div className={styles.sizeList}>
@@ -585,11 +596,11 @@ export default function YoshinoyaClient({ menus }) {
             <div className={styles.modalFooter}>
               {isEditing && (
                 <button className={styles.modalBtn} onClick={deleteFromModal} style={{ marginRight: 'auto', color: '#c33', borderColor: '#e7baba' }}>
-                  選択を解除
+                  {t("chain.removeSelection")}
                 </button>
               )}
-              <button className={styles.modalBtn} onClick={closeModal}>キャンセル</button>
-              <button className={styles.modalBtnPrimary} onClick={confirmModal}>完了</button>
+              <button className={styles.modalBtn} onClick={closeModal}>{t("chain.cancel")}</button>
+              <button className={styles.modalBtnPrimary} onClick={confirmModal}>{t("chain.done")}</button>
             </div>
           </div>
         </div>
@@ -600,18 +611,18 @@ export default function YoshinoyaClient({ menus }) {
           <div>
             <p className={styles.siteFooterText}>
               <span className={styles.brandName}>Calorie Checker</span>
-              数値は各社の公式情報を参照した参考値です。本サービスは各チェーン店と提携・関係ありません。
+              {t("footer.siteFooterText")}
             </p>
           </div>
           <div className={styles.siteFooterLinks}>
-            <Link href="/blog">ブログ</Link>
-            <Link href="/about">運営者情報</Link>
-            <Link href="/privacy">プライバシーポリシー</Link>
-            <Link href="/contact">お問い合わせ</Link>
+            <Link href={localizedHref("/blog", locale)}>{t("footer.blog")}</Link>
+            <Link href={localizedHref("/about", locale)}>{t("footer.about")}</Link>
+            <Link href={localizedHref("/privacy", locale)}>{t("footer.privacy")}</Link>
+            <Link href={localizedHref("/contact", locale)}>{t("footer.contact")}</Link>
           </div>
         </div>
         <div className={styles.siteFooterCopy}>
-          © 2026 CHAMANO. All rights reserved.
+          {t("footer.copyright")}
         </div>
       </footer>
     </div>

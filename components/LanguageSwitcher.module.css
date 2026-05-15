@@ -1,0 +1,183 @@
+/* =====================================================
+   LanguageSwitcher スタイル
+   ===================================================== */
+/* 既存サイトのデザイン言語（白背景・細い枠線・控えめな影）に合わせています。
+   既存の .backLink と並べて配置しても違和感が出ないようなトーンを採用。 */
+
+.container {
+  position: relative;
+  display: inline-block;
+}
+
+/* ===== トリガーボタン（「Language ▼」） ===== */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  color: #333;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.trigger:hover {
+  border-color: #b8b8b8;
+  background: #f8f8f8;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+.trigger[aria-expanded="true"] {
+  border-color: #b8b8b8;
+  background: #f8f8f8;
+}
+
+/* 地球儀アイコン */
+.icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: #666;
+}
+
+/* "Language" ラベル */
+.label {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+/* ▼ アイコン（開閉に応じて回転） */
+.chevron {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  margin-left: 2px;
+  color: #888;
+  transition: transform 0.18s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ===== ドロップダウン本体 ===== */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 130px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 4px;
+  margin: 0;
+  list-style: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  animation: dropdownIn 0.14s ease-out;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 選択肢 ===== */
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+  transition: background-color 0.12s ease;
+  user-select: none;
+}
+
+.option:hover {
+  background: #f3f3f3;
+}
+
+.optionSelected {
+  background: #f0f6ff;
+  color: #1f5fc8;
+  font-weight: 500;
+}
+
+.optionSelected:hover {
+  background: #e6efff;
+}
+
+.optionLabel {
+  flex: 1;
+}
+
+.checkIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-left: 8px;
+  color: #1f5fc8;
+}
+
+/* ===== モバイル対応（〜640px） ===== */
+@media (max-width: 640px) {
+  .trigger {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .label {
+    font-size: 12px;
+  }
+
+  .icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .dropdown {
+    min-width: 120px;
+    right: 0;
+  }
+
+  .option {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/* ===== prefers-reduced-motion 対応 ===== */
+@media (prefers-reduced-motion: reduce) {
+  .dropdown {
+    animation: none;
+  }
+  .chevron {
+    transition: none;
+  }
+  .trigger {
+    transition: none;
+  }
+  .option {
+    transition: none;
+  }
+}

@@ -4,27 +4,28 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 import { STARBUCKS_CUSTOMIZATIONS, CUSTOMIZATION_CATEGORIES } from "@/lib/starbucks-customizations";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { localizedHref } from "@/lib/i18n/getLocale";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // === ジャンル定義 ===
 // id: 商品データの category または subCategory と照合する値
-// subCategory が "フード" のものは全部「フード」タブに集約
+// labelKey: 辞書の category セクションのキー
 const GENRES = [
-  { id: "季節のおすすめ", label: "季節のおすすめ", type: "category" },
-  { id: "コーヒー", label: "コーヒー", type: "category" },
-  { id: "エスプレッソ", label: "エスプレッソ", type: "category" },
-  { id: "フラペチーノ®", label: "フラペチーノ®", type: "category" },
-  { id: "ティー | TEAVANA™", label: "ティー", type: "category" },
-  { id: "フード", label: "フード", type: "subCategory" },
+  { id: "季節のおすすめ", labelKey: "季節のおすすめ", type: "category" },
+  { id: "コーヒー", labelKey: "コーヒー", type: "category" },
+  { id: "エスプレッソ", labelKey: "エスプレッソ", type: "category" },
+  { id: "フラペチーノ®", labelKey: "フラペチーノ®", type: "category" },
+  { id: "ティー | TEAVANA™", labelKey: "ティー", type: "category" },
+  { id: "フード", labelKey: "フード", type: "subCategory" },
 ];
 
-// セレクトフィールドが配列か文字列で返ることへの対応
 function fieldMatches(field, value) {
   if (!field) return false;
   if (Array.isArray(field)) return field.includes(value);
   return field === value;
 }
 
-// 数値をスムーズにカウントアップする小さなコンポーネント
 function AnimatedNumber({ value, duration = 280 }) {
   const [displayValue, setDisplayValue] = useState(value);
   const previousValueRef = useRef(value);
@@ -55,23 +56,18 @@ function AnimatedNumber({ value, duration = 280 }) {
   return <>{isInteger ? Math.round(displayValue) : displayValue.toFixed(1)}</>;
 }
 
-// === メインコンポーネント ===
-export default function StarbucksClient({ menus }) {
+export default function StarbucksClient({ menus, locale = "ja" }) {
+  const { t, tCategory, tChain } = useTranslation(locale);
+
   const [activeGenre, setActiveGenre] = useState("季節のおすすめ");
   const [search, setSearch] = useState("");
-  // 選択中の商品: { [itemId]: { milkType: string|null, customizations: {[customId]: count} } }
   const [selections, setSelections] = useState({});
-
-  // モーダル制御
   const [modalState, setModalState] = useState(null);
-  // モバイル展開シート
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  // === フィルタリング ===
   const visibleMenus = useMemo(() => {
     const genre = GENRES.find((g) => g.id === activeGenre);
     if (!genre) return [];
-
     return menus
       .filter((m) => {
         if (genre.type === "category") {
@@ -85,7 +81,6 @@ export default function StarbucksClient({ menus }) {
       .filter((m) => !search || m.name.toLowerCase().includes(search.toLowerCase()));
   }, [menus, activeGenre, search]);
 
-  // タブごとの件数
   const genreCounts = useMemo(() => {
     const counts = {};
     GENRES.forEach((g) => {
@@ -98,15 +93,12 @@ export default function StarbucksClient({ menus }) {
     return counts;
   }, [menus]);
 
-  // === 商品 + ミルク + カスタマイズ から栄養素を計算 ===
   const calcItemNutrition = (item, milkType, customizations) => {
-    // 基本値
     let kcal = item.calorie || 0;
     let protein = item.protein || 0;
     let fat = item.fat || 0;
     let carb = item.carbohydrate || 0;
 
-    // ミルク選択がある場合はバリエーションから値を差し替える
     if (item.hasMilkOption && milkType && item.milkVariations) {
       try {
         const variations = JSON.parse(item.milkVariations);
@@ -122,7 +114,6 @@ export default function StarbucksClient({ menus }) {
       }
     }
 
-    // カスタマイズ加算
     if (customizations) {
       Object.entries(customizations).forEach(([customId, count]) => {
         if (count <= 0) return;
@@ -135,15 +126,12 @@ export default function StarbucksClient({ menus }) {
         }
       });
     }
-
     return { kcal, protein, fat, carb };
   };
 
-  // === 合計値 ===
   const totals = useMemo(() => {
     let calorie = 0, protein = 0, fat = 0, carb = 0;
     let count = 0;
-
     Object.entries(selections).forEach(([itemId, sel]) => {
       const item = menus.find((m) => m.id === itemId);
       if (!item) return;
@@ -154,7 +142,6 @@ export default function StarbucksClient({ menus }) {
       carb += n.carb;
       count += 1;
     });
-
     return {
       calorie: Math.round(calorie),
       protein: Math.round(protein * 10) / 10,
@@ -164,7 +151,6 @@ export default function StarbucksClient({ menus }) {
     };
   }, [selections, menus]);
 
-  // === 選択中アイテムの詳細リスト ===
   const selectedItems = useMemo(() => {
     return Object.entries(selections)
       .map(([itemId, sel]) => {
@@ -185,10 +171,9 @@ export default function StarbucksClient({ menus }) {
       .filter(Boolean);
   }, [selections, menus]);
 
-  // === 商品クリック時の動作 ===
   const handleItemClick = (item) => {
-    // フード（subCategory が "フード"）はクリックで即追加/解除
     const isFood = fieldMatches(item.subCategory, "フード");
+
     if (isFood) {
       setSelections((prev) => {
         const next = { ...prev };
@@ -202,9 +187,7 @@ export default function StarbucksClient({ menus }) {
       return;
     }
 
-    // ビバレッジは従来通りダイアログを開く
     if (selections[item.id]) {
-      // すでに選択済み → 編集モード
       const current = selections[item.id];
       if (item.hasMilkOption) {
         setModalState({
@@ -222,7 +205,6 @@ export default function StarbucksClient({ menus }) {
         });
       }
     } else {
-      // 新規追加
       if (item.hasMilkOption) {
         setModalState({
           step: 'milk',
@@ -241,20 +223,17 @@ export default function StarbucksClient({ menus }) {
     }
   };
 
-  // === 選択解除（×ボタン用） ===
   const removeSelection = (itemId) => {
     const next = { ...selections };
     delete next[itemId];
     setSelections(next);
   };
 
-  // === 全クリア ===
   const clearSelection = () => {
     setSelections({});
     setSheetOpen(false);
   };
 
-  // === モーダル操作 ===
   const closeModal = () => setModalState(null);
 
   const handleMilkSelect = (milkType) => {
@@ -283,7 +262,6 @@ export default function StarbucksClient({ menus }) {
     });
   };
 
-  // 完了ボタン: 選択を確定
   const confirmModal = () => {
     if (!modalState) return;
     setSelections((prev) => ({
@@ -296,14 +274,12 @@ export default function StarbucksClient({ menus }) {
     setModalState(null);
   };
 
-  // 削除ボタン: 選択を解除
   const deleteFromModal = () => {
     if (!modalState) return;
     removeSelection(modalState.itemId);
     setModalState(null);
   };
 
-  // ESCキーでモーダル閉じる
   useEffect(() => {
     if (!modalState) return;
     const handler = (e) => { if (e.key === 'Escape') closeModal(); };
@@ -311,11 +287,9 @@ export default function StarbucksClient({ menus }) {
     return () => window.removeEventListener('keydown', handler);
   }, [modalState]);
 
-  // 現在モーダルで操作中の商品
   const modalItem = modalState ? menus.find((m) => m.id === modalState.itemId) : null;
   const isEditing = modalState && selections[modalState.itemId];
 
-  // モーダル用: ミルクバリエーションをパース
   const modalMilks = useMemo(() => {
     if (!modalItem || !modalItem.hasMilkOption || !modalItem.milkVariations) return [];
     try {
@@ -325,29 +299,40 @@ export default function StarbucksClient({ menus }) {
     }
   }, [modalItem]);
 
+  // 言語別のリンク先
+  const homeHref = localizedHref("/", locale);
+  const categoryHref = localizedHref("/category/cafe", locale);
+
+  // チェーン名の表示（英語版は併記）
+  const chainDisplayName = tChain("スターバックス");
+
   return (
     <div className="page-fade-in">
       <nav className={styles.topnav}>
         <div className={styles.topnavInner}>
-          <Link href="/" className="brand-name-large">Calorie Checker</Link>
-          <Link href="/" className={styles.backLink}>← ホームに戻る</Link>
+          <Link href={homeHref} className="brand-name-large">Calorie Checker</Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Link href={homeHref} className={styles.backLink}>{t("common.backToHome")}</Link>
+            <LanguageSwitcher />
+          </div>
         </div>
       </nav>
 
       <div className={styles.wrapper}>
         <header className={styles.header}>
           <div className={styles.breadcrumb}>
-            <Link href="/">ホーム</Link>
+            <Link href={homeHref}>{t("common.home")}</Link>
             <span className={styles.sep}>/</span>
-            <Link href="/category/cafe">カフェ</Link>
-            <span className={styles.sep}>/</span>スターバックス
+            <Link href={categoryHref}>{tCategory("カフェ") || (locale === "en" ? "Cafe / カフェ" : "カフェ")}</Link>
+            <span className={styles.sep}>/</span>{chainDisplayName}
           </div>
-          <h1>スターバックス</h1>
-          <p className={styles.subtitle}>メニューを選んでミルクとカスタマイズを指定。合計カロリーが分かります。</p>
+          <h1>{chainDisplayName}</h1>
+          <p className={styles.subtitle}>{t("chain.subtitleStarbucks")}</p>
         </header>
 
         <div className={styles.mainLayout}>
           <div className={styles.leftCol}>
+
             <div className={styles.genreBar}>
               {GENRES.map((g) => (
                 <button
@@ -355,7 +340,7 @@ export default function StarbucksClient({ menus }) {
                   className={`${styles.genreTab} ${activeGenre === g.id ? styles.active : ""}`}
                   onClick={() => { setActiveGenre(g.id); setSearch(""); }}
                 >
-                  {g.label}
+                  {tCategory(g.labelKey)}
                   <span className={styles.num}>{genreCounts[g.id] || 0}</span>
                 </button>
               ))}
@@ -369,7 +354,7 @@ export default function StarbucksClient({ menus }) {
               <input
                 type="text"
                 className={styles.searchInput}
-                placeholder="メニュー名で検索"
+                placeholder={t("chain.searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -377,20 +362,17 @@ export default function StarbucksClient({ menus }) {
 
             <div className={styles.menuStack}>
               {visibleMenus.length === 0 ? (
-                <div className={styles.emptyState}>該当するメニューがありません</div>
+                <div className={styles.emptyState}>{t("chain.noResults")}</div>
               ) : (
                 visibleMenus.map((item) => {
                   const sel = selections[item.id];
                   const isSelected = !!sel;
-                  // 表示用の合計（その商品単体の値）
                   const itemNutri = isSelected
                     ? calcItemNutrition(item, sel.milkType, sel.customizations)
                     : { kcal: item.calorie, protein: item.protein, fat: item.fat, carb: item.carbohydrate };
-
                   const customCount = sel?.customizations
                     ? Object.values(sel.customizations).reduce((a, b) => a + b, 0)
                     : 0;
-
                   return (
                     <div
                       key={item.id}
@@ -405,14 +387,14 @@ export default function StarbucksClient({ menus }) {
                       <div className={styles.info}>
                         <div className={styles.name}>{item.name}</div>
                         <div className={styles.pfc}>
-                          たんぱく質 {Math.round(itemNutri.protein * 10) / 10}g · 脂質 {Math.round(itemNutri.fat * 10) / 10}g · 炭水化物 {Math.round(itemNutri.carb * 10) / 10}g
+                          {t("chain.protein")} {Math.round(itemNutri.protein * 10) / 10}g · {t("chain.fat")} {Math.round(itemNutri.fat * 10) / 10}g · {t("chain.carbs")} {Math.round(itemNutri.carb * 10) / 10}g
                         </div>
                         {isSelected && sel.milkType && (
-                          <span className={styles.milkBadge}>ミルク: {sel.milkType}</span>
+                          <span className={styles.milkBadge}>{t("chain.milkLabel")} {sel.milkType}</span>
                         )}
                         {isSelected && customCount > 0 && (
                           <span className={styles.milkBadge} style={{ marginLeft: 6 }}>
-                            カスタム {customCount}点
+                            {t("chain.customCount")} {customCount}{t("chain.customCountUnit")}
                           </span>
                         )}
                       </div>
@@ -428,15 +410,15 @@ export default function StarbucksClient({ menus }) {
             </div>
 
             <div className={styles.pageFooter}>
-              数値は <a href="https://www.starbucks.co.jp/" target="_blank" rel="noopener">スターバックス コーヒー ジャパン公式サイト</a> の成分情報を参照した参考値です。<br />
-              本サービスはスターバックスと提携・関係ありません。最新かつ正確な情報は公式サイトをご確認ください。
+              {t("chain.disclaimerPrefix")}<a href="https://www.starbucks.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Starbucks Japan " : "スターバックス コーヒー ジャパン"}{t("chain.officialSite")}</a>{t("chain.disclaimerSuffix")}<br />
+              {t("chain.disclaimerAffiliation")}{locale === "en" ? "Starbucks Japan" : "スターバックス"}{t("chain.disclaimerAffiliationSuffix")}
             </div>
           </div>
 
           <aside className={styles.rightCol}>
             <div className={styles.totalCardPc}>
-              <div className={styles.label}>合計</div>
-              <div className={styles.countLine}>{totals.count} 品 選択中</div>
+              <div className={styles.label}>{t("chain.total")}</div>
+              <div className={styles.countLine}>{totals.count} {t("chain.itemsSelected")}</div>
               <div className={styles.kcalBig}>
                 <AnimatedNumber value={totals.calorie} />
                 <span className={styles.u}>kcal</span>
@@ -444,21 +426,21 @@ export default function StarbucksClient({ menus }) {
               <hr className={styles.divider} />
               <div className={styles.nutriList}>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>たんぱく質</span>
+                  <span className={styles.nutriName}>{t("chain.protein")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.protein} />
                     <span className={styles.u}>g</span>
                   </span>
                 </div>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>脂質</span>
+                  <span className={styles.nutriName}>{t("chain.fat")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.fat} />
                     <span className={styles.u}>g</span>
                   </span>
                 </div>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>炭水化物</span>
+                  <span className={styles.nutriName}>{t("chain.carbs")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.carbohydrate} />
                     <span className={styles.u}>g</span>
@@ -466,13 +448,13 @@ export default function StarbucksClient({ menus }) {
                 </div>
               </div>
               <button className={styles.clearBtnPc} onClick={clearSelection} disabled={totals.count === 0}>
-                選択をクリア
+                {t("chain.clearSelection")}
               </button>
             </div>
 
             {selectedItems.length > 0 && (
               <div className={styles.selectedListCard}>
-                <div className={styles.selectedListLabel}>選択中のメニュー</div>
+                <div className={styles.selectedListLabel}>{t("chain.selectedItems")}</div>
                 <div className={styles.selectedList}>
                   {selectedItems.map((it) => (
                     <div key={it.id} className={styles.selectedItem}>
@@ -480,14 +462,14 @@ export default function StarbucksClient({ menus }) {
                         <div className={styles.selectedItemName}>{it.name}</div>
                         <div className={styles.selectedItemMeta}>
                           {it.milkType && <span>{it.milkType} · </span>}
-                          {it.customCount > 0 && <span>カスタム{it.customCount}点 · </span>}
+                          {it.customCount > 0 && <span>{t("chain.customCount")} {it.customCount}{t("chain.customCountUnit")} · </span>}
                           <span>{it.calorie} kcal</span>
                         </div>
                       </div>
                       <button
                         className={styles.removeBtn}
                         onClick={() => removeSelection(it.id)}
-                        aria-label={`${it.name}を解除`}
+                        aria-label={`${it.name}${t("chain.removeAria")}`}
                       >
                         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                           <path d="m4 4 8 8M12 4l-8 8" />
@@ -502,7 +484,6 @@ export default function StarbucksClient({ menus }) {
         </div>
       </div>
 
-      {/* モバイル下部の合計カード */}
       <div className={styles.totalCardMobile}>
         <button
           className={styles.mobileExpandBtn}
@@ -511,9 +492,9 @@ export default function StarbucksClient({ menus }) {
         >
           <div className={styles.mobileTop}>
             <div className={styles.mobileMeta}>
-              <div className={styles.mobileLabel}>合計</div>
+              <div className={styles.mobileLabel}>{t("chain.total")}</div>
               <div className={styles.mobileCount}>
-                {totals.count} 品 選択中{totals.count > 0 && <span className={styles.expandHint}> · タップで詳細</span>}
+                {totals.count} {t("chain.itemsSelected")}{totals.count > 0 && <span className={styles.expandHint}>{t("chain.tapForDetails")}</span>}
               </div>
             </div>
             <div className={styles.kcalNum}>
@@ -523,21 +504,21 @@ export default function StarbucksClient({ menus }) {
           </div>
           <div className={styles.nutrients}>
             <div className={styles.nCell}>
-              <div className={styles.nL}>たんぱく質</div>
+              <div className={styles.nL}>{t("chain.protein")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.protein} />
                 <span className={styles.u}>g</span>
               </div>
             </div>
             <div className={styles.nCell}>
-              <div className={styles.nL}>脂質</div>
+              <div className={styles.nL}>{t("chain.fat")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.fat} />
                 <span className={styles.u}>g</span>
               </div>
             </div>
             <div className={styles.nCell}>
-              <div className={styles.nL}>炭水化物</div>
+              <div className={styles.nL}>{t("chain.carbs")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.carbohydrate} />
                 <span className={styles.u}>g</span>
@@ -547,13 +528,12 @@ export default function StarbucksClient({ menus }) {
         </button>
       </div>
 
-      {/* === モバイル展開シート === */}
       {sheetOpen && (
         <div className={styles.sheetOverlay} onClick={() => setSheetOpen(false)}>
           <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
             <div className={styles.sheetHeader}>
-              <div className={styles.sheetTitle}>選択中のメニュー</div>
-              <button className={styles.sheetCloseBtn} onClick={() => setSheetOpen(false)} aria-label="閉じる">
+              <div className={styles.sheetTitle}>{t("chain.selectedItems")}</div>
+              <button className={styles.sheetCloseBtn} onClick={() => setSheetOpen(false)} aria-label={t("chain.close")}>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="m4 4 8 8M12 4l-8 8" />
                 </svg>
@@ -561,7 +541,7 @@ export default function StarbucksClient({ menus }) {
             </div>
             <div className={styles.sheetBody}>
               {selectedItems.length === 0 ? (
-                <div className={styles.sheetEmpty}>選択されたメニューはありません</div>
+                <div className={styles.sheetEmpty}>{t("chain.noSelectedItems")}</div>
               ) : (
                 selectedItems.map((it) => (
                   <div key={it.id} className={styles.sheetItem}>
@@ -569,14 +549,14 @@ export default function StarbucksClient({ menus }) {
                       <div className={styles.sheetItemName}>{it.name}</div>
                       <div className={styles.sheetItemMeta}>
                         {it.milkType && <span>{it.milkType} · </span>}
-                        {it.customCount > 0 && <span>カスタム{it.customCount}点 · </span>}
+                        {it.customCount > 0 && <span>{t("chain.customCount")} {it.customCount}{t("chain.customCountUnit")} · </span>}
                         <span>{it.calorie} kcal</span>
                       </div>
                     </div>
                     <button
                       className={styles.removeBtn}
                       onClick={() => removeSelection(it.id)}
-                      aria-label={`${it.name}を解除`}
+                      aria-label={`${it.name}${t("chain.removeAria")}`}
                     >
                       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                         <path d="m4 4 8 8M12 4l-8 8" />
@@ -588,32 +568,31 @@ export default function StarbucksClient({ menus }) {
             </div>
             <div className={styles.sheetFooter}>
               <div className={styles.sheetTotalLine}>
-                <span>合計</span>
+                <span>{t("chain.total")}</span>
                 <span className={styles.sheetTotalKcal}>
                   <AnimatedNumber value={totals.calorie} />
                   <span className={styles.u}>kcal</span>
                 </span>
               </div>
               <div className={styles.sheetNutri}>
-                <div>たんぱく質 <strong><AnimatedNumber value={totals.protein} /></strong>g</div>
-                <div>脂質 <strong><AnimatedNumber value={totals.fat} /></strong>g</div>
-                <div>炭水化物 <strong><AnimatedNumber value={totals.carbohydrate} /></strong>g</div>
+                <div>{t("chain.protein")} <strong><AnimatedNumber value={totals.protein} /></strong>g</div>
+                <div>{t("chain.fat")} <strong><AnimatedNumber value={totals.fat} /></strong>g</div>
+                <div>{t("chain.carbs")} <strong><AnimatedNumber value={totals.carbohydrate} /></strong>g</div>
               </div>
               <button className={styles.sheetClearBtn} onClick={clearSelection} disabled={totals.count === 0}>
-                選択をクリア
+                {t("chain.clearSelection")}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* === ミルク選択モーダル === */}
       {modalState && modalState.step === 'milk' && modalItem && (
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitle}>{modalItem.name}</div>
-              <div className={styles.modalSubtitle}>ミルクを選択してください</div>
+              <div className={styles.modalSubtitle}>{t("chain.chooseMilk")}</div>
             </div>
             <div className={styles.modalBody}>
               <div className={styles.milkList}>
@@ -632,24 +611,23 @@ export default function StarbucksClient({ menus }) {
             <div className={styles.modalFooter}>
               {isEditing && (
                 <button className={styles.modalBtn} onClick={deleteFromModal} style={{ marginRight: 'auto', color: '#c33', borderColor: '#e7baba' }}>
-                  選択を解除
+                  {t("chain.removeSelection")}
                 </button>
               )}
-              <button className={styles.modalBtn} onClick={closeModal}>キャンセル</button>
-              <button className={styles.modalBtnPrimary} onClick={goToCustomStep}>次へ</button>
+              <button className={styles.modalBtn} onClick={closeModal}>{t("chain.cancel")}</button>
+              <button className={styles.modalBtnPrimary} onClick={goToCustomStep}>{t("chain.next")}</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* === カスタマイズ選択モーダル === */}
       {modalState && modalState.step === 'custom' && modalItem && (
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitle}>{modalItem.name}</div>
               <div className={styles.modalSubtitle}>
-                カスタマイズを追加（任意・最大10個まで）
+                {t("chain.chooseCustom")}
               </div>
             </div>
             <div className={styles.modalBody}>
@@ -692,16 +670,16 @@ export default function StarbucksClient({ menus }) {
             <div className={styles.modalFooter}>
               {modalItem.hasMilkOption && (
                 <button className={styles.modalBtn} onClick={goBackToMilkStep} style={{ marginRight: 'auto' }}>
-                  ← ミルクに戻る
+                  {t("chain.backToMilk")}
                 </button>
               )}
               {!modalItem.hasMilkOption && isEditing && (
                 <button className={styles.modalBtn} onClick={deleteFromModal} style={{ marginRight: 'auto', color: '#c33', borderColor: '#e7baba' }}>
-                  選択を解除
+                  {t("chain.removeSelection")}
                 </button>
               )}
-              <button className={styles.modalBtn} onClick={closeModal}>キャンセル</button>
-              <button className={styles.modalBtnPrimary} onClick={confirmModal}>完了</button>
+              <button className={styles.modalBtn} onClick={closeModal}>{t("chain.cancel")}</button>
+              <button className={styles.modalBtnPrimary} onClick={confirmModal}>{t("chain.done")}</button>
             </div>
           </div>
         </div>
@@ -712,18 +690,18 @@ export default function StarbucksClient({ menus }) {
           <div>
             <p className={styles.siteFooterText}>
               <span className={styles.brandName}>Calorie Checker</span>
-              数値は各社の公式情報を参照した参考値です。本サービスは各チェーン店と提携・関係ありません。
+              {t("footer.siteFooterText")}
             </p>
           </div>
           <div className={styles.siteFooterLinks}>
-            <Link href="/blog">ブログ</Link>
-            <Link href="/about">運営者情報</Link>
-            <Link href="/privacy">プライバシーポリシー</Link>
-            <Link href="/contact">お問い合わせ</Link>
+            <Link href={localizedHref("/blog", locale)}>{t("footer.blog")}</Link>
+            <Link href={localizedHref("/about", locale)}>{t("footer.about")}</Link>
+            <Link href={localizedHref("/privacy", locale)}>{t("footer.privacy")}</Link>
+            <Link href={localizedHref("/contact", locale)}>{t("footer.contact")}</Link>
           </div>
         </div>
         <div className={styles.siteFooterCopy}>
-          © 2026 CHAMANO. All rights reserved.
+          {t("footer.copyright")}
         </div>
       </footer>
     </div>

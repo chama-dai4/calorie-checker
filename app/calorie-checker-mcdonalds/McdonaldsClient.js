@@ -3,12 +3,17 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { localizedHref } from "@/lib/i18n/getLocale";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
+// === ジャンル定義 ===
+// idはmicroCMSのcategory値と一致、labelKeyは辞書のサブカテゴリキー
 const GENRES = [
-  { id: "バーガー", label: "バーガー" },
-  { id: "サイドメニュー", label: "サイドメニュー" },
-  { id: "ドリンク", label: "ドリンク" },
-  { id: "マックカフェ", label: "マックカフェ" },
+  { id: "バーガー", labelKey: "ハンバーガー" },
+  { id: "サイドメニュー", labelKey: "サイドメニュー" },
+  { id: "ドリンク", labelKey: "ドリンク" },
+  { id: "マックカフェ", labelKey: "マックカフェ" },
 ];
 
 function fieldMatches(field, value) {
@@ -48,7 +53,9 @@ function AnimatedNumber({ value, duration = 280 }) {
   return <>{isInteger ? Math.round(displayValue) : displayValue.toFixed(1)}</>;
 }
 
-export default function McdonaldsClient({ menus }) {
+export default function McdonaldsClient({ menus, locale = "ja" }) {
+  const { t, tCategory, tChain } = useTranslation(locale);
+
   const [activeGenre, setActiveGenre] = useState("バーガー");
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -115,29 +122,40 @@ export default function McdonaldsClient({ menus }) {
     setSheetOpen(false);
   };
 
+  // 言語別のリンク先
+  const homeHref = localizedHref("/", locale);
+  const categoryHref = localizedHref("/category/burger", locale);
+
+  // チェーン名の表示（英語版は併記）
+  const chainDisplayName = tChain("マクドナルド");
+
   return (
     <div className="page-fade-in">
       <nav className={styles.topnav}>
         <div className={styles.topnavInner}>
-          <Link href="/" className="brand-name-large">Calorie Checker</Link>
-          <Link href="/" className={styles.backLink}>← ホームに戻る</Link>
+          <Link href={homeHref} className="brand-name-large">Calorie Checker</Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Link href={homeHref} className={styles.backLink}>{t("common.backToHome")}</Link>
+            <LanguageSwitcher />
+          </div>
         </div>
       </nav>
 
       <div className={styles.wrapper}>
         <header className={styles.header}>
           <div className={styles.breadcrumb}>
-            <Link href="/">ホーム</Link>
+            <Link href={homeHref}>{t("common.home")}</Link>
             <span className={styles.sep}>/</span>
-            <Link href="/category/burger">ハンバーガー</Link>
-            <span className={styles.sep}>/</span>マクドナルド
+            <Link href={categoryHref}>{tCategory("ハンバーガー")}</Link>
+            <span className={styles.sep}>/</span>{chainDisplayName}
           </div>
-          <h1>マクドナルド</h1>
-          <p className={styles.subtitle}>メニューを選ぶだけで、合計カロリーと栄養素が分かります。</p>
+          <h1>{chainDisplayName}</h1>
+          <p className={styles.subtitle}>{t("chain.subtitleDefault")}</p>
         </header>
 
         <div className={styles.mainLayout}>
           <div className={styles.leftCol}>
+
             <div className={styles.genreBar}>
               {GENRES.map((g) => (
                 <button
@@ -145,7 +163,7 @@ export default function McdonaldsClient({ menus }) {
                   className={`${styles.genreTab} ${activeGenre === g.id ? styles.active : ""}`}
                   onClick={() => { setActiveGenre(g.id); setSearch(""); }}
                 >
-                  {g.label}
+                  {tCategory(g.labelKey)}
                   <span className={styles.num}>{genreCounts[g.id] || 0}</span>
                 </button>
               ))}
@@ -159,7 +177,7 @@ export default function McdonaldsClient({ menus }) {
               <input
                 type="text"
                 className={styles.searchInput}
-                placeholder="メニュー名で検索"
+                placeholder={t("chain.searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -167,7 +185,7 @@ export default function McdonaldsClient({ menus }) {
 
             <div className={styles.menuStack}>
               {visibleMenus.length === 0 ? (
-                <div className={styles.emptyState}>該当するメニューがありません</div>
+                <div className={styles.emptyState}>{t("chain.noResults")}</div>
               ) : (
                 visibleMenus.map((item) => {
                   const isSelected = selectedIds.has(item.id);
@@ -185,7 +203,7 @@ export default function McdonaldsClient({ menus }) {
                       <div className={styles.info}>
                         <div className={styles.name}>{item.name}</div>
                         <div className={styles.pfc}>
-                          たんぱく質 {item.protein}g · 脂質 {item.fat}g · 炭水化物 {item.carbohydrate}g
+                          {t("chain.protein")} {item.protein}g · {t("chain.fat")} {item.fat}g · {t("chain.carbs")} {item.carbohydrate}g
                         </div>
                       </div>
                       <div className={styles.right}>
@@ -200,15 +218,15 @@ export default function McdonaldsClient({ menus }) {
             </div>
 
             <div className={styles.pageFooter}>
-              数値は <a href="https://www.mcdonalds.co.jp/" target="_blank" rel="noopener">日本マクドナルド公式サイト</a> の成分情報を参照した参考値です。<br />
-              本サービスはマクドナルドと提携・関係ありません。最新かつ正確な情報は公式サイトをご確認ください。
+              {t("chain.disclaimerPrefix")}<a href="https://www.mcdonalds.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "McDonald's Japan " : "日本マクドナルド"}{t("chain.officialSite")}</a>{t("chain.disclaimerSuffix")}<br />
+              {t("chain.disclaimerAffiliation")}{locale === "en" ? "McDonald's Japan" : "マクドナルド"}{t("chain.disclaimerAffiliationSuffix")}
             </div>
           </div>
 
           <aside className={styles.rightCol}>
             <div className={styles.totalCardPc}>
-              <div className={styles.label}>合計</div>
-              <div className={styles.countLine}>{totals.count} 品 選択中</div>
+              <div className={styles.label}>{t("chain.total")}</div>
+              <div className={styles.countLine}>{totals.count} {t("chain.itemsSelected")}</div>
               <div className={styles.kcalBig}>
                 <AnimatedNumber value={totals.calorie} />
                 <span className={styles.u}>kcal</span>
@@ -216,21 +234,21 @@ export default function McdonaldsClient({ menus }) {
               <hr className={styles.divider} />
               <div className={styles.nutriList}>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>たんぱく質</span>
+                  <span className={styles.nutriName}>{t("chain.protein")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.protein} />
                     <span className={styles.u}>g</span>
                   </span>
                 </div>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>脂質</span>
+                  <span className={styles.nutriName}>{t("chain.fat")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.fat} />
                     <span className={styles.u}>g</span>
                   </span>
                 </div>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>炭水化物</span>
+                  <span className={styles.nutriName}>{t("chain.carbs")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.carbohydrate} />
                     <span className={styles.u}>g</span>
@@ -238,13 +256,13 @@ export default function McdonaldsClient({ menus }) {
                 </div>
               </div>
               <button className={styles.clearBtnPc} onClick={clearSelection} disabled={totals.count === 0}>
-                選択をクリア
+                {t("chain.clearSelection")}
               </button>
             </div>
 
             {selectedItems.length > 0 && (
               <div className={styles.selectedListCard}>
-                <div className={styles.selectedListLabel}>選択中のメニュー</div>
+                <div className={styles.selectedListLabel}>{t("chain.selectedItems")}</div>
                 <div className={styles.selectedList}>
                   {selectedItems.map((it) => (
                     <div key={it.id} className={styles.selectedItem}>
@@ -257,7 +275,7 @@ export default function McdonaldsClient({ menus }) {
                       <button
                         className={styles.removeBtn}
                         onClick={() => removeSelection(it.id)}
-                        aria-label={`${it.name}を解除`}
+                        aria-label={`${it.name}${t("chain.removeAria")}`}
                       >
                         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                           <path d="m4 4 8 8M12 4l-8 8" />
@@ -280,9 +298,9 @@ export default function McdonaldsClient({ menus }) {
         >
           <div className={styles.mobileTop}>
             <div className={styles.mobileMeta}>
-              <div className={styles.mobileLabel}>合計</div>
+              <div className={styles.mobileLabel}>{t("chain.total")}</div>
               <div className={styles.mobileCount}>
-                {totals.count} 品 選択中{totals.count > 0 && <span className={styles.expandHint}> · タップで詳細</span>}
+                {totals.count} {t("chain.itemsSelected")}{totals.count > 0 && <span className={styles.expandHint}>{t("chain.tapForDetails")}</span>}
               </div>
             </div>
             <div className={styles.kcalNum}>
@@ -292,21 +310,21 @@ export default function McdonaldsClient({ menus }) {
           </div>
           <div className={styles.nutrients}>
             <div className={styles.nCell}>
-              <div className={styles.nL}>たんぱく質</div>
+              <div className={styles.nL}>{t("chain.protein")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.protein} />
                 <span className={styles.u}>g</span>
               </div>
             </div>
             <div className={styles.nCell}>
-              <div className={styles.nL}>脂質</div>
+              <div className={styles.nL}>{t("chain.fat")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.fat} />
                 <span className={styles.u}>g</span>
               </div>
             </div>
             <div className={styles.nCell}>
-              <div className={styles.nL}>炭水化物</div>
+              <div className={styles.nL}>{t("chain.carbs")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.carbohydrate} />
                 <span className={styles.u}>g</span>
@@ -320,8 +338,8 @@ export default function McdonaldsClient({ menus }) {
         <div className={styles.sheetOverlay} onClick={() => setSheetOpen(false)}>
           <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
             <div className={styles.sheetHeader}>
-              <div className={styles.sheetTitle}>選択中のメニュー</div>
-              <button className={styles.sheetCloseBtn} onClick={() => setSheetOpen(false)} aria-label="閉じる">
+              <div className={styles.sheetTitle}>{t("chain.selectedItems")}</div>
+              <button className={styles.sheetCloseBtn} onClick={() => setSheetOpen(false)} aria-label={t("chain.close")}>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="m4 4 8 8M12 4l-8 8" />
                 </svg>
@@ -329,7 +347,7 @@ export default function McdonaldsClient({ menus }) {
             </div>
             <div className={styles.sheetBody}>
               {selectedItems.length === 0 ? (
-                <div className={styles.sheetEmpty}>選択されたメニューはありません</div>
+                <div className={styles.sheetEmpty}>{t("chain.noSelectedItems")}</div>
               ) : (
                 selectedItems.map((it) => (
                   <div key={it.id} className={styles.sheetItem}>
@@ -342,7 +360,7 @@ export default function McdonaldsClient({ menus }) {
                     <button
                       className={styles.removeBtn}
                       onClick={() => removeSelection(it.id)}
-                      aria-label={`${it.name}を解除`}
+                      aria-label={`${it.name}${t("chain.removeAria")}`}
                     >
                       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                         <path d="m4 4 8 8M12 4l-8 8" />
@@ -354,19 +372,19 @@ export default function McdonaldsClient({ menus }) {
             </div>
             <div className={styles.sheetFooter}>
               <div className={styles.sheetTotalLine}>
-                <span>合計</span>
+                <span>{t("chain.total")}</span>
                 <span className={styles.sheetTotalKcal}>
                   <AnimatedNumber value={totals.calorie} />
                   <span className={styles.u}>kcal</span>
                 </span>
               </div>
               <div className={styles.sheetNutri}>
-                <div>たんぱく質 <strong><AnimatedNumber value={totals.protein} /></strong>g</div>
-                <div>脂質 <strong><AnimatedNumber value={totals.fat} /></strong>g</div>
-                <div>炭水化物 <strong><AnimatedNumber value={totals.carbohydrate} /></strong>g</div>
+                <div>{t("chain.protein")} <strong><AnimatedNumber value={totals.protein} /></strong>g</div>
+                <div>{t("chain.fat")} <strong><AnimatedNumber value={totals.fat} /></strong>g</div>
+                <div>{t("chain.carbs")} <strong><AnimatedNumber value={totals.carbohydrate} /></strong>g</div>
               </div>
               <button className={styles.sheetClearBtn} onClick={clearSelection} disabled={totals.count === 0}>
-                選択をクリア
+                {t("chain.clearSelection")}
               </button>
             </div>
           </div>
@@ -378,18 +396,18 @@ export default function McdonaldsClient({ menus }) {
           <div>
             <p className={styles.siteFooterText}>
               <span className={styles.brandName}>Calorie Checker</span>
-              数値は各社の公式情報を参照した参考値です。本サービスは各チェーン店と提携・関係ありません。
+              {t("footer.siteFooterText")}
             </p>
           </div>
           <div className={styles.siteFooterLinks}>
-            <Link href="/blog">ブログ</Link>
-            <Link href="/about">運営者情報</Link>
-            <Link href="/privacy">プライバシーポリシー</Link>
-            <Link href="/contact">お問い合わせ</Link>
+            <Link href={localizedHref("/blog", locale)}>{t("footer.blog")}</Link>
+            <Link href={localizedHref("/about", locale)}>{t("footer.about")}</Link>
+            <Link href={localizedHref("/privacy", locale)}>{t("footer.privacy")}</Link>
+            <Link href={localizedHref("/contact", locale)}>{t("footer.contact")}</Link>
           </div>
         </div>
         <div className={styles.siteFooterCopy}>
-          © 2026 CHAMANO. All rights reserved.
+          {t("footer.copyright")}
         </div>
       </footer>
     </div>

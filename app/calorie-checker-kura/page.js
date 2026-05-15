@@ -6,6 +6,14 @@ export const metadata = {
   description:
     "くら寿司の全メニューのカロリーとアレルゲン情報がすぐに分かる計算ツール。定番寿司、限定商品、サイドメニュー、デザート、ドリンクのカロリーを選んで合計表示。卵・小麦・乳・えび・かになど特定原材料27品目に対応。",
   keywords: ["くら寿司 カロリー", "くら寿司 アレルゲン", "くら寿司 アレルギー", "くら寿司 メニュー", "回転寿司 カロリー"],
+  alternates: {
+    canonical: "https://www.calorie-check.com/calorie-checker-kura",
+    languages: {
+      "ja": "https://www.calorie-check.com/calorie-checker-kura",
+      "en": "https://www.calorie-check.com/en/calorie-checker-kura",
+      "x-default": "https://www.calorie-check.com/calorie-checker-kura",
+    },
+  },
 };
 
 export const revalidate = 3600;
@@ -13,6 +21,5 @@ export const revalidate = 3600;
 export default async function KuraPage() {
   const data = await getMenusByChain("くら寿司");
   const menus = data.contents;
-
-  return <KuraClient menus={menus} />;
+  return <KuraClient menus={menus} locale="ja" />;
 }

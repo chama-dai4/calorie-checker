@@ -3,57 +3,67 @@ import { getBlogPosts } from "@/lib/microcms";
 
 const SITE_URL = "https://www.calorie-check.com";
 
+// 日本語/英語両対応のチェーン店パス
+const BILINGUAL_CHAIN_PATHS = [
+  "/calorie-checker-mcdonalds",
+  "/calorie-checker-mos",
+  "/calorie-checker-burgerking",
+  "/calorie-checker-zetteria",
+  "/calorie-checker-starbucks",
+  "/calorie-checker-yoshinoya",
+  "/calorie-checker-kura",
+];
+
+// 日本語/英語両対応の言語マップを生成するヘルパー
+function buildLanguagesMap(pathSegment) {
+  return {
+    ja: `${SITE_URL}${pathSegment}`,
+    en: `${SITE_URL}/en${pathSegment}`,
+    "x-default": `${SITE_URL}${pathSegment}`,
+  };
+}
+
 export default async function sitemap() {
-  // 固定ページ
-  const staticPages = [
-    {
-      url: `${SITE_URL}/`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 1.0,
-    },
-    {
-      url: `${SITE_URL}/calorie-checker-mcdonalds`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/calorie-checker-mos`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/calorie-checker-burgerking`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/calorie-checker-zetteria`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/calorie-checker-starbucks`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/calorie-checker-yoshinoya`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/calorie-checker-kura`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
+  // ===== 固定ページ =====
+
+  // ホーム（日本語版）
+  const homeJa = {
+    url: `${SITE_URL}/`,
+    lastModified: new Date(),
+    changeFrequency: "daily",
+    priority: 1.0,
+    alternates: { languages: buildLanguagesMap("/") },
+  };
+
+  // ホーム（英語版）
+  const homeEn = {
+    url: `${SITE_URL}/en`,
+    lastModified: new Date(),
+    changeFrequency: "daily",
+    priority: 1.0,
+    alternates: { languages: buildLanguagesMap("/") },
+  };
+
+  // チェーン店（日本語版）— alternates付き
+  const chainPagesJa = BILINGUAL_CHAIN_PATHS.map((path) => ({
+    url: `${SITE_URL}${path}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.9,
+    alternates: { languages: buildLanguagesMap(path) },
+  }));
+
+  // チェーン店（英語版）— alternates付き
+  const chainPagesEn = BILINGUAL_CHAIN_PATHS.map((path) => ({
+    url: `${SITE_URL}/en${path}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.9,
+    alternates: { languages: buildLanguagesMap(path) },
+  }));
+
+  // 日本語のみのページ（about / privacy / contact / blog一覧）
+  const jaOnlyPages = [
     {
       url: `${SITE_URL}/blog`,
       lastModified: new Date(),
@@ -80,15 +90,31 @@ export default async function sitemap() {
     },
   ];
 
-  // カテゴリページ（/category/burger など）
-  const categoryPages = CATEGORIES.map((cat) => ({
-    url: `${SITE_URL}/category/${cat.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
+  // ===== カテゴリページ（日本語版）— alternates付き =====
+  const categoryPagesJa = CATEGORIES.map((cat) => {
+    const path = `/category/${cat.slug}`;
+    return {
+      url: `${SITE_URL}${path}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+      alternates: { languages: buildLanguagesMap(path) },
+    };
+  });
 
-  // ブログ記事ページ（microCMSから取得）
+  // ===== カテゴリページ（英語版）— alternates付き =====
+  const categoryPagesEn = CATEGORIES.map((cat) => {
+    const path = `/category/${cat.slug}`;
+    return {
+      url: `${SITE_URL}/en${path}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+      alternates: { languages: buildLanguagesMap(path) },
+    };
+  });
+
+  // ===== ブログ記事ページ（日本語のみ） =====
   let blogPages = [];
   try {
     const blogData = await getBlogPosts();
@@ -102,5 +128,14 @@ export default async function sitemap() {
     console.error("Failed to fetch blog posts for sitemap:", e);
   }
 
-  return [...staticPages, ...categoryPages, ...blogPages];
+  return [
+    homeJa,
+    homeEn,
+    ...chainPagesJa,
+    ...chainPagesEn,
+    ...jaOnlyPages,
+    ...categoryPagesJa,
+    ...categoryPagesEn,
+    ...blogPages,
+  ];
 }
