@@ -87,19 +87,31 @@ function getAvailableSizes(item) {
   return sizeArr;
 }
 
-// 該当のサイズ・温度バリエーションを取得
-function findVariation(item, size, temp) {
+// 該当のサイズ・温度・ミルクバリエーションを取得
+// 第4引数 milk を追加し、tempSizeVariations の milk フィールドも考慮する
+function findVariation(item, size, temp, milk) {
   const variations = parseTempSizeVariations(item.tempSizeVariations);
-  // 完全一致を試す
+  // 1. サイズ × 温度 × ミルク の完全一致
+  if (milk) {
+    let found = variations.find(v => v.size === size && v.temperature === temp && v.milk === milk);
+    if (found) return found;
+    // 2. サイズ × ミルク 一致(temperature無視)
+    found = variations.find(v => v.size === size && v.milk === milk);
+    if (found) return found;
+    // 3. ミルクだけ一致(サイズ無視) — サイズ無し商品のフォールバック
+    found = variations.find(v => v.milk === milk);
+    if (found) return found;
+  }
+  // 4. サイズ × 温度 一致(milk無視) — 旧データ互換
   let found = variations.find(v => v.size === size && v.temperature === temp);
   if (found) return found;
-  // サイズだけ一致
+  // 5. サイズだけ一致
   found = variations.find(v => v.size === size);
   if (found) return found;
-  // 温度だけ一致
+  // 6. 温度だけ一致
   found = variations.find(v => v.temperature === temp);
   if (found) return found;
-  // 最初の1件
+  // 7. 最初の1件
   return variations[0] || null;
 }
 
@@ -140,70 +152,45 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
     return counts;
   }, [menus]);
 
-  // カロリー計算(サイズ × ミルク比率近似)
+  // カロリー計算(tempSizeVariations 優先 / milkVariations 互換)
   const calcItemNutrition = (item, selectedSize, milkType, customizations) => {
-    // 1) ベースカロリー: 選択サイズの値 or 既存値
-    let baseKcal = item.calorie || 0;
-    let baseProtein = item.protein || 0;
-    let baseFat = item.fat || 0;
-    let baseCarb = item.carbohydrate || 0;
+    // ベース値(フォールバック用)
+    let kcal = item.calorie || 0;
+    let protein = item.protein || 0;
+    let fat = item.fat || 0;
+    let carb = item.carbohydrate || 0;
 
-    // 商品名から温度を判定(該当があればそれに固定、無ければ"ホット"優先)
+    // 商品名から温度を判定
     const fixedTemp = detectTempFromName(item.name);
     const effectiveTemp = fixedTemp || "ホット";
 
-    // tempSizeVariations から、選択サイズ・温度の値を取得
-    if (item.hasSizeOption && selectedSize) {
-      const variation = findVariation(item, selectedSize, effectiveTemp);
+    // tempSizeVariations が存在する商品: サイズ×ミルクの完全一致で値を取得
+    const variations = parseTempSizeVariations(item.tempSizeVariations);
+    if (variations.length > 0) {
+      const variation = findVariation(item, selectedSize, effectiveTemp, milkType);
       if (variation) {
-        baseKcal = Number(variation.calorie) || baseKcal;
-        baseProtein = Number(variation.protein) || baseProtein;
-        baseFat = Number(variation.fat) || baseFat;
-        baseCarb = Number(variation.carb) || baseCarb;
+        kcal = Number(variation.calorie) || kcal;
+        protein = Number(variation.protein) || protein;
+        fat = Number(variation.fat) || fat;
+        carb = Number(variation.carb) || carb;
       }
-    }
-
-    // 2) ミルク差分(Tallベース) → サイズ比で補正
-    let kcal = baseKcal;
-    let protein = baseProtein;
-    let fat = baseFat;
-    let carb = baseCarb;
-
-    if (item.hasMilkOption && milkType && item.milkVariations) {
+    } else if (item.hasMilkOption && milkType && item.milkVariations) {
+      // tempSizeVariations が無い旧データ: milkVariations を使用
       try {
-        const variations = JSON.parse(item.milkVariations);
-        const selected = variations.find((v) => v.type === milkType);
-        const defaultMilk = variations.find((v) => v.type === "ミルク") || variations[0];
-        if (selected && defaultMilk) {
-          // Tallベースのデフォルトカロリー(item.calorie はもともと Tall ホット値)
-          const tallBaseKcal = Number(item.calorie) || 0;
-          // サイズ補正比率
-          const sizeRatio = tallBaseKcal > 0 ? baseKcal / tallBaseKcal : 1;
-          // ミルク差分(Tall基準) × サイズ比
-          const diffKcal = (Number(selected.kcal) || 0) - (Number(defaultMilk.kcal) || 0);
-          const diffProtein = (Number(selected.protein) || 0) - (Number(defaultMilk.protein) || 0);
-          const diffFat = (Number(selected.fat) || 0) - (Number(defaultMilk.fat) || 0);
-          const diffCarb = (Number(selected.carb) || 0) - (Number(defaultMilk.carb) || 0);
-          // サイズ選択なし or デフォルトミルク → 既存ロジック(直接値を使う)
-          if (!item.hasSizeOption || !selectedSize) {
-            kcal = Number(selected.kcal) || baseKcal;
-            protein = Number(selected.protein) || baseProtein;
-            fat = Number(selected.fat) || baseFat;
-            carb = Number(selected.carb) || baseCarb;
-          } else {
-            // サイズ × ミルク = ベース + 差分×比率
-            kcal = baseKcal + diffKcal * sizeRatio;
-            protein = baseProtein + diffProtein * sizeRatio;
-            fat = baseFat + diffFat * sizeRatio;
-            carb = baseCarb + diffCarb * sizeRatio;
-          }
+        const milkVars = JSON.parse(item.milkVariations);
+        const selected = milkVars.find((v) => v.type === milkType);
+        if (selected) {
+          kcal = Number(selected.kcal) || kcal;
+          protein = Number(selected.protein) || protein;
+          fat = Number(selected.fat) || fat;
+          carb = Number(selected.carb) || carb;
         }
       } catch (e) {
         // JSON パース失敗時は基本値のまま
       }
     }
 
-    // 3) カスタマイズ加算(サイズ無関係に単純加算)
+    // カスタマイズ加算(サイズ無関係に単純加算)
     if (customizations) {
       Object.entries(customizations).forEach(([customId, count]) => {
         if (count <= 0) return;
@@ -403,13 +390,41 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
   }, [modalItem]);
 
   const modalMilks = useMemo(() => {
-    if (!modalItem || !modalItem.hasMilkOption || !modalItem.milkVariations) return [];
+    if (!modalItem || !modalItem.hasMilkOption) return [];
+    const fixedTemp = detectTempFromName(modalItem.name) || "ホット";
+    const currentSize = modalState?.tempSize || (modalItem.hasSizeOption ? "トール" : null);
+
+    // tempSizeVariations が存在する商品: 選択中サイズに対応するミルク一覧を生成
+    const variations = parseTempSizeVariations(modalItem.tempSizeVariations);
+    if (variations.length > 0) {
+      const list = [];
+      const seen = new Set();
+      variations.forEach((v) => {
+        if (!v.milk) return;
+        // 選択中サイズに合致するミルクのみ抽出(サイズ指定なしのデータは全件表示)
+        const sizeOk = !currentSize || !v.size || v.size === currentSize;
+        if (!sizeOk) return;
+        if (seen.has(v.milk)) return;
+        seen.add(v.milk);
+        list.push({
+          type: v.milk,
+          kcal: Math.round(Number(v.calorie) || 0),
+          protein: Number(v.protein) || 0,
+          fat: Number(v.fat) || 0,
+          carb: Number(v.carb) || 0,
+        });
+      });
+      if (list.length > 0) return list;
+    }
+
+    // フォールバック: 旧データ(milkVariations)を使用
+    if (!modalItem.milkVariations) return [];
     try {
       return JSON.parse(modalItem.milkVariations);
     } catch {
       return [];
     }
-  }, [modalItem]);
+  }, [modalItem, modalState?.tempSize]);
 
   // 言語別のリンク先
   const homeHref = localizedHref("/", locale);
@@ -714,7 +729,9 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
               <div className={styles.milkList}>
                 {modalSizes.map((size) => {
                   const fixedTemp = detectTempFromName(modalItem.name) || "ホット";
-                  const v = findVariation(modalItem, size, fixedTemp);
+                  // 現在モーダルで仮選択中のミルクを使って、各サイズの正確なカロリーを表示
+                  const currentMilk = modalState.tempMilkType || (modalItem.hasMilkOption ? "ミルク" : null);
+                  const v = findVariation(modalItem, size, fixedTemp, currentMilk);
                   return (
                     <div
                       key={size}
