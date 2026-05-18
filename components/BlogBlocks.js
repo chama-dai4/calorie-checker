@@ -245,6 +245,107 @@ function CalorieCardBlock(props) {
   );
 }
 
+// ========== Phase C-2: compareCard(比較カード) ==========
+function CompareCardBlock(props) {
+  // スタイル取得
+  let cardStyle = "vsCard";
+  if (props.style) {
+    if (Array.isArray(props.style)) {
+      cardStyle = props.style[0] || "vsCard";
+    } else {
+      cardStyle = props.style;
+    }
+  }
+
+  // 左カラー取得
+  let leftColor = "neutral";
+  if (props.leftColor) {
+    if (Array.isArray(props.leftColor)) {
+      leftColor = props.leftColor[0] || "neutral";
+    } else {
+      leftColor = props.leftColor;
+    }
+  }
+
+  // 右カラー取得
+  let rightColor = "neutral";
+  if (props.rightColor) {
+    if (Array.isArray(props.rightColor)) {
+      rightColor = props.rightColor[0] || "neutral";
+    } else {
+      rightColor = props.rightColor;
+    }
+  }
+
+  // 必須項目のチェック
+  if (!props.leftName || !props.rightName || !props.leftValue || !props.rightValue) {
+    return null;
+  }
+
+  const containerClass = [
+    styles.compareCard,
+    styles["compareCardStyle_" + cardStyle],
+  ].join(" ");
+
+  const leftSideClass = [
+    styles.compareCardSide,
+    styles["compareCardColor_" + leftColor],
+  ].join(" ");
+
+  const rightSideClass = [
+    styles.compareCardSide,
+    styles["compareCardColor_" + rightColor],
+  ].join(" ");
+
+  return (
+    <div className={containerClass}>
+      {props.title && (
+        <div className={styles.compareCardTitle}>{props.title}</div>
+      )}
+      <div className={styles.compareCardBody}>
+        {/* 左側 */}
+        <div className={leftSideClass}>
+          {props.leftLabel && (
+            <div className={styles.compareCardLabel}>{props.leftLabel}</div>
+          )}
+          <div className={styles.compareCardName}>{props.leftName}</div>
+          <div className={styles.compareCardValueRow}>
+            <span className={styles.compareCardValue}>{props.leftValue}</span>
+            {props.leftUnit && (
+              <span className={styles.compareCardUnit}>{props.leftUnit}</span>
+            )}
+          </div>
+          {props.leftSubText && (
+            <div className={styles.compareCardSubText}>{props.leftSubText}</div>
+          )}
+        </div>
+
+        {/* 中央のVSマーク(versus スタイルのみ) */}
+        {cardStyle === "versus" && (
+          <div className={styles.compareCardVs}>VS</div>
+        )}
+
+        {/* 右側 */}
+        <div className={rightSideClass}>
+          {props.rightLabel && (
+            <div className={styles.compareCardLabel}>{props.rightLabel}</div>
+          )}
+          <div className={styles.compareCardName}>{props.rightName}</div>
+          <div className={styles.compareCardValueRow}>
+            <span className={styles.compareCardValue}>{props.rightValue}</span>
+            {props.rightUnit && (
+              <span className={styles.compareCardUnit}>{props.rightUnit}</span>
+            )}
+          </div>
+          {props.rightSubText && (
+            <div className={styles.compareCardSubText}>{props.rightSubText}</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function BlogBlocks(props) {
   const blocks = props.blocks;
 
@@ -308,6 +409,28 @@ export default function BlogBlocks(props) {
               subText={block.subText}
               style={block.style}
               color={block.color}
+            />
+          );
+        }
+        // ★ Phase C-2: compareCard
+        if (type === "compareCard") {
+          return (
+            <CompareCardBlock
+              key={key}
+              title={block.title}
+              leftLabel={block.leftLabel}
+              leftName={block.leftName}
+              leftValue={block.leftValue}
+              leftUnit={block.leftUnit}
+              leftSubText={block.leftSubText}
+              leftColor={block.leftColor}
+              rightLabel={block.rightLabel}
+              rightName={block.rightName}
+              rightValue={block.rightValue}
+              rightUnit={block.rightUnit}
+              rightSubText={block.rightSubText}
+              rightColor={block.rightColor}
+              style={block.style}
             />
           );
         }
