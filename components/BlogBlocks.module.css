@@ -1527,3 +1527,225 @@
     font-size: 12px;
   }
 }
+/* =============================================================
+   Phase C-6: ratingBox ブロック スタイル
+   3スタイル(default/compact/card) × 5カラー(gold/green/red/blue/neutral)
+   ============================================================= */
+
+/* ------- ベース ------- */
+.ratingBox {
+  margin: 28px 0;
+  padding: 20px 24px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+/* ------- ヘッダー(タイトル + 総合評価) ------- */
+.ratingBoxHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+
+.ratingBoxTitleArea {
+  flex: 1;
+  min-width: 0;
+}
+
+.ratingBoxTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.ratingBoxSubtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.ratingBoxOverall {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.ratingBoxOverallValue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+}
+
+.ratingBoxOverallNumber {
+  font-size: 24px;
+  color: var(--c-accent, var(--ink));
+}
+
+.ratingBoxOverallMax {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ------- 星(SVG) ------- */
+.ratingStars {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.ratingStar {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* 総合評価の星はちょっと大きめ */
+.ratingBoxOverall .ratingStar {
+  width: 22px;
+  height: 22px;
+}
+
+/* ------- カテゴリーリスト ------- */
+.ratingBoxCategories {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ratingBoxCategory {
+  display: grid;
+  grid-template-columns: 80px 1fr 50px;
+  align-items: center;
+  gap: 12px;
+}
+
+.ratingBoxCategoryLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.ratingBoxCategory .ratingStar {
+  width: 16px;
+  height: 16px;
+}
+
+.ratingBoxCategoryValue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--c-accent, var(--ink));
+  text-align: right;
+}
+
+/* ------- コメント ------- */
+.ratingBoxComment {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ------- カラー定義 ------- */
+.ratingBoxColor_gold    { --c-accent: #f59e0b; }
+.ratingBoxColor_green   { --c-accent: #22c55e; }
+.ratingBoxColor_red     { --c-accent: #ef4444; }
+.ratingBoxColor_blue    { --c-accent: #3b82f6; }
+.ratingBoxColor_neutral { --c-accent: #0a0a0a; }
+
+/* ------- スタイル: default ------- */
+/* ベースがそのまま default なので追加CSS不要 */
+
+/* ------- スタイル: compact(カテゴリ・コメントなし・1行表示) ------- */
+.ratingBoxStyle_compact {
+  padding: 14px 18px;
+}
+.ratingBoxStyle_compact .ratingBoxHeader {
+  padding-bottom: 0;
+  border-bottom: none;
+  margin-bottom: 0;
+  align-items: center;
+}
+.ratingBoxStyle_compact .ratingBoxTitle {
+  font-size: 16px;
+}
+.ratingBoxStyle_compact .ratingBoxOverallNumber {
+  font-size: 20px;
+}
+.ratingBoxStyle_compact .ratingBoxOverall .ratingStar {
+  width: 18px;
+  height: 18px;
+}
+
+/* ------- スタイル: card(カード型・浮き上がる) ------- */
+.ratingBoxStyle_card {
+  border: 1px solid var(--line);
+  background: var(--bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.ratingBoxStyle_card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+/* card は左側にアクセントボーダーを足してより華やかに */
+.ratingBoxStyle_card {
+  border-left: 4px solid var(--c-accent);
+  padding-left: 24px;
+}
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  .ratingBox {
+    padding: 16px 18px;
+  }
+  .ratingBoxHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .ratingBoxOverall {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+  }
+  .ratingBoxTitle {
+    font-size: 16px;
+  }
+  .ratingBoxOverallNumber {
+    font-size: 20px;
+  }
+  .ratingBoxOverall .ratingStar {
+    width: 18px;
+    height: 18px;
+  }
+  .ratingBoxCategory {
+    grid-template-columns: 70px 1fr 40px;
+    gap: 8px;
+  }
+  .ratingBoxCategoryLabel {
+    font-size: 13px;
+  }
+  .ratingBoxCategoryValue {
+    font-size: 13px;
+  }
+  .ratingBoxCategory .ratingStar {
+    width: 14px;
+    height: 14px;
+  }
+  .ratingBoxStyle_card {
+    padding-left: 18px;
+  }
+}
