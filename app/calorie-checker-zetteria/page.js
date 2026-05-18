@@ -3,17 +3,48 @@ import ZetteriaClient from "./ZetteriaClient";
 
 export const metadata = {
   title: "ゼッテリアのカロリー計算【絶品チーズバーガー対応】| 2026年最新・全メニュー",
-description:
-  "ゼッテリア(旧ロッテリア)の全メニュー・サイズ別(S/M/L)のカロリーをすぐに計算。絶品チーズバーガー、ハンバーガー、サイド、ドリンクの合計カロリーや脂質・たんぱく質・炭水化物を瞬時に表示。ZOZOマリン・千里中央など店舗限定メニューにも対応。2026年最新版。",
-keywords: ["ゼッテリア カロリー 計算", "ゼッテリア カロリー", "Zetteria カロリー", "絶品チーズバーガー カロリー", "ロッテリア カロリー", "ZOZOマリン メニュー カロリー"],
+  description:
+    "ゼッテリアの全メニューから選ぶだけで、合計カロリー・たんぱく質・脂質・炭水化物を瞬時に算出。絶品チーズバーガーなどのカロリーが一目で分かる無料ツール。2026年最新版。",
+  keywords: [
+    "ゼッテリア カロリー 計算",
+    "ゼッテリア カロリー",
+    "絶品チーズバーガー カロリー",
+    "ゼッテリア ダイエット",
+    "ロッテリア カロリー",
+  ],
   alternates: {
     canonical: "https://www.calorie-check.com/calorie-checker-zetteria",
     languages: {
-      "ja": "https://www.calorie-check.com/calorie-checker-zetteria",
-      "en": "https://www.calorie-check.com/en/calorie-checker-zetteria",
+      ja: "https://www.calorie-check.com/calorie-checker-zetteria",
+      en: "https://www.calorie-check.com/en/calorie-checker-zetteria",
       "x-default": "https://www.calorie-check.com/calorie-checker-zetteria",
     },
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      name: "ゼッテリアのカロリー計算ツール",
+      url: "https://www.calorie-check.com/calorie-checker-zetteria",
+      description:
+        "ゼッテリアの全メニューから選ぶだけで合計カロリー・たんぱく質・脂質・炭水化物を瞬時に算出する無料ツール。",
+      applicationCategory: "HealthApplication",
+      operatingSystem: "Any",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "JPY" },
+      inLanguage: "ja",
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "ホーム", item: "https://www.calorie-check.com/" },
+        { "@type": "ListItem", position: 2, name: "ハンバーガー", item: "https://www.calorie-check.com/category/burger" },
+        { "@type": "ListItem", position: 3, name: "ゼッテリア", item: "https://www.calorie-check.com/calorie-checker-zetteria" },
+      ],
+    },
+  ],
 };
 
 export const revalidate = 3600;
@@ -22,5 +53,13 @@ export default async function ZetteriaPage() {
   const data = await getMenusByChain("ゼッテリア");
   const menus = data.contents;
 
-  return <ZetteriaClient menus={menus} locale="ja" />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ZetteriaClient menus={menus} locale="ja" />
+    </>
+  );
 }
