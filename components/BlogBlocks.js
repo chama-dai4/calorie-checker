@@ -1,18 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./BlogBlocks.module.css";
-
+ 
 function HeadingBlock(props) {
   const level = props.level;
   const text = props.text;
   const id = props.id;
-
+ 
   if (level === "H3") {
     return <h3 id={id} className={styles.heading3}>{text}</h3>;
   }
   return <h2 id={id} className={styles.heading2}>{text}</h2>;
 }
-
+ 
 function RichTextBlock(props) {
   return (
     <div
@@ -21,7 +21,7 @@ function RichTextBlock(props) {
     />
   );
 }
-
+ 
 function ImageBlock(props) {
   if (!props.src) return null;
   return (
@@ -31,11 +31,11 @@ function ImageBlock(props) {
     </figure>
   );
 }
-
+ 
 function CtaBlock(props) {
   const url = props.url;
   const isExternal = url && url.startsWith("http");
-
+ 
   if (isExternal) {
     return (
       <div className={styles.cta}>
@@ -47,7 +47,7 @@ function CtaBlock(props) {
       </div>
     );
   }
-
+ 
   return (
     <div className={styles.cta}>
       {props.title && <div className={styles.ctaTitle}>{props.title}</div>}
@@ -58,7 +58,7 @@ function CtaBlock(props) {
     </div>
   );
 }
-
+ 
 function CalloutBlock(props) {
   let calloutType = "info";
   if (props.type) {
@@ -68,7 +68,7 @@ function CalloutBlock(props) {
       calloutType = props.type;
     }
   }
-
+ 
   let calloutStyle = "filled";
   if (props.style) {
     if (Array.isArray(props.style)) {
@@ -77,7 +77,7 @@ function CalloutBlock(props) {
       calloutStyle = props.style;
     }
   }
-
+ 
   const icons = {
     info: "💡",
     tip: "✨",
@@ -88,13 +88,13 @@ function CalloutBlock(props) {
     nutrition: "💪",
     discovery: "🔍",
   };
-
+ 
   const calloutClass = [
     styles.callout,
     styles["callout_" + calloutType],
     styles["calloutStyle_" + calloutStyle],
   ].join(" ");
-
+ 
   return (
     <div className={calloutClass}>
       <div className={styles.calloutHeader}>
@@ -105,7 +105,7 @@ function CalloutBlock(props) {
     </div>
   );
 }
-
+ 
 function TableBlock(props) {
   const rowsText = props.rows || "";
   const parsedRows = rowsText
@@ -116,9 +116,9 @@ function TableBlock(props) {
       const parts = line.split("|").map((p) => p.trim());
       return { left: parts[0] || "", right: parts[1] || "" };
     });
-
+ 
   if (parsedRows.length === 0) return null;
-
+ 
   return (
     <div className={styles.tableWrap}>
       {props.title && <div className={styles.tableTitle}>{props.title}</div>}
@@ -143,7 +143,7 @@ function TableBlock(props) {
     </div>
   );
 }
-
+ 
 function FaqBlock(props) {
   return (
     <div className={styles.faq}>
@@ -158,7 +158,7 @@ function FaqBlock(props) {
     </div>
   );
 }
-
+ 
 function QuoteBlock(props) {
   return (
     <blockquote className={styles.quote}>
@@ -167,17 +167,17 @@ function QuoteBlock(props) {
     </blockquote>
   );
 }
-
+ 
 function DividerBlock(props) {
   const styleType = (props.style && props.style[0]) || props.style || "default";
   const dividerClass = styles.divider + " " + styles["divider_" + styleType];
   return <hr className={dividerClass} />;
 }
-
+ 
 function RelatedLinkBlock(props) {
   const url = props.url;
   const isExternal = url && url.startsWith("http");
-
+ 
   if (isExternal) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer" className={styles.relatedLink}>
@@ -189,7 +189,7 @@ function RelatedLinkBlock(props) {
       </a>
     );
   }
-
+ 
   return (
     <Link href={url} className={styles.relatedLink}>
       <div className={styles.relatedLinkLabel}>🔗 {props.title}</div>
@@ -200,7 +200,7 @@ function RelatedLinkBlock(props) {
     </Link>
   );
 }
-
+ 
 // ========== Phase C-1: calorieCard(数値ハイライト) ==========
 function CalorieCardBlock(props) {
   let cardStyle = "default";
@@ -211,7 +211,7 @@ function CalorieCardBlock(props) {
       cardStyle = props.style;
     }
   }
-
+ 
   let cardColor = "neutral";
   if (props.color) {
     if (Array.isArray(props.color)) {
@@ -220,15 +220,15 @@ function CalorieCardBlock(props) {
       cardColor = props.color;
     }
   }
-
+ 
   if (!props.value) return null;
-
+ 
   const cardClass = [
     styles.calorieCard,
     styles["calorieCardStyle_" + cardStyle],
     styles["calorieCardColor_" + cardColor],
   ].join(" ");
-
+ 
   return (
     <div className={cardClass}>
       <div className={styles.calorieCardMain}>
@@ -244,7 +244,7 @@ function CalorieCardBlock(props) {
     </div>
   );
 }
-
+ 
 // ========== Phase C-2: compareCard(比較カード) ==========
 function CompareCardBlock(props) {
   let cardStyle = "vsCard";
@@ -255,7 +255,7 @@ function CompareCardBlock(props) {
       cardStyle = props.style;
     }
   }
-
+ 
   let leftColor = "neutral";
   if (props.leftColor) {
     if (Array.isArray(props.leftColor)) {
@@ -264,7 +264,7 @@ function CompareCardBlock(props) {
       leftColor = props.leftColor;
     }
   }
-
+ 
   let rightColor = "neutral";
   if (props.rightColor) {
     if (Array.isArray(props.rightColor)) {
@@ -273,26 +273,26 @@ function CompareCardBlock(props) {
       rightColor = props.rightColor;
     }
   }
-
+ 
   if (!props.leftName || !props.rightName || !props.leftValue || !props.rightValue) {
     return null;
   }
-
+ 
   const containerClass = [
     styles.compareCard,
     styles["compareCardStyle_" + cardStyle],
   ].join(" ");
-
+ 
   const leftSideClass = [
     styles.compareCardSide,
     styles["compareCardColor_" + leftColor],
   ].join(" ");
-
+ 
   const rightSideClass = [
     styles.compareCardSide,
     styles["compareCardColor_" + rightColor],
   ].join(" ");
-
+ 
   return (
     <div className={containerClass}>
       {props.title && (
@@ -314,11 +314,11 @@ function CompareCardBlock(props) {
             <div className={styles.compareCardSubText}>{props.leftSubText}</div>
           )}
         </div>
-
+ 
         {cardStyle === "versus" && (
           <div className={styles.compareCardVs}>VS</div>
         )}
-
+ 
         <div className={rightSideClass}>
           {props.rightLabel && (
             <div className={styles.compareCardLabel}>{props.rightLabel}</div>
@@ -338,7 +338,7 @@ function CompareCardBlock(props) {
     </div>
   );
 }
-
+ 
 // =============================================================
 // Phase C-3: stepGuide ブロック
 // =============================================================
@@ -348,13 +348,13 @@ function StepGuideBlock(props) {
   if (props.style) {
     cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
   }
-
+ 
   // カラー(neutral / blue / green / orange / red)
   let cardColor = "neutral";
   if (props.color) {
     cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
   }
-
+ 
   // 最大5ステップまでループで収集(後方互換性:空はスキップ)
   const steps = [];
   for (let i = 1; i <= 5; i++) {
@@ -367,10 +367,10 @@ function StepGuideBlock(props) {
       });
     }
   }
-
+ 
   // ステップが1つもなければ描画しない(安全対策)
   if (steps.length === 0) return null;
-
+ 
   return (
     <div
       className={`${styles.stepGuide} ${styles[`stepGuideStyle_${cardStyle}`]} ${styles[`stepGuideColor_${cardColor}`]}`}
@@ -399,26 +399,26 @@ function StepGuideBlock(props) {
     </div>
   );
 }
-
+ 
 // =============================================================
 // Phase C-4: checklist ブロック
 // =============================================================
 function ChecklistBlock(props) {
   // items が無ければ描画しない
   if (!props.items) return null;
-
+ 
   // スタイル(default / simple / card)
   let cardStyle = "default";
   if (props.style) {
     cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
   }
-
+ 
   // カラー(green / blue / orange / red / neutral)
   let cardColor = "green";
   if (props.color) {
     cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
   }
-
+ 
   // 行ごとに解析: [x] = チェック済み / [ ] = 未チェック / その他は未チェック扱い
   const items = String(props.items)
     .split("\n")
@@ -435,9 +435,9 @@ function ChecklistBlock(props) {
         return { checked: false, text: line };
       }
     });
-
+ 
   if (items.length === 0) return null;
-
+ 
   return (
     <div
       className={`${styles.checklist} ${styles[`checklistStyle_${cardStyle}`]} ${styles[`checklistColor_${cardColor}`]}`}
@@ -463,7 +463,7 @@ function ChecklistBlock(props) {
     </div>
   );
 }
-
+ 
 // =============================================================
 // Phase C-5: progressBar ブロック
 // =============================================================
@@ -471,35 +471,35 @@ function ProgressBarBlock(props) {
   // 数値変換(文字列で来てもOKに)
   const current = parseFloat(props.current);
   const max = parseFloat(props.max);
-
+ 
   // 不正値ガード
   if (isNaN(current) || isNaN(max) || max <= 0) return null;
-
+ 
   // 割合計算(0〜100にクランプ)
   const percent = Math.min(100, Math.max(0, (current / max) * 100));
-
+ 
   // スタイル(thin / normal / thick)
   let cardStyle = "normal";
   if (props.style) {
     cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
   }
-
+ 
   // カラー(auto / green / yellow / red / blue)
   let cardColor = "auto";
   if (props.color) {
     cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
   }
-
+ 
   // auto の場合は値で自動切替
   if (cardColor === "auto") {
     if (percent < 50) cardColor = "green";
     else if (percent < 80) cardColor = "yellow";
     else cardColor = "red";
   }
-
+ 
   // パーセント表示(デフォルトは true)
   const showPercent = props.showPercent !== false;
-
+ 
   return (
     <div
       className={`${styles.progressBar} ${styles[`progressBarStyle_${cardStyle}`]} ${styles[`progressBarColor_${cardColor}`]}`}
@@ -531,21 +531,21 @@ function ProgressBarBlock(props) {
     </div>
   );
 }
-
+ 
 export default function BlogBlocks(props) {
   const blocks = props.blocks;
-
+ 
   if (!blocks || blocks.length === 0) {
     return null;
   }
-
+ 
   return (
     <div className={styles.blocks}>
       {blocks.map((block, index) => {
         const type = block.fieldId;
         const key = type + "-" + index;
         const headingId = "heading-" + index;
-
+ 
         if (type === "heading") {
           const level = (block.level && block.level[0]) || block.level;
           return (
@@ -673,3 +673,4 @@ export default function BlogBlocks(props) {
     </div>
   );
 }
+ 
