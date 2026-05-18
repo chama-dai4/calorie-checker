@@ -346,6 +346,67 @@ function CompareCardBlock(props) {
   );
 }
 
+// =============================================================
+// Phase C-3: stepGuide ブロック
+// =============================================================
+function StepGuideBlock(props) {
+  // スタイル(numbered / arrow / cards)
+  let cardStyle = "numbered";
+  if (props.style) {
+    cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
+  }
+
+  // カラー(neutral / blue / green / orange / red)
+  let cardColor = "neutral";
+  if (props.color) {
+    cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  // 最大5ステップまでループで収集(後方互換性:空はスキップ)
+  const steps = [];
+  for (let i = 1; i <= 5; i++) {
+    const title = props[`step${i}Title`];
+    const content = props[`step${i}Content`];
+    if (title && String(title).trim().length > 0) {
+      steps.push({
+        title: title,
+        content: content || "",
+      });
+    }
+  }
+
+  // ステップが1つもなければ描画しない(安全対策)
+  if (steps.length === 0) return null;
+
+  return (
+    <div
+      className={`${styles.stepGuide} ${styles[`stepGuideStyle_${cardStyle}`]} ${styles[`stepGuideColor_${cardColor}`]}`}
+    >
+      {props.title && (
+        <div className={styles.stepGuideTitle}>{props.title}</div>
+      )}
+      <div className={styles.stepGuideItems}>
+        {steps.map((step, idx) => (
+          <div key={idx} className={styles.stepItem}>
+            <div className={styles.stepNumber}>
+              {cardStyle === "arrow" && idx > 0 ? (
+                <span className={styles.stepArrow} aria-hidden="true">→</span>
+              ) : null}
+              <span className={styles.stepNumberInner}>{idx + 1}</span>
+            </div>
+            <div className={styles.stepBody}>
+              <div className={styles.stepTitle}>{step.title}</div>
+              {step.content && (
+                <div className={styles.stepContent}>{step.content}</div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function BlogBlocks(props) {
   const blocks = props.blocks;
 
@@ -434,6 +495,26 @@ export default function BlogBlocks(props) {
             />
           );
         }
+        if (type === "stepGuide") {
+  return (
+    <StepGuideBlock
+      key={key}
+      title={block.title}
+      step1Title={block.step1Title}
+      step1Content={block.step1Content}
+      step2Title={block.step2Title}
+      step2Content={block.step2Content}
+      step3Title={block.step3Title}
+      step3Content={block.step3Content}
+      step4Title={block.step4Title}
+      step4Content={block.step4Content}
+      step5Title={block.step5Title}
+      step5Content={block.step5Content}
+      style={block.style}
+      color={block.color}
+    />
+  );
+}
         return null;
       })}
     </div>

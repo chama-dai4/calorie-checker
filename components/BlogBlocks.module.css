@@ -1051,3 +1051,200 @@
     display: none;
   }
 }
+/* =============================================================
+   Phase C-3: stepGuide ブロック スタイル
+   3スタイル(numbered/arrow/cards) × 5カラー(neutral/blue/green/orange/red)
+   ============================================================= */
+
+/* ------- ベース ------- */
+.stepGuide {
+  margin: 28px 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.stepGuideTitle {
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 20px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.stepGuideItems {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------- 各ステップ(共通) ------- */
+.stepItem {
+  padding: 20px;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 16px;
+  align-items: flex-start;
+}
+.stepItem:last-child {
+  border-bottom: none;
+}
+
+.stepNumber {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--c-accent, var(--ink));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  font-family: 'Space Grotesk', sans-serif;
+  flex-shrink: 0;
+}
+
+.stepNumberInner {
+  display: inline-block;
+  line-height: 1;
+}
+
+.stepBody {
+  min-width: 0; /* テキストの折り返し対策 */
+}
+
+.stepTitle {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.stepContent {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* ------- カラー定義 ------- */
+.stepGuideColor_neutral { --c-accent: #0a0a0a; }
+.stepGuideColor_blue    { --c-accent: #3b82f6; }
+.stepGuideColor_green   { --c-accent: #22c55e; }
+.stepGuideColor_orange  { --c-accent: #f97316; }
+.stepGuideColor_red     { --c-accent: #ef4444; }
+
+/* ------- スタイル: numbered(デフォルト・縦並び) ------- */
+/* ベーススタイルがそのまま numbered なので追加CSS不要 */
+
+/* ------- スタイル: arrow(横並び・矢印付き) ------- */
+.stepGuideStyle_arrow .stepGuideItems {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.stepGuideStyle_arrow .stepItem {
+  flex: 1 1 0;
+  min-width: 180px;
+  border-bottom: none;
+  border-right: 1px solid var(--line);
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  padding: 18px 16px;
+}
+.stepGuideStyle_arrow .stepItem:last-child {
+  border-right: none;
+}
+.stepGuideStyle_arrow .stepNumber {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+.stepGuideStyle_arrow .stepArrow {
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-light);
+  font-size: 18px;
+  font-weight: 700;
+  pointer-events: none;
+}
+.stepGuideStyle_arrow .stepTitle {
+  font-size: 14px;
+}
+.stepGuideStyle_arrow .stepContent {
+  font-size: 13px;
+}
+
+/* ------- スタイル: cards(各ステップが独立カード) ------- */
+.stepGuideStyle_cards {
+  border: none;
+  background: transparent;
+  overflow: visible;
+}
+.stepGuideStyle_cards .stepGuideTitle {
+  background: transparent;
+  border-bottom: none;
+  padding: 0 0 12px 0;
+}
+.stepGuideStyle_cards .stepGuideItems {
+  flex-direction: column;
+  gap: 12px;
+}
+.stepGuideStyle_cards .stepItem {
+  border: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  padding: 18px 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.stepGuideStyle_cards .stepItem:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+.stepGuideStyle_cards .stepItem:last-child {
+  border-bottom: 1px solid var(--line); /* cardsは最後も枠を維持 */
+}
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  .stepItem {
+    padding: 16px;
+    grid-template-columns: 36px 1fr;
+    gap: 12px;
+  }
+  .stepNumber {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  .stepTitle {
+    font-size: 14px;
+  }
+  .stepContent {
+    font-size: 13px;
+  }
+
+  /* arrow は縦並びに切り替え */
+  .stepGuideStyle_arrow .stepGuideItems {
+    flex-direction: column;
+  }
+  .stepGuideStyle_arrow .stepItem {
+    flex: none;
+    min-width: 0;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .stepGuideStyle_arrow .stepItem:last-child {
+    border-bottom: none;
+  }
+  .stepGuideStyle_arrow .stepArrow {
+    display: none; /* スマホでは矢印は非表示 */
+  }
+}
