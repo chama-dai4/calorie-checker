@@ -60,18 +60,49 @@ function CtaBlock(props) {
 }
 
 function CalloutBlock(props) {
-  const calloutType = (props.type && props.type[0]) || props.type || "info";
+  // 種類(色)を取得 - 既存4種類 + 新規4種類
+  let calloutType = "info";
+  if (props.type) {
+    if (Array.isArray(props.type)) {
+      calloutType = props.type[0] || "info";
+    } else {
+      calloutType = props.type;
+    }
+  }
+
+  // スタイルを取得 - 新規追加(デフォルトは filled で後方互換)
+  let calloutStyle = "filled";
+  if (props.style) {
+    if (Array.isArray(props.style)) {
+      calloutStyle = props.style[0] || "filled";
+    } else {
+      calloutStyle = props.style;
+    }
+  }
+
+  // アイコンマッピング(8色)
   const icons = {
-    info: "ℹ️",
-    tip: "💡",
-    warning: "⚠️",
-    success: "✓",
+    info: "💡",       // 一般情報・補足
+    tip: "✨",        // アドバイス
+    warning: "⚠️",   // 注意
+    success: "✅",   // OK・推奨
+    danger: "🔥",    // NG・絶対避けたい
+    diet: "🥗",      // ダイエット情報
+    nutrition: "💪", // 栄養・健康情報
+    discovery: "🔍", // 豆知識・発見
   };
-  const calloutClass = styles.callout + " " + styles["callout_" + calloutType];
+
+  // クラス名を組み立て(色 × スタイル)
+  const calloutClass = [
+    styles.callout,
+    styles["callout_" + calloutType],
+    styles["calloutStyle_" + calloutStyle],
+  ].join(" ");
+
   return (
     <div className={calloutClass}>
       <div className={styles.calloutHeader}>
-        <span className={styles.calloutIcon}>{icons[calloutType] || "ℹ️"}</span>
+        <span className={styles.calloutIcon}>{icons[calloutType] || "💡"}</span>
         {props.title && <span className={styles.calloutTitle}>{props.title}</span>}
       </div>
       <div className={styles.calloutContent}>{props.content}</div>
@@ -154,7 +185,7 @@ function RelatedLinkBlock(props) {
   if (isExternal) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer" className={styles.relatedLink}>
-        <div className={styles.relatedLinkLabel}>📖 {props.title}</div>
+        <div className={styles.relatedLinkLabel}>🔗 {props.title}</div>
         <div className={styles.relatedLinkText}>
           {props.text}
           <span className={styles.relatedLinkArrow}>→</span>
@@ -165,7 +196,7 @@ function RelatedLinkBlock(props) {
 
   return (
     <Link href={url} className={styles.relatedLink}>
-      <div className={styles.relatedLinkLabel}>📖 {props.title}</div>
+      <div className={styles.relatedLinkLabel}>🔗 {props.title}</div>
       <div className={styles.relatedLinkText}>
         {props.text}
         <span className={styles.relatedLinkArrow}>→</span>
@@ -209,7 +240,7 @@ export default function BlogBlocks(props) {
           return <CtaBlock key={key} title={block.title} text={block.text} url={block.url} />;
         }
         if (type === "callout") {
-          return <CalloutBlock key={key} type={block.type} title={block.title} content={block.content} />;
+          return <CalloutBlock key={key} type={block.type} style={block.style} title={block.title} content={block.content} />;
         }
         if (type === "table") {
           return <TableBlock key={key} title={block.title} leftHeader={block.leftHeader} rightHeader={block.rightHeader} rows={block.rows} />;

@@ -176,14 +176,22 @@
   transform: translateX(3px);
 }
 
-/* ========== ポイントボックス（callout） ========== */
+/* ========================================================== */
+/* ========== ポイントボックス(callout)拡張版 ========== */
+/* ========================================================== */
+
+/* ベース */
 .callout {
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 16px 18px;
   border: 1px solid;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.callout:hover {
+  transform: translateY(-1px);
 }
 .calloutHeader {
   display: flex;
@@ -191,42 +199,128 @@
   gap: 8px;
 }
 .calloutIcon {
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1;
+  flex-shrink: 0;
 }
 .calloutTitle {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
   letter-spacing: -0.005em;
 }
 .calloutContent {
   font-size: 14px;
-  line-height: 1.75;
+  line-height: 1.8;
   white-space: pre-wrap;
 }
 
+/* ========== 8色定義(色変数) ========== */
+/* CSS変数で各色のベース・ボーダー・テキストを定義 */
+
 .callout_info {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  color: #1e40af;
+  --c-bg: #eff6ff;
+  --c-border: #bfdbfe;
+  --c-text: #1e40af;
+  --c-accent: #3b82f6;
 }
 .callout_tip {
-  background: #f5f3ff;
-  border-color: #ddd6fe;
-  color: #5b21b6;
+  --c-bg: #fff7ed;
+  --c-border: #fed7aa;
+  --c-text: #9a3412;
+  --c-accent: #f97316;
 }
 .callout_warning {
-  background: #fffbeb;
-  border-color: #fde68a;
-  color: #92400e;
+  --c-bg: #fffbeb;
+  --c-border: #fde68a;
+  --c-text: #92400e;
+  --c-accent: #f59e0b;
 }
 .callout_success {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
-  color: #166534;
+  --c-bg: #f0fdf4;
+  --c-border: #bbf7d0;
+  --c-text: #166534;
+  --c-accent: #22c55e;
+}
+.callout_danger {
+  --c-bg: #fef2f2;
+  --c-border: #fecaca;
+  --c-text: #991b1b;
+  --c-accent: #ef4444;
+}
+.callout_diet {
+  --c-bg: #fdf2f8;
+  --c-border: #fbcfe8;
+  --c-text: #9d174d;
+  --c-accent: #ec4899;
+}
+.callout_nutrition {
+  --c-bg: #f5f3ff;
+  --c-border: #ddd6fe;
+  --c-text: #5b21b6;
+  --c-accent: #8b5cf6;
+}
+.callout_discovery {
+  --c-bg: #ecfeff;
+  --c-border: #a5f3fc;
+  --c-text: #155e75;
+  --c-accent: #06b6d4;
 }
 
+/* ========== 4スタイル定義 ========== */
+
+/* 1. filled(塗りつぶし) - デフォルト */
+.calloutStyle_filled {
+  background: var(--c-bg);
+  border-color: var(--c-border);
+  color: var(--c-text);
+}
+
+/* 2. outline(枠線+白背景) */
+.calloutStyle_outline {
+  background: var(--bg);
+  border: 2px solid var(--c-accent);
+  color: var(--c-text);
+}
+.calloutStyle_outline .calloutTitle {
+  color: var(--c-accent);
+}
+
+/* 3. accent(左ボーダー強調) */
+.calloutStyle_accent {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--c-accent);
+  color: var(--ink);
+  border-radius: 6px;
+}
+.calloutStyle_accent .calloutTitle {
+  color: var(--c-accent);
+}
+
+/* 4. minimal(アイコン+文字のみ) */
+.calloutStyle_minimal {
+  background: transparent;
+  border: none;
+  padding: 12px 0;
+  border-top: 1px dashed var(--c-border);
+  border-bottom: 1px dashed var(--c-border);
+  border-radius: 0;
+  color: var(--ink);
+}
+.calloutStyle_minimal:hover {
+  transform: none;
+}
+.calloutStyle_minimal .calloutTitle {
+  color: var(--c-accent);
+  font-weight: 700;
+}
+.calloutStyle_minimal .calloutContent {
+  color: var(--muted);
+}
+
+/* ========================================================== */
 /* ========== 比較表 ========== */
+/* ========================================================== */
 .tableWrap {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -402,7 +496,8 @@
   transform: translateX(3px);
   color: var(--ink);
 }
-/* ========== ハイライト（マーカー）スタイル ========== */
+
+/* ========== ハイライト(マーカー)スタイル ========== */
 .richText mark,
 .richText :global(.marker) {
   background: linear-gradient(to top, #fef3c7 50%, transparent 50%);
@@ -411,7 +506,7 @@
   font-weight: 500;
 }
 
-/* ========== リッチエディタの色付き太字（オプション） ========== */
+/* ========== リッチエディタの色付き太字 ========== */
 .richText strong {
   color: var(--ink);
   font-weight: 700;
@@ -444,5 +539,21 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ========== レスポンシブ:モバイル対応 ========== */
+@media (max-width: 760px) {
+  .callout {
+    padding: 14px 16px;
+  }
+  .calloutIcon {
+    font-size: 16px;
+  }
+  .calloutTitle {
+    font-size: 13px;
+  }
+  .calloutContent {
+    font-size: 13px;
   }
 }
