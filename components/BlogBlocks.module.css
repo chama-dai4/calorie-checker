@@ -1749,3 +1749,246 @@
     padding-left: 18px;
   }
 }
+/* =============================================================
+   Phase C-7: menuShowcase ブロック スタイル
+   3スタイル(grid/list/compact) × 5カラー(neutral/green/orange/red/blue)
+   ============================================================= */
+
+/* ------- ベース ------- */
+.menuShowcase {
+  margin: 28px 0;
+}
+
+/* ------- ヘッダー(タイトル・副題) ------- */
+.menuShowcaseHeader {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.menuShowcaseTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.menuShowcaseSubtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ------- メニュー個別カード(共通) ------- */
+.menuShowcaseItem {
+  padding: 20px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  text-align: center;
+  position: relative;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.menuShowcaseItem:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.menuShowcaseName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.menuShowcaseValueRow {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.menuShowcaseValue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--c-accent, var(--ink));
+  line-height: 1;
+}
+
+.menuShowcaseUnit {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.menuShowcaseNote {
+  font-size: 12px;
+  color: var(--muted);
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  margin-top: auto;
+}
+
+/* ------- ランクメダル(list スタイル時のみ) ------- */
+.menuShowcaseRank {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 36px;
+  height: 36px;
+  background: var(--bg);
+  border: 2px solid var(--c-accent, var(--line));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  z-index: 1;
+}
+
+/* ------- カラー定義 ------- */
+.menuShowcaseColor_neutral { --c-accent: #0a0a0a; }
+.menuShowcaseColor_green   { --c-accent: #22c55e; }
+.menuShowcaseColor_orange  { --c-accent: #f97316; }
+.menuShowcaseColor_red     { --c-accent: #ef4444; }
+.menuShowcaseColor_blue    { --c-accent: #3b82f6; }
+
+/* ------- スタイル: grid(2〜3列のグリッド) ------- */
+.menuShowcaseStyle_grid .menuShowcaseItems {
+  display: grid;
+  gap: 12px;
+}
+/* メニュー数に応じたグリッド列数 */
+.menuShowcaseStyle_grid.menuShowcaseCount_1 .menuShowcaseItems {
+  grid-template-columns: 1fr;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.menuShowcaseStyle_grid.menuShowcaseCount_2 .menuShowcaseItems {
+  grid-template-columns: repeat(2, 1fr);
+}
+.menuShowcaseStyle_grid.menuShowcaseCount_3 .menuShowcaseItems {
+  grid-template-columns: repeat(3, 1fr);
+}
+/* gridスタイルのカード調整 */
+.menuShowcaseStyle_grid .menuShowcaseItem {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px;
+}
+/* gridスタイル: 1位を強調(色付きボーダー) */
+.menuShowcaseStyle_grid .menuShowcaseItem:first-child {
+  border-color: var(--c-accent);
+  border-width: 2px;
+}
+
+/* ------- スタイル: list(横並びTOP◯・メダル付き) ------- */
+.menuShowcaseStyle_list .menuShowcaseItems {
+  display: grid;
+  gap: 16px 12px;
+  grid-template-columns: repeat(3, 1fr);
+}
+.menuShowcaseStyle_list.menuShowcaseCount_1 .menuShowcaseItems {
+  grid-template-columns: 1fr;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.menuShowcaseStyle_list.menuShowcaseCount_2 .menuShowcaseItems {
+  grid-template-columns: repeat(2, 1fr);
+}
+.menuShowcaseStyle_list .menuShowcaseItem {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px;
+  padding-top: 24px;
+}
+/* listスタイル: 1位は色付きの太枠で目立たせる */
+.menuShowcaseStyle_list .menuShowcaseItem:first-child {
+  border-color: var(--c-accent);
+  border-width: 2px;
+  background: var(--bg);
+}
+
+/* ------- スタイル: compact(縦並び1列・行型) ------- */
+.menuShowcaseStyle_compact .menuShowcaseItems {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.menuShowcaseStyle_compact .menuShowcaseItem {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  text-align: left;
+  padding: 14px 18px;
+  min-height: auto;
+  gap: 12px;
+}
+.menuShowcaseStyle_compact .menuShowcaseName {
+  margin-bottom: 0;
+  font-size: 14px;
+}
+.menuShowcaseStyle_compact .menuShowcaseValueRow {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+.menuShowcaseStyle_compact .menuShowcaseValue {
+  font-size: 20px;
+}
+.menuShowcaseStyle_compact .menuShowcaseUnit {
+  font-size: 12px;
+}
+.menuShowcaseStyle_compact .menuShowcaseNote {
+  grid-column: 1 / -1;
+  border-top: 1px dashed var(--line);
+  padding-top: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  text-align: left;
+}
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  .menuShowcaseTitle {
+    font-size: 16px;
+  }
+  .menuShowcaseName {
+    font-size: 14px;
+  }
+  .menuShowcaseValue {
+    font-size: 24px;
+  }
+  .menuShowcaseNote {
+    font-size: 11px;
+  }
+
+  /* gridスタイル: スマホでは2列、3個の時は3個目を全幅 */
+  .menuShowcaseStyle_grid.menuShowcaseCount_3 .menuShowcaseItems {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .menuShowcaseStyle_grid.menuShowcaseCount_3 .menuShowcaseItem:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  /* listスタイル: スマホでは縦並びに */
+  .menuShowcaseStyle_list .menuShowcaseItems {
+    grid-template-columns: 1fr;
+  }
+  .menuShowcaseStyle_list .menuShowcaseItem {
+    min-height: auto;
+    padding-top: 20px;
+  }
+
+  /* compactは元から1列なので変更なし */
+  .menuShowcaseStyle_compact .menuShowcaseItem {
+    padding: 12px 14px;
+  }
+  .menuShowcaseStyle_compact .menuShowcaseValue {
+    font-size: 18px;
+  }
+}

@@ -343,19 +343,16 @@ function CompareCardBlock(props) {
 // Phase C-3: stepGuide ブロック
 // =============================================================
 function StepGuideBlock(props) {
-  // スタイル(numbered / arrow / cards)
   let cardStyle = "numbered";
   if (props.style) {
     cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
   }
 
-  // カラー(neutral / blue / green / orange / red)
   let cardColor = "neutral";
   if (props.color) {
     cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
   }
 
-  // 最大5ステップまでループで収集(後方互換性:空はスキップ)
   const steps = [];
   for (let i = 1; i <= 5; i++) {
     const title = props[`step${i}Title`];
@@ -523,9 +520,6 @@ function ProgressBarBlock(props) {
 // =============================================================
 // Phase C-6: ratingBox ブロック(SVG半星対応)
 // =============================================================
-
-// 1つの星を描画するSVGコンポーネント
-// fillPercent: 0(空)〜100(完全に塗りつぶし)
 function RatingStar({ fillPercent, color, gradId }) {
   const safeFill = Math.max(0, Math.min(100, fillPercent));
 
@@ -542,14 +536,12 @@ function RatingStar({ fillPercent, color, gradId }) {
           <stop offset={`${safeFill}%`} stopColor="transparent" />
         </linearGradient>
       </defs>
-      {/* 背景の灰色の星(空の星) */}
       <path
         d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
         fill="#e5e7eb"
         stroke="#d1d5db"
         strokeWidth="0.5"
       />
-      {/* 塗りつぶし部分(評価に応じた色) */}
       <path
         d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
         fill={`url(#${gradId})`}
@@ -558,7 +550,6 @@ function RatingStar({ fillPercent, color, gradId }) {
   );
 }
 
-// 星のリスト(5個まとめて描画)
 function RatingStars({ rating, color, idPrefix }) {
   const safeRating = Math.max(0, Math.min(5, rating));
   const stars = [];
@@ -583,24 +574,20 @@ function RatingStars({ rating, color, idPrefix }) {
 }
 
 function RatingBoxBlock(props) {
-  // 必須項目チェック
   if (!props.title) return null;
   const overall = parseFloat(props.overallRating);
   if (isNaN(overall)) return null;
 
-  // スタイル(default / compact / card)
   let cardStyle = "default";
   if (props.style) {
     cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
   }
 
-  // カラー(gold / green / red / blue / neutral)
   let cardColor = "gold";
   if (props.color) {
     cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
   }
 
-  // カラーコード
   const colorMap = {
     gold: "#f59e0b",
     green: "#22c55e",
@@ -610,10 +597,8 @@ function RatingBoxBlock(props) {
   };
   const starColor = colorMap[cardColor] || colorMap.gold;
 
-  // SVG gradient用のユニークID prefix(同一ページに複数置いてもID衝突しないように)
   const idPrefix = `rb-${props.idx || 0}-${cardColor}`;
 
-  // 固定カテゴリ4つ(値があるものだけ表示)
   const categories = [
     { label: "味", value: parseFloat(props.tasteRating) },
     { label: "価格", value: parseFloat(props.priceRating) },
@@ -670,6 +655,80 @@ function RatingBoxBlock(props) {
       {cardStyle !== "compact" && props.comment && (
         <div className={styles.ratingBoxComment}>{props.comment}</div>
       )}
+    </div>
+  );
+}
+
+// =============================================================
+// Phase C-7: menuShowcase ブロック(メニュー紹介・最大3個)
+// =============================================================
+function MenuShowcaseBlock(props) {
+  // スタイル(grid / list / compact)
+  let cardStyle = "grid";
+  if (props.style) {
+    cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
+  }
+
+  // カラー(neutral / green / orange / red / blue)
+  let cardColor = "neutral";
+  if (props.color) {
+    cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  // 最大3メニュー収集(menu1Nameが必須・空はスキップ)
+  const menus = [];
+  for (let i = 1; i <= 3; i++) {
+    const name = props[`menu${i}Name`];
+    if (name && String(name).trim().length > 0) {
+      menus.push({
+        name: name,
+        value: props[`menu${i}Value`],
+        unit: props[`menu${i}Unit`] || "",
+        note: props[`menu${i}Note`] || "",
+      });
+    }
+  }
+
+  // メニューが1つもなければ描画しない
+  if (menus.length === 0) return null;
+
+  return (
+    <div
+      className={`${styles.menuShowcase} ${styles[`menuShowcaseStyle_${cardStyle}`]} ${styles[`menuShowcaseColor_${cardColor}`]} ${styles[`menuShowcaseCount_${menus.length}`]}`}
+    >
+      {(props.title || props.subtitle) && (
+        <div className={styles.menuShowcaseHeader}>
+          {props.title && (
+            <div className={styles.menuShowcaseTitle}>{props.title}</div>
+          )}
+          {props.subtitle && (
+            <div className={styles.menuShowcaseSubtitle}>{props.subtitle}</div>
+          )}
+        </div>
+      )}
+      <div className={styles.menuShowcaseItems}>
+        {menus.map((menu, idx) => (
+          <div key={idx} className={styles.menuShowcaseItem}>
+            {cardStyle === "list" && (
+              <div className={styles.menuShowcaseRank}>
+                {idx === 0 ? "🥇" : idx === 1 ? "🥈" : "🥉"}
+              </div>
+            )}
+            <div className={styles.menuShowcaseName}>{menu.name}</div>
+            {(menu.value !== undefined && menu.value !== null && menu.value !== "") && (
+              <div className={styles.menuShowcaseValueRow}>
+                <span className={styles.menuShowcaseValue}>{menu.value}</span>
+                {menu.unit && (
+                  <span className={styles.menuShowcaseUnit}>{menu.unit}</span>
+                )}
+              </div>
+            )}
+            {menu.note && (
+              <div className={styles.menuShowcaseNote}>{menu.note}</div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -824,6 +883,30 @@ export default function BlogBlocks(props) {
               healthRating={block.healthRating}
               satisfactionRating={block.satisfactionRating}
               comment={block.comment}
+              style={block.style}
+              color={block.color}
+            />
+          );
+        }
+        // ★ Phase C-7: menuShowcase
+        if (type === "menuShowcase") {
+          return (
+            <MenuShowcaseBlock
+              key={key}
+              title={block.title}
+              subtitle={block.subtitle}
+              menu1Name={block.menu1Name}
+              menu1Value={block.menu1Value}
+              menu1Unit={block.menu1Unit}
+              menu1Note={block.menu1Note}
+              menu2Name={block.menu2Name}
+              menu2Value={block.menu2Value}
+              menu2Unit={block.menu2Unit}
+              menu2Note={block.menu2Note}
+              menu3Name={block.menu3Name}
+              menu3Value={block.menu3Value}
+              menu3Unit={block.menu3Unit}
+              menu3Note={block.menu3Note}
               style={block.style}
               color={block.color}
             />
