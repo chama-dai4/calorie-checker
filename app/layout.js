@@ -1,5 +1,7 @@
 import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
+// ▼ 変更点1: headers をインポート(追加)
+import { headers } from "next/headers";
 
 export const metadata = {
   title: "カロリーチェッカー | 外食チェーンのカロリー計算サイト",
@@ -9,9 +11,16 @@ export const metadata = {
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
-export default function RootLayout({ children }) {
+// ▼ 変更点2: function → async function(変更)
+export default async function RootLayout({ children }) {
+  // ▼ 変更点3: proxy.js が付与した x-pathname を読み取って lang を判定(追加)
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") || "";
+  const lang = pathname.startsWith("/en") ? "en" : "ja";
+
   return (
-    <html lang="ja">
+    // ▼ 変更点4: <html lang="ja"> → <html lang={lang}>(変更)
+    <html lang={lang}>
       <head>
         <meta name="color-scheme" content="light only" />
         <meta name="supported-color-schemes" content="light" />
