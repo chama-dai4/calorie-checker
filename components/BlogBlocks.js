@@ -60,7 +60,6 @@ function CtaBlock(props) {
 }
 
 function CalloutBlock(props) {
-  // 種類(色)を取得 - 既存4種類 + 新規4種類
   let calloutType = "info";
   if (props.type) {
     if (Array.isArray(props.type)) {
@@ -70,7 +69,6 @@ function CalloutBlock(props) {
     }
   }
 
-  // スタイルを取得 - 新規追加(デフォルトは filled で後方互換)
   let calloutStyle = "filled";
   if (props.style) {
     if (Array.isArray(props.style)) {
@@ -80,19 +78,17 @@ function CalloutBlock(props) {
     }
   }
 
-  // アイコンマッピング(8色)
   const icons = {
-    info: "💡",       // 一般情報・補足
-    tip: "✨",        // アドバイス
-    warning: "⚠️",   // 注意
-    success: "✅",   // OK・推奨
-    danger: "🔥",    // NG・絶対避けたい
-    diet: "🥗",      // ダイエット情報
-    nutrition: "💪", // 栄養・健康情報
-    discovery: "🔍", // 豆知識・発見
+    info: "💡",
+    tip: "✨",
+    warning: "⚠️",
+    success: "✅",
+    danger: "🔥",
+    diet: "🥗",
+    nutrition: "💪",
+    discovery: "🔍",
   };
 
-  // クラス名を組み立て(色 × スタイル)
   const calloutClass = [
     styles.callout,
     styles["callout_" + calloutType],
@@ -205,6 +201,50 @@ function RelatedLinkBlock(props) {
   );
 }
 
+// ========== Phase C-1: calorieCard(数値ハイライト) ==========
+function CalorieCardBlock(props) {
+  let cardStyle = "default";
+  if (props.style) {
+    if (Array.isArray(props.style)) {
+      cardStyle = props.style[0] || "default";
+    } else {
+      cardStyle = props.style;
+    }
+  }
+
+  let cardColor = "neutral";
+  if (props.color) {
+    if (Array.isArray(props.color)) {
+      cardColor = props.color[0] || "neutral";
+    } else {
+      cardColor = props.color;
+    }
+  }
+
+  if (!props.value) return null;
+
+  const cardClass = [
+    styles.calorieCard,
+    styles["calorieCardStyle_" + cardStyle],
+    styles["calorieCardColor_" + cardColor],
+  ].join(" ");
+
+  return (
+    <div className={cardClass}>
+      <div className={styles.calorieCardMain}>
+        <span className={styles.calorieCardValue}>{props.value}</span>
+        {props.unit && <span className={styles.calorieCardUnit}>{props.unit}</span>}
+      </div>
+      {(props.label || props.subText) && (
+        <div className={styles.calorieCardInfo}>
+          {props.label && <div className={styles.calorieCardLabel}>{props.label}</div>}
+          {props.subText && <div className={styles.calorieCardSubText}>{props.subText}</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function BlogBlocks(props) {
   const blocks = props.blocks;
 
@@ -256,6 +296,20 @@ export default function BlogBlocks(props) {
         }
         if (type === "relatedLink") {
           return <RelatedLinkBlock key={key} title={block.title} text={block.text} url={block.url} />;
+        }
+        // ★ Phase C-1: calorieCard
+        if (type === "calorieCard") {
+          return (
+            <CalorieCardBlock
+              key={key}
+              value={block.value}
+              unit={block.unit}
+              label={block.label}
+              subText={block.subText}
+              style={block.style}
+              color={block.color}
+            />
+          );
         }
         return null;
       })}

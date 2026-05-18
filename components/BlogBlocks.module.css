@@ -557,3 +557,242 @@
     font-size: 13px;
   }
 }
+/* ========================================================== */
+/* ========== Phase C-1: calorieCard(数値ハイライト) ========== */
+/* ========================================================== */
+ 
+/* ベース */
+.calorieCard {
+  border-radius: 12px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+.calorieCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+ 
+/* メイン数値部分 */
+.calorieCardMain {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  line-height: 1;
+}
+.calorieCardValue {
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--c-value, var(--ink));
+}
+.calorieCardUnit {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--c-unit, var(--muted));
+  letter-spacing: -0.01em;
+}
+ 
+/* インフォ部分(商品名+サブ情報) */
+.calorieCardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 16px;
+  border-top: 1px solid var(--c-divider, var(--line));
+  width: 100%;
+}
+.calorieCardLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.calorieCardSubText {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+ 
+/* ========== 9カラー定義 ========== */
+ 
+/* neutral(汎用・グレー系) */
+.calorieCardColor_neutral {
+  --c-value: #0a0a0a;
+  --c-unit: #6b6b6b;
+  --c-divider: #e8e8e8;
+  --c-accent: #6b6b6b;
+  --c-bg-light: #fafafa;
+}
+ 
+/* mcdonalds(マック・赤+黄) */
+.calorieCardColor_mcdonalds {
+  --c-value: #d62300;
+  --c-unit: #ffbc0d;
+  --c-divider: #ffe0b3;
+  --c-accent: #d62300;
+  --c-bg-light: #fff8e7;
+}
+ 
+/* starbucks(スタバ・緑) */
+.calorieCardColor_starbucks {
+  --c-value: #006241;
+  --c-unit: #1e3932;
+  --c-divider: #cae6d8;
+  --c-accent: #006241;
+  --c-bg-light: #f0f7f2;
+}
+ 
+/* mos(モス・緑+赤) */
+.calorieCardColor_mos {
+  --c-value: #c8102e;
+  --c-unit: #00683c;
+  --c-divider: #d4ebd6;
+  --c-accent: #c8102e;
+  --c-bg-light: #f2faf3;
+}
+ 
+/* burgerking(BK・オレンジ+赤) */
+.calorieCardColor_burgerking {
+  --c-value: #d62300;
+  --c-unit: #f5ebdc;
+  --c-divider: #fde2c2;
+  --c-accent: #d62300;
+  --c-bg-light: #fff5eb;
+}
+ 
+/* zetteria(ゼッテリア・黄+黒) */
+.calorieCardColor_zetteria {
+  --c-value: #1a1a1a;
+  --c-unit: #ffd200;
+  --c-divider: #fff0a0;
+  --c-accent: #1a1a1a;
+  --c-bg-light: #fffce0;
+}
+ 
+/* yoshinoya(吉野家・オレンジ) */
+.calorieCardColor_yoshinoya {
+  --c-value: #e6791f;
+  --c-unit: #c25e0f;
+  --c-divider: #fde0c0;
+  --c-accent: #e6791f;
+  --c-bg-light: #fff5e8;
+}
+ 
+/* kura(くら寿司・赤) */
+.calorieCardColor_kura {
+  --c-value: #c40d2e;
+  --c-unit: #861220;
+  --c-divider: #f8d0d5;
+  --c-accent: #c40d2e;
+  --c-bg-light: #fef0f2;
+}
+ 
+/* freshness(フレッシュネス・緑) */
+.calorieCardColor_freshness {
+  --c-value: #2d8044;
+  --c-unit: #1f5c2f;
+  --c-divider: #c5e6cd;
+  --c-accent: #2d8044;
+  --c-bg-light: #f0f8f2;
+}
+ 
+/* ========== 3スタイル定義 ========== */
+ 
+/* 1. default(シンプル枠付き) */
+.calorieCardStyle_default {
+  background: var(--bg);
+}
+ 
+/* 2. accent(背景色+左ボーダー強調) */
+.calorieCardStyle_accent {
+  background: var(--c-bg-light);
+  border: none;
+  border-left: 6px solid var(--c-accent);
+  border-radius: 0 12px 12px 0;
+}
+.calorieCardStyle_accent::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, var(--c-accent) 0%, transparent 70%);
+  opacity: 0.08;
+  pointer-events: none;
+}
+ 
+/* 3. compact(横長コンパクト) */
+.calorieCardStyle_compact {
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  padding: 18px 22px;
+  gap: 20px;
+}
+.calorieCardStyle_compact .calorieCardMain {
+  flex-shrink: 0;
+}
+.calorieCardStyle_compact .calorieCardValue {
+  font-size: 38px;
+}
+.calorieCardStyle_compact .calorieCardUnit {
+  font-size: 15px;
+}
+.calorieCardStyle_compact .calorieCardInfo {
+  padding-top: 0;
+  border-top: none;
+  border-left: 1px solid var(--c-divider, var(--line));
+  padding-left: 20px;
+  width: auto;
+  flex: 1;
+  text-align: left;
+}
+ 
+/* ========== レスポンシブ:モバイル ========== */
+@media (max-width: 760px) {
+  .calorieCard {
+    padding: 22px 18px;
+  }
+  .calorieCardValue {
+    font-size: 44px;
+  }
+  .calorieCardUnit {
+    font-size: 17px;
+  }
+  .calorieCardLabel {
+    font-size: 14px;
+  }
+  .calorieCardSubText {
+    font-size: 12px;
+  }
+ 
+  /* compact スタイルはモバイルで縦に切り替え */
+  .calorieCardStyle_compact {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 18px 16px;
+  }
+  .calorieCardStyle_compact .calorieCardValue {
+    font-size: 36px;
+  }
+  .calorieCardStyle_compact .calorieCardInfo {
+    border-left: none;
+    border-top: 1px solid var(--c-divider, var(--line));
+    padding-left: 0;
+    padding-top: 12px;
+    text-align: center;
+    width: 100%;
+  }
+}
