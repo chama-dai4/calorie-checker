@@ -1401,3 +1401,129 @@
     padding: 10px 14px;
   }
 }
+/* =============================================================
+   Phase C-5: progressBar ブロック スタイル
+   3スタイル(thin/normal/thick) × 5カラー(auto/green/yellow/red/blue)
+   ※ auto は JS側で値に応じて green/yellow/red に変換されるため
+     CSS には auto クラスは不要(自動的に該当カラークラスが付く)
+   ============================================================= */
+
+/* ------- ベース ------- */
+.progressBar {
+  margin: 24px 0;
+  padding: 4px 0;
+}
+
+.progressBarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+.progressBarLabel {
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.progressBarValue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  color: var(--c-accent, var(--ink));
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.progressBarSeparator {
+  color: var(--muted-light);
+  font-weight: 400;
+  margin: 0 2px;
+}
+
+.progressBarUnit {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.progressBarPercent {
+  color: var(--c-accent, var(--ink));
+  font-weight: 700;
+}
+
+/* ------- バー本体 ------- */
+.progressBarTrack {
+  height: 12px;
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: var(--c-accent, var(--ink));
+  border-radius: 8px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 4px; /* 0%でも少し見えるように */
+}
+
+/* ------- スタイル: thin(細め) ------- */
+.progressBarStyle_thin .progressBarTrack {
+  height: 6px;
+  border-radius: 4px;
+}
+.progressBarStyle_thin .progressBarFill {
+  border-radius: 4px;
+}
+
+/* ------- スタイル: normal(標準) ------- */
+/* ベースがそのまま normal なので追加CSS不要 */
+
+/* ------- スタイル: thick(太め) ------- */
+.progressBarStyle_thick .progressBarTrack {
+  height: 20px;
+  border-radius: 10px;
+}
+.progressBarStyle_thick .progressBarFill {
+  border-radius: 10px;
+  position: relative;
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 16px 16px;
+}
+
+/* ------- カラー定義 ------- */
+.progressBarColor_green  { --c-accent: #22c55e; }
+.progressBarColor_yellow { --c-accent: #eab308; }
+.progressBarColor_red    { --c-accent: #ef4444; }
+.progressBarColor_blue   { --c-accent: #3b82f6; }
+/* auto は JS側で上記いずれかに置換されるため CSS定義不要 */
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  .progressBarHeader {
+    font-size: 13px;
+    gap: 8px;
+  }
+  .progressBarLabel,
+  .progressBarValue {
+    font-size: 13px;
+  }
+  .progressBarUnit {
+    font-size: 12px;
+  }
+}

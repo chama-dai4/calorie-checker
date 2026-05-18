@@ -464,6 +464,74 @@ function ChecklistBlock(props) {
   );
 }
 
+// =============================================================
+// Phase C-5: progressBar ブロック
+// =============================================================
+function ProgressBarBlock(props) {
+  // 数値変換(文字列で来てもOKに)
+  const current = parseFloat(props.current);
+  const max = parseFloat(props.max);
+
+  // 不正値ガード
+  if (isNaN(current) || isNaN(max) || max <= 0) return null;
+
+  // 割合計算(0〜100にクランプ)
+  const percent = Math.min(100, Math.max(0, (current / max) * 100));
+
+  // スタイル(thin / normal / thick)
+  let cardStyle = "normal";
+  if (props.style) {
+    cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
+  }
+
+  // カラー(auto / green / yellow / red / blue)
+  let cardColor = "auto";
+  if (props.color) {
+    cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  // auto の場合は値で自動切替
+  if (cardColor === "auto") {
+    if (percent < 50) cardColor = "green";
+    else if (percent < 80) cardColor = "yellow";
+    else cardColor = "red";
+  }
+
+  // パーセント表示(デフォルトは true)
+  const showPercent = props.showPercent !== false;
+
+  return (
+    <div
+      className={`${styles.progressBar} ${styles[`progressBarStyle_${cardStyle}`]} ${styles[`progressBarColor_${cardColor}`]}`}
+    >
+      <div className={styles.progressBarHeader}>
+        {props.label && (
+          <span className={styles.progressBarLabel}>{props.label}</span>
+        )}
+        <span className={styles.progressBarValue}>
+          {current}
+          <span className={styles.progressBarSeparator}> / </span>
+          {max}
+          {props.unit && (
+            <span className={styles.progressBarUnit}> {props.unit}</span>
+          )}
+          {showPercent && (
+            <span className={styles.progressBarPercent}>
+              {" "}({Math.round(percent)}%)
+            </span>
+          )}
+        </span>
+      </div>
+      <div className={styles.progressBarTrack}>
+        <div
+          className={styles.progressBarFill}
+          style={{ width: `${percent}%` }}
+        ></div>
+      </div>
+    </div>
+  );
+}
+
 export default function BlogBlocks(props) {
   const blocks = props.blocks;
 
@@ -580,6 +648,21 @@ export default function BlogBlocks(props) {
               key={key}
               title={block.title}
               items={block.items}
+              style={block.style}
+              color={block.color}
+            />
+          );
+        }
+        // ★ Phase C-5: progressBar
+        if (type === "progressBar") {
+          return (
+            <ProgressBarBlock
+              key={key}
+              label={block.label}
+              current={block.current}
+              max={block.max}
+              unit={block.unit}
+              showPercent={block.showPercent}
               style={block.style}
               color={block.color}
             />
