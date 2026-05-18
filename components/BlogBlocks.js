@@ -201,7 +201,7 @@ function RelatedLinkBlock(props) {
   );
 }
 
-// ========== Phase C-1: calorieCard(数値ハイライト) ==========
+// ========== Phase C-1: calorieCard ==========
 function CalorieCardBlock(props) {
   let cardStyle = "default";
   if (props.style) {
@@ -245,7 +245,7 @@ function CalorieCardBlock(props) {
   );
 }
 
-// ========== Phase C-2: compareCard(比較カード) ==========
+// ========== Phase C-2: compareCard ==========
 function CompareCardBlock(props) {
   let cardStyle = "vsCard";
   if (props.style) {
@@ -339,9 +339,7 @@ function CompareCardBlock(props) {
   );
 }
 
-// =============================================================
-// Phase C-3: stepGuide ブロック
-// =============================================================
+// ========== Phase C-3: stepGuide ==========
 function StepGuideBlock(props) {
   let cardStyle = "numbered";
   if (props.style) {
@@ -396,9 +394,7 @@ function StepGuideBlock(props) {
   );
 }
 
-// =============================================================
-// Phase C-4: checklist ブロック
-// =============================================================
+// ========== Phase C-4: checklist ==========
 function ChecklistBlock(props) {
   if (!props.items) return null;
 
@@ -456,9 +452,7 @@ function ChecklistBlock(props) {
   );
 }
 
-// =============================================================
-// Phase C-5: progressBar ブロック
-// =============================================================
+// ========== Phase C-5: progressBar ==========
 function ProgressBarBlock(props) {
   const current = parseFloat(props.current);
   const max = parseFloat(props.max);
@@ -517,9 +511,7 @@ function ProgressBarBlock(props) {
   );
 }
 
-// =============================================================
-// Phase C-6: ratingBox ブロック(SVG半星対応)
-// =============================================================
+// ========== Phase C-6: ratingBox(SVG半星) ==========
 function RatingStar({ fillPercent, color, gradId }) {
   const safeFill = Math.max(0, Math.min(100, fillPercent));
 
@@ -659,23 +651,18 @@ function RatingBoxBlock(props) {
   );
 }
 
-// =============================================================
-// Phase C-7: menuShowcase ブロック(メニュー紹介・最大3個)
-// =============================================================
+// ========== Phase C-7: menuShowcase ==========
 function MenuShowcaseBlock(props) {
-  // スタイル(grid / list / compact)
   let cardStyle = "grid";
   if (props.style) {
     cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
   }
 
-  // カラー(neutral / green / orange / red / blue)
   let cardColor = "neutral";
   if (props.color) {
     cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
   }
 
-  // 最大3メニュー収集(menu1Nameが必須・空はスキップ)
   const menus = [];
   for (let i = 1; i <= 3; i++) {
     const name = props[`menu${i}Name`];
@@ -689,7 +676,6 @@ function MenuShowcaseBlock(props) {
     }
   }
 
-  // メニューが1つもなければ描画しない
   if (menus.length === 0) return null;
 
   return (
@@ -726,6 +712,71 @@ function MenuShowcaseBlock(props) {
             {menu.note && (
               <div className={styles.menuShowcaseNote}>{menu.note}</div>
             )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// =============================================================
+// Phase C-8: timeline ブロック(時系列イベント)
+// =============================================================
+function TimelineBlock(props) {
+  // スタイル(vertical / horizontal / compact)
+  let cardStyle = "vertical";
+  if (props.style) {
+    cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
+  }
+
+  // カラー(neutral / blue / green / orange / red)
+  let cardColor = "neutral";
+  if (props.color) {
+    cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  // 最大5イベントを収集(event1Title が必須・空はスキップ)
+  const events = [];
+  for (let i = 1; i <= 5; i++) {
+    const title = props[`event${i}Title`];
+    if (title && String(title).trim().length > 0) {
+      events.push({
+        date: props[`event${i}Date`] || "",
+        title: title,
+        content: props[`event${i}Content`] || "",
+      });
+    }
+  }
+
+  // イベントが1つもなければ描画しない
+  if (events.length === 0) return null;
+
+  return (
+    <div
+      className={`${styles.timeline} ${styles[`timelineStyle_${cardStyle}`]} ${styles[`timelineColor_${cardColor}`]} ${styles[`timelineCount_${events.length}`]}`}
+    >
+      {props.title && (
+        <div className={styles.timelineTitle}>{props.title}</div>
+      )}
+      <div className={styles.timelineItems}>
+        {events.map((event, idx) => (
+          <div key={idx} className={styles.timelineItem}>
+            <div className={styles.timelineMarker}>
+              <div className={styles.timelineDot} aria-hidden="true"></div>
+              {/* 最後以外は接続線を表示 */}
+              {idx < events.length - 1 && (
+                <div className={styles.timelineLine} aria-hidden="true"></div>
+              )}
+            </div>
+            <div className={styles.timelineBody}>
+              {event.date && (
+                <div className={styles.timelineDate}>{event.date}</div>
+              )}
+              <div className={styles.timelineEventTitle}>{event.title}</div>
+              {cardStyle !== "compact" && event.content && (
+                <div className={styles.timelineContent}>{event.content}</div>
+              )}
+            </div>
           </div>
         ))}
       </div>
@@ -907,6 +958,32 @@ export default function BlogBlocks(props) {
               menu3Value={block.menu3Value}
               menu3Unit={block.menu3Unit}
               menu3Note={block.menu3Note}
+              style={block.style}
+              color={block.color}
+            />
+          );
+        }
+        // ★ Phase C-8: timeline
+        if (type === "timeline") {
+          return (
+            <TimelineBlock
+              key={key}
+              title={block.title}
+              event1Date={block.event1Date}
+              event1Title={block.event1Title}
+              event1Content={block.event1Content}
+              event2Date={block.event2Date}
+              event2Title={block.event2Title}
+              event2Content={block.event2Content}
+              event3Date={block.event3Date}
+              event3Title={block.event3Title}
+              event3Content={block.event3Content}
+              event4Date={block.event4Date}
+              event4Title={block.event4Title}
+              event4Content={block.event4Content}
+              event5Date={block.event5Date}
+              event5Title={block.event5Title}
+              event5Content={block.event5Content}
               style={block.style}
               color={block.color}
             />

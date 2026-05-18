@@ -1992,3 +1992,279 @@
     font-size: 18px;
   }
 }
+/* =============================================================
+   Phase C-8: timeline ブロック スタイル
+   3スタイル(vertical/horizontal/compact) × 5カラー(neutral/blue/green/orange/red)
+   ============================================================= */
+
+/* ------- ベース ------- */
+.timeline {
+  margin: 28px 0;
+}
+
+.timelineTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.4;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ------- マーカー(ドット + 接続線・共通) ------- */
+.timelineMarker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timelineDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--c-accent, var(--ink));
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  /* ドットの周りに薄い色のハロー */
+  box-shadow: 0 0 0 4px var(--c-accent-bg, rgba(0, 0, 0, 0.05));
+}
+
+.timelineLine {
+  flex: 1;
+  width: 2px;
+  background: var(--line);
+  margin-top: 4px;
+  min-height: 30px;
+}
+
+/* ------- 本文部分(共通) ------- */
+.timelineBody {
+  min-width: 0; /* テキストの折り返し対策 */
+}
+
+.timelineDate {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-accent, var(--muted));
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.timelineEventTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.timelineContent {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* ------- カラー定義 ------- */
+.timelineColor_neutral { --c-accent: #0a0a0a; --c-accent-bg: rgba(10, 10, 10, 0.08); }
+.timelineColor_blue    { --c-accent: #3b82f6; --c-accent-bg: rgba(59, 130, 246, 0.12); }
+.timelineColor_green   { --c-accent: #22c55e; --c-accent-bg: rgba(34, 197, 94, 0.12); }
+.timelineColor_orange  { --c-accent: #f97316; --c-accent-bg: rgba(249, 115, 22, 0.12); }
+.timelineColor_red     { --c-accent: #ef4444; --c-accent-bg: rgba(239, 68, 68, 0.12); }
+
+/* ------- スタイル: vertical(縦並び・標準) ------- */
+.timelineStyle_vertical .timelineItems {
+  display: flex;
+  flex-direction: column;
+}
+
+.timelineStyle_vertical .timelineItem {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 16px;
+  padding-bottom: 24px;
+  align-items: flex-start;
+}
+
+.timelineStyle_vertical .timelineItem:last-child {
+  padding-bottom: 0;
+}
+
+.timelineStyle_vertical .timelineMarker {
+  align-self: stretch;
+  padding-top: 4px;
+}
+
+.timelineStyle_vertical .timelineBody {
+  padding-top: 0;
+  padding-bottom: 8px;
+}
+
+/* ------- スタイル: horizontal(横並び・PCで4-5個並べる) ------- */
+.timelineStyle_horizontal .timelineItems {
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(var(--cols, 5), 1fr);
+}
+.timelineStyle_horizontal.timelineCount_1 .timelineItems { --cols: 1; }
+.timelineStyle_horizontal.timelineCount_2 .timelineItems { --cols: 2; }
+.timelineStyle_horizontal.timelineCount_3 .timelineItems { --cols: 3; }
+.timelineStyle_horizontal.timelineCount_4 .timelineItems { --cols: 4; }
+.timelineStyle_horizontal.timelineCount_5 .timelineItems { --cols: 5; }
+
+.timelineStyle_horizontal .timelineItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 8px;
+  position: relative;
+}
+
+.timelineStyle_horizontal .timelineMarker {
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.timelineStyle_horizontal .timelineDot {
+  margin: 0 auto;
+}
+
+/* 横方向の接続線 */
+.timelineStyle_horizontal .timelineLine {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  margin-top: 0;
+  min-height: 0;
+}
+
+.timelineStyle_horizontal .timelineBody {
+  text-align: center;
+}
+
+/* ------- スタイル: compact(縦並び・コンパクト・本文なし) ------- */
+.timelineStyle_compact .timelineItems {
+  display: flex;
+  flex-direction: column;
+}
+
+.timelineStyle_compact .timelineItem {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 14px;
+  padding-bottom: 14px;
+  align-items: center;
+}
+
+.timelineStyle_compact .timelineItem:last-child {
+  padding-bottom: 0;
+}
+
+.timelineStyle_compact .timelineMarker {
+  align-self: stretch;
+  justify-content: center;
+}
+
+.timelineStyle_compact .timelineDot {
+  width: 10px;
+  height: 10px;
+  box-shadow: 0 0 0 3px var(--c-accent-bg);
+}
+
+.timelineStyle_compact .timelineLine {
+  min-height: 8px;
+}
+
+.timelineStyle_compact .timelineBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 0;
+}
+
+.timelineStyle_compact .timelineDate {
+  margin-bottom: 0;
+  font-size: 11px;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.timelineStyle_compact .timelineEventTitle {
+  font-size: 14px;
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  .timelineTitle {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  .timelineEventTitle {
+    font-size: 14px;
+  }
+  .timelineContent {
+    font-size: 13px;
+  }
+  .timelineDate {
+    font-size: 11px;
+  }
+
+  /* vertical はそのまま */
+  .timelineStyle_vertical .timelineItem {
+    padding-bottom: 20px;
+  }
+
+  /* horizontal は縦並びに変換 */
+  .timelineStyle_horizontal .timelineItems {
+    grid-template-columns: 24px 1fr;
+    gap: 0;
+  }
+  .timelineStyle_horizontal .timelineItem {
+    display: contents; /* グリッドアイテムを直接配置 */
+  }
+  .timelineStyle_horizontal .timelineItem .timelineMarker {
+    grid-column: 1;
+    flex-direction: column;
+    width: auto;
+    margin-bottom: 0;
+    padding-bottom: 20px;
+    align-self: stretch;
+  }
+  .timelineStyle_horizontal .timelineItem .timelineLine {
+    position: static;
+    width: 2px;
+    height: auto;
+    flex: 1;
+    min-height: 30px;
+    margin-top: 4px;
+  }
+  .timelineStyle_horizontal .timelineItem .timelineBody {
+    grid-column: 2;
+    text-align: left;
+    padding-bottom: 20px;
+  }
+  .timelineStyle_horizontal .timelineItem:last-child .timelineMarker,
+  .timelineStyle_horizontal .timelineItem:last-child .timelineBody {
+    padding-bottom: 0;
+  }
+
+  /* compact のレイアウト調整 */
+  .timelineStyle_compact .timelineDate {
+    min-width: 70px;
+    font-size: 10px;
+  }
+  .timelineStyle_compact .timelineEventTitle {
+    font-size: 13px;
+  }
+}
