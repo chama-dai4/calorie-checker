@@ -1248,3 +1248,156 @@
     display: none; /* スマホでは矢印は非表示 */
   }
 }
+/* =============================================================
+   Phase C-4: checklist ブロック スタイル
+   3スタイル(default/simple/card) × 5カラー(green/blue/orange/red/neutral)
+   ============================================================= */
+
+/* ------- ベース ------- */
+.checklist {
+  margin: 28px 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 20px;
+  background: var(--bg);
+}
+
+.checklistTitle {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.checklistItems {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------- 各アイテム(共通) ------- */
+.checklistItem {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: flex-start;
+}
+.checklistItem:last-child {
+  border-bottom: none;
+}
+
+/* チェックボックス */
+.checklistCheck {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--c-accent, var(--muted));
+  border-radius: 4px;
+  flex-shrink: 0;
+  position: relative;
+  margin-top: 2px;
+  background: transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+/* チェック済み: 塗りつぶし + ✓マーク */
+.checklistCheck.checked {
+  background: var(--c-accent, var(--ink));
+  border-color: var(--c-accent, var(--ink));
+}
+.checklistCheck.checked::after {
+  content: "✓";
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* テキスト */
+.checklistText {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+  min-width: 0;
+  word-break: break-word;
+}
+.checklistText.checked {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* ------- カラー定義 ------- */
+.checklistColor_green   { --c-accent: #22c55e; }
+.checklistColor_blue    { --c-accent: #3b82f6; }
+.checklistColor_orange  { --c-accent: #f97316; }
+.checklistColor_red     { --c-accent: #ef4444; }
+.checklistColor_neutral { --c-accent: #0a0a0a; }
+
+/* ------- スタイル: default ------- */
+/* ベースがそのまま default なので追加CSS不要 */
+
+/* ------- スタイル: simple(背景・枠なし) ------- */
+.checklistStyle_simple {
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  border-radius: 0;
+}
+.checklistStyle_simple .checklistTitle {
+  border-bottom: none;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+}
+.checklistStyle_simple .checklistItem {
+  border-bottom: none;
+  padding: 6px 0;
+}
+
+/* ------- スタイル: card(各アイテムが独立カード) ------- */
+.checklistStyle_card {
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+.checklistStyle_card .checklistTitle {
+  border-bottom: none;
+  padding: 0 0 12px 0;
+  margin-bottom: 4px;
+}
+.checklistStyle_card .checklistItems {
+  gap: 8px;
+}
+.checklistStyle_card .checklistItem {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 16px;
+  background: var(--bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.checklistStyle_card .checklistItem:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+.checklistStyle_card .checklistItem:last-child {
+  border-bottom: 1px solid var(--line); /* cardは最後も枠を維持 */
+}
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  .checklist {
+    padding: 14px 16px;
+  }
+  .checklistText {
+    font-size: 13px;
+  }
+  .checklistStyle_card .checklistItem {
+    padding: 10px 14px;
+  }
+}

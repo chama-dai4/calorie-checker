@@ -247,7 +247,6 @@ function CalorieCardBlock(props) {
 
 // ========== Phase C-2: compareCard(比較カード) ==========
 function CompareCardBlock(props) {
-  // スタイル取得
   let cardStyle = "vsCard";
   if (props.style) {
     if (Array.isArray(props.style)) {
@@ -257,7 +256,6 @@ function CompareCardBlock(props) {
     }
   }
 
-  // 左カラー取得
   let leftColor = "neutral";
   if (props.leftColor) {
     if (Array.isArray(props.leftColor)) {
@@ -267,7 +265,6 @@ function CompareCardBlock(props) {
     }
   }
 
-  // 右カラー取得
   let rightColor = "neutral";
   if (props.rightColor) {
     if (Array.isArray(props.rightColor)) {
@@ -277,7 +274,6 @@ function CompareCardBlock(props) {
     }
   }
 
-  // 必須項目のチェック
   if (!props.leftName || !props.rightName || !props.leftValue || !props.rightValue) {
     return null;
   }
@@ -303,7 +299,6 @@ function CompareCardBlock(props) {
         <div className={styles.compareCardTitle}>{props.title}</div>
       )}
       <div className={styles.compareCardBody}>
-        {/* 左側 */}
         <div className={leftSideClass}>
           {props.leftLabel && (
             <div className={styles.compareCardLabel}>{props.leftLabel}</div>
@@ -320,12 +315,10 @@ function CompareCardBlock(props) {
           )}
         </div>
 
-        {/* 中央のVSマーク(versus スタイルのみ) */}
         {cardStyle === "versus" && (
           <div className={styles.compareCardVs}>VS</div>
         )}
 
-        {/* 右側 */}
         <div className={rightSideClass}>
           {props.rightLabel && (
             <div className={styles.compareCardLabel}>{props.rightLabel}</div>
@@ -399,6 +392,70 @@ function StepGuideBlock(props) {
               {step.content && (
                 <div className={styles.stepContent}>{step.content}</div>
               )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// =============================================================
+// Phase C-4: checklist ブロック
+// =============================================================
+function ChecklistBlock(props) {
+  // items が無ければ描画しない
+  if (!props.items) return null;
+
+  // スタイル(default / simple / card)
+  let cardStyle = "default";
+  if (props.style) {
+    cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
+  }
+
+  // カラー(green / blue / orange / red / neutral)
+  let cardColor = "green";
+  if (props.color) {
+    cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  // 行ごとに解析: [x] = チェック済み / [ ] = 未チェック / その他は未チェック扱い
+  const items = String(props.items)
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((line) => {
+      const checkedMatch = line.match(/^\[x\]\s*(.*)/i);
+      const uncheckedMatch = line.match(/^\[\s*\]\s*(.*)/);
+      if (checkedMatch) {
+        return { checked: true, text: checkedMatch[1] };
+      } else if (uncheckedMatch) {
+        return { checked: false, text: uncheckedMatch[1] };
+      } else {
+        return { checked: false, text: line };
+      }
+    });
+
+  if (items.length === 0) return null;
+
+  return (
+    <div
+      className={`${styles.checklist} ${styles[`checklistStyle_${cardStyle}`]} ${styles[`checklistColor_${cardColor}`]}`}
+    >
+      {props.title && (
+        <div className={styles.checklistTitle}>{props.title}</div>
+      )}
+      <div className={styles.checklistItems}>
+        {items.map((item, idx) => (
+          <div key={idx} className={styles.checklistItem}>
+            <div
+              className={`${styles.checklistCheck} ${item.checked ? styles.checked : ""}`}
+              aria-hidden="true"
+            ></div>
+            <div
+              className={`${styles.checklistText} ${item.checked ? styles.checked : ""}`}
+            >
+              {item.text}
             </div>
           </div>
         ))}
@@ -495,26 +552,39 @@ export default function BlogBlocks(props) {
             />
           );
         }
+        // ★ Phase C-3: stepGuide
         if (type === "stepGuide") {
-  return (
-    <StepGuideBlock
-      key={key}
-      title={block.title}
-      step1Title={block.step1Title}
-      step1Content={block.step1Content}
-      step2Title={block.step2Title}
-      step2Content={block.step2Content}
-      step3Title={block.step3Title}
-      step3Content={block.step3Content}
-      step4Title={block.step4Title}
-      step4Content={block.step4Content}
-      step5Title={block.step5Title}
-      step5Content={block.step5Content}
-      style={block.style}
-      color={block.color}
-    />
-  );
-}
+          return (
+            <StepGuideBlock
+              key={key}
+              title={block.title}
+              step1Title={block.step1Title}
+              step1Content={block.step1Content}
+              step2Title={block.step2Title}
+              step2Content={block.step2Content}
+              step3Title={block.step3Title}
+              step3Content={block.step3Content}
+              step4Title={block.step4Title}
+              step4Content={block.step4Content}
+              step5Title={block.step5Title}
+              step5Content={block.step5Content}
+              style={block.style}
+              color={block.color}
+            />
+          );
+        }
+        // ★ Phase C-4: checklist
+        if (type === "checklist") {
+          return (
+            <ChecklistBlock
+              key={key}
+              title={block.title}
+              items={block.items}
+              style={block.style}
+              color={block.color}
+            />
+          );
+        }
         return null;
       })}
     </div>
