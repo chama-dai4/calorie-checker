@@ -3153,3 +3153,54 @@
   );
   background-color: var(--divider-color-strong, #6b7280);
 }
+/* =============================================================
+   Phase B-6: spacer ブロック(完全新規・透明な余白調整)
+   5サイズ × 各高さ
+   ============================================================= */
+
+/* ------- 共通ベース ------- */
+.spacer {
+  width: 100%;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* ------- サイズ別の高さ ------- */
+.spacer_xs {
+  height: 8px;
+}
+
+.spacer_sm {
+  height: 16px;
+}
+
+.spacer_md {
+  height: 32px;
+}
+
+.spacer_lg {
+  height: 64px;
+}
+
+.spacer_xl {
+  height: 96px;
+}
+
+/* ------- レスポンシブ(スマホ・少し詰める) ------- */
+@media (max-width: 640px) {
+  .spacer_xs {
+    height: 6px;
+  }
+  .spacer_sm {
+    height: 12px;
+  }
+  .spacer_md {
+    height: 24px;
+  }
+  .spacer_lg {
+    height: 48px;
+  }
+  .spacer_xl {
+    height: 72px;
+  }
+}

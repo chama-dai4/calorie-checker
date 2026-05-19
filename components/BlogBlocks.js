@@ -344,6 +344,25 @@ function DividerBlock(props) {
   return <div className={containerClass} role="separator" aria-hidden="true"></div>;
 }
 
+// =============================================================
+// Phase B-6: spacer ブロック(完全新規・透明な余白調整)
+// 5サイズ(xs/sm/md/lg/xl)= 8/16/32/64/96px
+// =============================================================
+function SpacerBlock(props) {
+  // サイズ(xs / sm / md / lg / xl)
+  let spacerSize = "md";
+  if (props.size) {
+    spacerSize = Array.isArray(props.size) ? props.size[0] : props.size;
+  }
+
+  const containerClass = [
+    styles.spacer,
+    styles[`spacer_${spacerSize}`],
+  ].join(" ");
+
+  return <div className={containerClass} aria-hidden="true"></div>;
+}
+
 function RelatedLinkBlock(props) {
   const url = props.url;
   const isExternal = url && url.startsWith("http");
@@ -1043,6 +1062,17 @@ export default function BlogBlocks(props) {
             />
           );
         }
+
+        // ★ Phase B-6: spacer(完全新規)
+        if (type === "spacer") {
+          return (
+            <SpacerBlock
+              key={key}
+              size={block.size}
+            />
+          );
+        }
+        
         if (type === "relatedLink") {
           return <RelatedLinkBlock key={key} title={block.title} text={block.text} url={block.url} />;
         }
