@@ -34,19 +34,16 @@ function ImageBlock(props) {
 
 // =============================================================
 // Phase B-1: CTA ブロック強化(3スタイル × 5カラー)
-// 後方互換性: style/color 未指定なら simple + neutral(既存挙動)
 // =============================================================
 function CtaBlock(props) {
   const url = props.url;
   const isExternal = url && url.startsWith("http");
 
-  // スタイル(simple / gradient / card)
   let cardStyle = "simple";
   if (props.style) {
     cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
   }
 
-  // カラー(neutral / primary / orange / blue / red)
   let cardColor = "neutral";
   if (props.color) {
     cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
@@ -64,7 +61,6 @@ function CtaBlock(props) {
     styles[`ctaButtonColor_${cardColor}`],
   ].join(" ");
 
-  // ボタン部分(内部 or 外部リンクの分岐)
   const ButtonContent = (
     <>
       {props.text}
@@ -91,14 +87,12 @@ function CtaBlock(props) {
     <div className={containerClass}>
       {props.title && <div className={styles.ctaTitle}>{props.title}</div>}
 
-      {/* card スタイル時のみ description を表示 */}
       {cardStyle === "card" && props.description && (
         <div className={styles.ctaDescription}>{props.description}</div>
       )}
 
       {buttonElement}
 
-      {/* card スタイル時のみ subText を表示 */}
       {cardStyle === "card" && props.subText && (
         <div className={styles.ctaSubText}>{props.subText}</div>
       )}
@@ -191,9 +185,49 @@ function TableBlock(props) {
   );
 }
 
+// =============================================================
+// Phase B-2: FAQ ブロック強化(default / accordion × 5カラー)
+// アコーディオン実装: HTML標準 <details> タグ(JS不要・SEO有利)
+// =============================================================
 function FaqBlock(props) {
+  // スタイル(default / accordion)
+  let cardStyle = "accordion";
+  if (props.style) {
+    cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
+  }
+
+  // カラー(neutral / primary / blue / orange / red)
+  let cardColor = "neutral";
+  if (props.color) {
+    cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  const containerClass = [
+    styles.faq,
+    styles[`faqStyle_${cardStyle}`],
+    styles[`faqColor_${cardColor}`],
+  ].join(" ");
+
+  // accordion スタイルは <details> タグでクリック開閉
+  if (cardStyle === "accordion") {
+    return (
+      <details className={containerClass}>
+        <summary className={styles.faqQuestion}>
+          <span className={styles.faqMark}>Q</span>
+          <span className={styles.faqText}>{props.question}</span>
+          <span className={styles.faqChevron} aria-hidden="true">▼</span>
+        </summary>
+        <div className={styles.faqAnswer}>
+          <span className={styles.faqMark}>A</span>
+          <span className={styles.faqText}>{props.answer}</span>
+        </div>
+      </details>
+    );
+  }
+
+  // default スタイルは常時表示(既存挙動と同じ)
   return (
-    <div className={styles.faq}>
+    <div className={containerClass}>
       <div className={styles.faqQuestion}>
         <span className={styles.faqMark}>Q</span>
         <span className={styles.faqText}>{props.question}</span>
@@ -876,8 +910,17 @@ export default function BlogBlocks(props) {
         if (type === "table") {
           return <TableBlock key={key} title={block.title} leftHeader={block.leftHeader} rightHeader={block.rightHeader} rows={block.rows} />;
         }
+        // ★ Phase B-2: FAQ(強化版)
         if (type === "faq") {
-          return <FaqBlock key={key} question={block.question} answer={block.answer} />;
+          return (
+            <FaqBlock
+              key={key}
+              question={block.question}
+              answer={block.answer}
+              style={block.style}
+              color={block.color}
+            />
+          );
         }
         if (type === "quote") {
           return <QuoteBlock key={key} text={block.text} source={block.source} />;

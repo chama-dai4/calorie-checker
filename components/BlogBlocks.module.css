@@ -2497,3 +2497,206 @@
     font-size: 11px;
   }
 }
+/* =============================================================
+   Phase B-2: FAQ ブロック強化スタイル
+   2スタイル(default/accordion) × 5カラー(neutral/primary/blue/orange/red)
+   ※ accordion は HTML標準 <details>/<summary> タグ使用(JS不要)
+   ============================================================= */
+
+/* ------- カラー変数定義 ------- */
+.faqColor_neutral {
+  --faq-accent: #0a0a0a;
+  --faq-accent-bg: rgba(10, 10, 10, 0.04);
+  --faq-border: var(--line);
+}
+.faqColor_primary {
+  --faq-accent: #16a34a;
+  --faq-accent-bg: rgba(34, 197, 94, 0.06);
+  --faq-border: rgba(34, 197, 94, 0.3);
+}
+.faqColor_blue {
+  --faq-accent: #3b82f6;
+  --faq-accent-bg: rgba(59, 130, 246, 0.06);
+  --faq-border: rgba(59, 130, 246, 0.3);
+}
+.faqColor_orange {
+  --faq-accent: #f97316;
+  --faq-accent-bg: rgba(249, 115, 22, 0.06);
+  --faq-border: rgba(249, 115, 22, 0.3);
+}
+.faqColor_red {
+  --faq-accent: #ef4444;
+  --faq-accent-bg: rgba(239, 68, 68, 0.06);
+  --faq-border: rgba(239, 68, 68, 0.3);
+}
+
+/* ------- スタイル: default(既存互換・常時表示) ------- */
+/* default はカラーだけ反映 */
+.faqStyle_default .faqMark {
+  color: var(--faq-accent, var(--ink));
+}
+
+/* ------- スタイル: accordion(<details> タグでクリック開閉) ------- */
+.faqStyle_accordion {
+  margin: 12px 0;
+  border: 1px solid var(--faq-border, var(--line));
+  border-radius: 10px;
+  background: var(--bg);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+/* ホバー時の影 */
+.faqStyle_accordion:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* 開いた時のスタイル */
+.faqStyle_accordion[open] {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  background: var(--faq-accent-bg, var(--bg-alt));
+}
+
+/* デフォルトのトライアングルマーカーを非表示(Webkit / Firefox両対応) */
+.faqStyle_accordion summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+.faqStyle_accordion summary::-webkit-details-marker {
+  display: none;
+}
+.faqStyle_accordion summary::marker {
+  display: none;
+}
+
+/* 開いている時の質問エリア */
+.faqStyle_accordion[open] summary {
+  border-bottom: 1px solid var(--faq-border, var(--line));
+}
+
+/* ホバー時の背景 */
+.faqStyle_accordion summary:hover {
+  background: var(--faq-accent-bg, var(--bg-alt));
+}
+
+/* Q / A マーク */
+.faqStyle_accordion .faqMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--faq-accent, var(--ink));
+  color: #fff;
+  border-radius: 50%;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* 質問テキスト */
+.faqStyle_accordion .faqQuestion .faqText {
+  flex: 1;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* 開閉アイコン(▼) */
+.faqChevron {
+  flex-shrink: 0;
+  color: var(--faq-accent, var(--muted));
+  font-size: 12px;
+  transition: transform 0.3s ease;
+  margin-left: auto;
+}
+
+/* 開いている時は ▲ に回転 */
+.faqStyle_accordion[open] .faqChevron {
+  transform: rotate(180deg);
+}
+
+/* 回答エリア */
+.faqStyle_accordion .faqAnswer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  align-items: flex-start;
+  animation: faqSlideDown 0.3s ease-out;
+}
+
+/* 開いた時のスライドアニメーション */
+@keyframes faqSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 回答テキスト */
+.faqStyle_accordion .faqAnswer .faqText {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
+/* 回答のAマーク(質問のQより少し小さく・薄く) */
+.faqStyle_accordion .faqAnswer .faqMark {
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+  background: var(--bg);
+  color: var(--faq-accent, var(--ink));
+  border: 2px solid var(--faq-accent, var(--ink));
+  margin-top: -2px;
+}
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  .faqStyle_accordion summary {
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .faqStyle_accordion .faqAnswer {
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .faqStyle_accordion .faqMark {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  .faqStyle_accordion .faqAnswer .faqMark {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+
+  .faqStyle_accordion .faqQuestion .faqText {
+    font-size: 14px;
+  }
+
+  .faqStyle_accordion .faqAnswer .faqText {
+    font-size: 13px;
+  }
+
+  .faqChevron {
+    font-size: 11px;
+  }
+}
