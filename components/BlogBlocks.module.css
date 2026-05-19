@@ -2700,3 +2700,157 @@
     font-size: 11px;
   }
 }
+/* =============================================================
+   Phase B-3: table ブロック強化スタイル
+   3スタイル(default/striped/comparison) × 5カラー(neutral/primary/blue/orange/red)
+   ============================================================= */
+
+/* ------- カラー変数定義 ------- */
+.tableColor_neutral {
+  --table-accent: #0a0a0a;
+  --table-accent-bg: rgba(10, 10, 10, 0.04);
+  --table-accent-light: rgba(10, 10, 10, 0.02);
+}
+.tableColor_primary {
+  --table-accent: #16a34a;
+  --table-accent-bg: rgba(34, 197, 94, 0.08);
+  --table-accent-light: rgba(34, 197, 94, 0.03);
+}
+.tableColor_blue {
+  --table-accent: #3b82f6;
+  --table-accent-bg: rgba(59, 130, 246, 0.08);
+  --table-accent-light: rgba(59, 130, 246, 0.03);
+}
+.tableColor_orange {
+  --table-accent: #f97316;
+  --table-accent-bg: rgba(249, 115, 22, 0.08);
+  --table-accent-light: rgba(249, 115, 22, 0.03);
+}
+.tableColor_red {
+  --table-accent: #ef4444;
+  --table-accent-bg: rgba(239, 68, 68, 0.08);
+  --table-accent-light: rgba(239, 68, 68, 0.03);
+}
+
+/* ------- スタイル: default(既存互換・カラーだけ反映) ------- */
+/* default はヘッダー行だけアクセントカラー */
+.tableStyle_default .table thead th {
+  background: var(--table-accent-bg, var(--bg-alt));
+  color: var(--table-accent, var(--ink));
+  font-weight: 700;
+}
+
+/* ------- スタイル: striped(縞模様・長い表向け) ------- */
+.tableStyle_striped .table thead th {
+  background: var(--table-accent, var(--ink));
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* 偶数行に薄い背景色(縞模様) */
+.tableStyle_striped .table tbody tr:nth-child(even) {
+  background: var(--table-accent-light, rgba(0, 0, 0, 0.02));
+}
+
+/* ホバーで行が薄く色付く */
+.tableStyle_striped .table tbody tr:hover {
+  background: var(--table-accent-bg, var(--bg-alt));
+  transition: background 0.15s ease;
+}
+
+/* ------- スタイル: comparison(比較表・1列目強調・3列以上対応) ------- */
+.tableStyle_comparison {
+  overflow-x: auto; /* 列が多い時は横スクロール */
+}
+
+.tableStyle_comparison .table {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* ヘッダー(背景色強調) */
+.tableStyle_comparison .table thead th {
+  background: var(--table-accent, var(--ink));
+  color: #ffffff;
+  font-weight: 700;
+  padding: 14px 16px;
+  font-size: 14px;
+  text-align: center;
+  border-bottom: 2px solid var(--table-accent, var(--ink));
+}
+
+/* 1列目のヘッダーは少し違うトーン */
+.tableStyle_comparison .table thead th:first-child {
+  background: var(--bg);
+  color: var(--table-accent, var(--ink));
+  border-right: 2px solid var(--table-accent, var(--ink));
+}
+
+/* セル */
+.tableStyle_comparison .table tbody td {
+  padding: 12px 16px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  transition: background 0.15s ease;
+}
+
+/* 1列目(項目名)を強調 */
+.tableStyle_comparison .table tbody td:first-child {
+  font-weight: 700;
+  color: var(--table-accent, var(--ink));
+  background: var(--table-accent-light, var(--bg-alt));
+  text-align: left;
+  border-right: 2px solid var(--table-accent, var(--ink));
+}
+
+/* 偶数行に薄い背景(視認性UP) */
+.tableStyle_comparison .table tbody tr:nth-child(even) td:not(:first-child) {
+  background: var(--table-accent-light, rgba(0, 0, 0, 0.02));
+}
+
+/* ホバーで行全体が薄く色付く */
+.tableStyle_comparison .table tbody tr:hover td {
+  background: var(--table-accent-bg, var(--bg-alt));
+}
+.tableStyle_comparison .table tbody tr:hover td:first-child {
+  background: var(--table-accent-bg, var(--bg-alt));
+}
+
+/* 最終行のボーダー消し */
+.tableStyle_comparison .table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ------- ◎○△× などのバッジ表現(オプション・comparison内のセル) ------- */
+/* テキストとして "◎" "○" "△" "×" を書けばそのまま表示される
+   特殊なクラスを使う場合は将来的に拡張可能 */
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  /* default / striped はテーブル全体の文字サイズ調整 */
+  .tableStyle_default .table,
+  .tableStyle_striped .table {
+    font-size: 13px;
+  }
+
+  /* comparison は横スクロール対応 */
+  .tableStyle_comparison .table {
+    font-size: 12px;
+  }
+  .tableStyle_comparison .table thead th,
+  .tableStyle_comparison .table tbody td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  /* スマホでは1列目のborder-right を細く */
+  .tableStyle_comparison .table thead th:first-child,
+  .tableStyle_comparison .table tbody td:first-child {
+    border-right-width: 1px;
+  }
+}

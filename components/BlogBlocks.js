@@ -149,34 +149,70 @@ function CalloutBlock(props) {
 
 function TableBlock(props) {
   const rowsText = props.rows || "";
+
+  // 各行をパース(2〜N列対応・パイプ区切り)
   const parsedRows = rowsText
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .map((line) => {
-      const parts = line.split("|").map((p) => p.trim());
-      return { left: parts[0] || "", right: parts[1] || "" };
-    });
+    .map((line) => line.split("|").map((p) => p.trim()));
 
   if (parsedRows.length === 0) return null;
 
+  // ヘッダーのパース
+  // headers フィールド優先 → なければ leftHeader/rightHeader を使う(後方互換)
+  let parsedHeaders = [];
+  if (props.headers && String(props.headers).trim().length > 0) {
+    parsedHeaders = String(props.headers).split("|").map((p) => p.trim());
+  } else if (props.leftHeader || props.rightHeader) {
+    parsedHeaders = [props.leftHeader || "", props.rightHeader || ""];
+  }
+
+  // 最大列数を判定(各行の列数の最大値)
+  const maxCols = Math.max(
+    parsedHeaders.length,
+    ...parsedRows.map((row) => row.length)
+  );
+
+  // スタイル(default / striped / comparison)
+  let cardStyle = "default";
+  if (props.style) {
+    cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
+  }
+
+  // カラー(neutral / primary / blue / orange / red)
+  let cardColor = "neutral";
+  if (props.color) {
+    cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  const wrapClass = [
+    styles.tableWrap,
+    styles[`tableStyle_${cardStyle}`],
+    styles[`tableColor_${cardColor}`],
+  ].join(" ");
+
+  const hasHeaders = parsedHeaders.length > 0;
+
   return (
-    <div className={styles.tableWrap}>
+    <div className={wrapClass}>
       {props.title && <div className={styles.tableTitle}>{props.title}</div>}
       <table className={styles.table}>
-        {(props.leftHeader || props.rightHeader) && (
+        {hasHeaders && (
           <thead>
             <tr>
-              <th>{props.leftHeader || ""}</th>
-              <th>{props.rightHeader || ""}</th>
+              {Array.from({ length: maxCols }).map((_, i) => (
+                <th key={i}>{parsedHeaders[i] || ""}</th>
+              ))}
             </tr>
           </thead>
         )}
         <tbody>
-          {parsedRows.map((row, i) => (
-            <tr key={i}>
-              <td>{row.left}</td>
-              <td>{row.right}</td>
+          {parsedRows.map((row, rowIdx) => (
+            <tr key={rowIdx}>
+              {Array.from({ length: maxCols }).map((_, colIdx) => (
+                <td key={colIdx}>{row[colIdx] || ""}</td>
+              ))}
             </tr>
           ))}
         </tbody>
@@ -908,7 +944,18 @@ export default function BlogBlocks(props) {
           return <CalloutBlock key={key} type={block.type} style={block.style} title={block.title} content={block.content} />;
         }
         if (type === "table") {
-          return <TableBlock key={key} title={block.title} leftHeader={block.leftHeader} rightHeader={block.rightHeader} rows={block.rows} />;
+          return (
+            <TableBlock
+              key={key}
+              title={block.title}
+              leftHeader={block.leftHeader}
+              rightHeader={block.rightHeader}
+              headers={block.headers}
+              rows={block.rows}
+              style={block.style}
+              color={block.color}
+            />
+          );
         }
         // ★ Phase B-2: FAQ(強化版)
         if (type === "faq") {
