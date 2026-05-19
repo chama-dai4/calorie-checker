@@ -32,23 +32,22 @@ export default function BlogScrollAnimator({ children, delay = 0 }) {
       }
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // delay 後にアニメ発火
-            setTimeout(() => {
-              entry.target.classList.add(styles.visible);
-            }, delay);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.1,        // 10% が見えたら発火
-        rootMargin: "0px 0px -50px 0px",  // 下に少し余裕
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add(styles.visible);
+        }, delay);
+        observer.unobserve(entry.target);
       }
-    );
+    });
+  },
+  {
+    threshold: 0.15,
+    rootMargin: "0px 0px -100px 0px",
+  }
+);
 
     observer.observe(element);
 

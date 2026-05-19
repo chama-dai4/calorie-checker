@@ -9,6 +9,7 @@ import AuthorCard from "@/components/AuthorCard";
 import PostCard from "@/components/PostCard";
 import Sidebar from "@/components/Sidebar";
 import GlobalNav from "@/components/GlobalNav";
+import BlogScrollAnimator from "@/components/BlogScrollAnimator";
 import { calculateReadingTime, generateTableOfContents } from "@/lib/blogUtils";
 import styles from "./page.module.css";
 
@@ -85,39 +86,43 @@ export default async function BlogPostPage({ params }) {
             <span className={styles.crumbCurrent}>{post.title}</span>
           </div>
 
-          <header className={styles.articleHeader}>
-            <div className={styles.headerMeta}>
-              {post.category && (
-                <div className={styles.category}>
-                  {Array.isArray(post.category) ? post.category[0] : post.category}
+          <BlogScrollAnimator>
+            <header className={styles.articleHeader}>
+              <div className={styles.headerMeta}>
+                {post.category && (
+                  <div className={styles.category}>
+                    {Array.isArray(post.category) ? post.category[0] : post.category}
+                  </div>
+                )}
+                <time className={styles.publishDate}>{formatDate(post.publishedAt)}</time>
+                {hasBlocks && (
+                  <span className={styles.readingTime}>
+                    <span className={styles.readingTimeIcon}>○</span>
+                    読了 約{readingTime}分
+                  </span>
+                )}
+              </div>
+              <h1 className={styles.articleTitle}>{post.title}</h1>
+              {post.excerpt && (
+                <p className={styles.articleLead}>{post.excerpt}</p>
+              )}
+              {tags.length > 0 && (
+                <div className={styles.tags}>
+                  {tags.map((tag) => (
+                    <span key={tag} className={styles.tag}>#{tag}</span>
+                  ))}
                 </div>
               )}
-              <time className={styles.publishDate}>{formatDate(post.publishedAt)}</time>
-              {hasBlocks && (
-                <span className={styles.readingTime}>
-                  <span className={styles.readingTimeIcon}>○</span>
-                  読了 約{readingTime}分
-                </span>
-              )}
-            </div>
-            <h1 className={styles.articleTitle}>{post.title}</h1>
-            {post.excerpt && (
-              <p className={styles.articleLead}>{post.excerpt}</p>
-            )}
-            {tags.length > 0 && (
-              <div className={styles.tags}>
-                {tags.map((tag) => (
-                  <span key={tag} className={styles.tag}>#{tag}</span>
-                ))}
-              </div>
-            )}
-            <div className={styles.divider}></div>
-          </header>
+              <div className={styles.divider}></div>
+            </header>
+          </BlogScrollAnimator>
 
           {post.thumbnail && (
-            <div className={styles.heroImage}>
-              <img src={post.thumbnail.url} alt={post.title} />
-            </div>
+            <BlogScrollAnimator>
+              <div className={styles.heroImage}>
+                <img src={post.thumbnail.url} alt={post.title} />
+              </div>
+            </BlogScrollAnimator>
           )}
 
           {hasToc && <div className={styles.mobileToc}><TableOfContents items={tocItems} /></div>}
@@ -130,36 +135,44 @@ export default async function BlogPostPage({ params }) {
             <div className={styles.content} dangerouslySetInnerHTML={{ __html: post.content }} />
           ) : null}
 
-          <ShareButtons url={articleUrl} title={post.title} />
+          <BlogScrollAnimator>
+            <ShareButtons url={articleUrl} title={post.title} />
+          </BlogScrollAnimator>
 
-          <AuthorCard />
+          <BlogScrollAnimator>
+            <AuthorCard />
+          </BlogScrollAnimator>
 
-          <div className={styles.articleFooter}>
-            <div className={styles.footerMeta}>
-              <span className={styles.metaLabel}>Posted on</span>
-              <time>{formatDate(post.publishedAt)}</time>
-              {post.updatedAt !== post.publishedAt && (
-                <span className={styles.updated}>
-                  <span className={styles.metaLabel}>Updated</span>
-                  {formatDate(post.updatedAt)}
-                </span>
-              )}
+          <BlogScrollAnimator>
+            <div className={styles.articleFooter}>
+              <div className={styles.footerMeta}>
+                <span className={styles.metaLabel}>Posted on</span>
+                <time>{formatDate(post.publishedAt)}</time>
+                {post.updatedAt !== post.publishedAt && (
+                  <span className={styles.updated}>
+                    <span className={styles.metaLabel}>Updated</span>
+                    {formatDate(post.updatedAt)}
+                  </span>
+                )}
+              </div>
+              <Link href="/blog" className={styles.backToList}>← ブログ一覧に戻る</Link>
             </div>
-            <Link href="/blog" className={styles.backToList}>← ブログ一覧に戻る</Link>
-          </div>
+          </BlogScrollAnimator>
 
           {relatedPosts.length > 0 && (
-            <section className={styles.related}>
-              <div className={styles.relatedHeader}>
-                <span className={styles.relatedLabel}>Related</span>
-                <h3 className={styles.relatedTitle}>他の記事を読む</h3>
-              </div>
-              <div className={styles.relatedGrid}>
-                {relatedPosts.map((p) => (
-                  <PostCard key={p.id} post={p} variant="compact" />
-                ))}
-              </div>
-            </section>
+            <BlogScrollAnimator>
+              <section className={styles.related}>
+                <div className={styles.relatedHeader}>
+                  <span className={styles.relatedLabel}>Related</span>
+                  <h3 className={styles.relatedTitle}>他の記事を読む</h3>
+                </div>
+                <div className={styles.relatedGrid}>
+                  {relatedPosts.map((p) => (
+                    <PostCard key={p.id} post={p} variant="compact" />
+                  ))}
+                </div>
+              </section>
+            </BlogScrollAnimator>
           )}
         </article>
 

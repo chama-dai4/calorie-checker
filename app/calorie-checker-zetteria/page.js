@@ -62,4 +62,4 @@ export default async function ZetteriaPage() {
       <ZetteriaClient menus={menus} locale="ja" />
     </>
   );
-}
+}s
