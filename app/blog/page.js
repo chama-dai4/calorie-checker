@@ -4,6 +4,7 @@ import PostCard from "@/components/PostCard";
 import styles from "./page.module.css";
 import GlobalNav from "@/components/GlobalNav";
 import BlogScrollAnimator from "@/components/BlogScrollAnimator";
+import BlogHomeSidebar from "@/components/BlogHomeSidebar";
 
 export const metadata = {
   title: "ブログ | カロリーチェッカー",
@@ -37,19 +38,25 @@ export default async function BlogPage() {
           </header>
         </BlogScrollAnimator>
 
-        {posts.length === 0 ? (
-          <div className={styles.empty}>
-            <p>まだ記事がありません。</p>
+        <div className={styles.layoutWrap}>
+          <div className={styles.layoutMain}>
+            {posts.length === 0 ? (
+              <div className={styles.empty}>
+                <p>まだ記事がありません。</p>
+              </div>
+            ) : (
+              <div className={styles.grid}>
+                {posts.map((post, index) => (
+                  <BlogScrollAnimator key={post.id} delay={index * 80}>
+                    <PostCard post={post} variant="default" />
+                  </BlogScrollAnimator>
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <div className={styles.grid}>
-            {posts.map((post, index) => (
-              <BlogScrollAnimator key={post.id} delay={index * 80}>
-                <PostCard post={post} variant="default" />
-              </BlogScrollAnimator>
-            ))}
-          </div>
-        )}
+
+          <BlogHomeSidebar recentPosts={posts} />
+        </div>
       </main>
 
       <footer className={styles.footer}>

@@ -30,11 +30,33 @@
 }
 
 /* ========== メイン ========== */
+/* ========== メイン ========== */
 .main {
   max-width: 1440px;
   margin: 0 auto;
   padding: 56px 32px 96px;
   animation: fadeInUp 0.5s ease-out;
+}
+
+/* ========== 2カラムレイアウト(記事グリッド + サイドバー) ========== */
+.layoutWrap {
+  display: flex;
+  gap: 64px;
+  align-items: flex-start;
+  margin-top: 0;
+}
+
+.layoutMain {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ========== レスポンシブ:タブレット以下(900px) ========== */
+@media (max-width: 900px) {
+  .layoutWrap {
+    display: block;
+    gap: 0;
+  }
 }
 
 @keyframes fadeInUp {
@@ -108,10 +130,10 @@
   margin: 0 auto;
 }
 
-/* ========== グリッド（カード一覧） ========== */
+/* ========== グリッド(カード一覧・自動列調整) ========== */
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 28px;
 }
 
@@ -150,14 +172,14 @@
   text-decoration: none;
 }
 
-/* ========== レスポンシブ：タブレット ========== */
+/* ========== レスポンシブ:タブレット ========== */
 @media (max-width: 900px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 24px;
   }
   .pageTitle {
-    font-size: 28px;
+    font-size: 36px;
   }
 }
 
