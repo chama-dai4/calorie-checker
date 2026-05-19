@@ -276,11 +276,44 @@ function FaqBlock(props) {
   );
 }
 
+// =============================================================
+// Phase B-4: quote ブロック強化(3スタイル × 5カラー)
+// =============================================================
 function QuoteBlock(props) {
+  if (!props.text) return null;
+
+  // スタイル(default / centered / card)
+  let cardStyle = "default";
+  if (props.style) {
+    cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
+  }
+
+  // カラー(neutral / primary / blue / orange / red)
+  let cardColor = "neutral";
+  if (props.color) {
+    cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  const containerClass = [
+    styles.quote,
+    styles[`quoteStyle_${cardStyle}`],
+    styles[`quoteColor_${cardColor}`],
+  ].join(" ");
+
   return (
-    <blockquote className={styles.quote}>
+    <blockquote className={containerClass}>
+      {/* card / centered スタイル: 装飾用の大きな引用符 */}
+      {(cardStyle === "card" || cardStyle === "centered") && (
+        <span className={styles.quoteMark} aria-hidden="true">
+          "
+        </span>
+      )}
+
       <div className={styles.quoteText}>{props.text}</div>
-      {props.source && <cite className={styles.quoteSource}>— {props.source}</cite>}
+
+      {props.source && (
+        <cite className={styles.quoteSource}>— {props.source}</cite>
+      )}
     </blockquote>
   );
 }
@@ -970,7 +1003,15 @@ export default function BlogBlocks(props) {
           );
         }
         if (type === "quote") {
-          return <QuoteBlock key={key} text={block.text} source={block.source} />;
+          return (
+            <QuoteBlock
+              key={key}
+              text={block.text}
+              source={block.source}
+              style={block.style}
+              color={block.color}
+            />
+          );
         }
         if (type === "divider") {
           return <DividerBlock key={key} style={block.style} />;

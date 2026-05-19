@@ -2854,3 +2854,164 @@
     border-right-width: 1px;
   }
 }
+/* =============================================================
+   Phase B-4: quote ブロック強化スタイル
+   3スタイル(default/centered/card) × 5カラー(neutral/primary/blue/orange/red)
+   ============================================================= */
+
+/* ------- カラー変数定義 ------- */
+.quoteColor_neutral {
+  --quote-accent: #0a0a0a;
+  --quote-accent-bg: rgba(10, 10, 10, 0.04);
+  --quote-mark-color: rgba(10, 10, 10, 0.12);
+}
+.quoteColor_primary {
+  --quote-accent: #16a34a;
+  --quote-accent-bg: rgba(34, 197, 94, 0.06);
+  --quote-mark-color: rgba(34, 197, 94, 0.18);
+}
+.quoteColor_blue {
+  --quote-accent: #3b82f6;
+  --quote-accent-bg: rgba(59, 130, 246, 0.06);
+  --quote-mark-color: rgba(59, 130, 246, 0.18);
+}
+.quoteColor_orange {
+  --quote-accent: #f97316;
+  --quote-accent-bg: rgba(249, 115, 22, 0.06);
+  --quote-mark-color: rgba(249, 115, 22, 0.18);
+}
+.quoteColor_red {
+  --quote-accent: #ef4444;
+  --quote-accent-bg: rgba(239, 68, 68, 0.06);
+  --quote-mark-color: rgba(239, 68, 68, 0.18);
+}
+
+/* ------- スタイル: default(既存互換・左に縦線+カラー反映) ------- */
+.quoteStyle_default {
+  border-left-color: var(--quote-accent, var(--ink));
+}
+
+/* ------- スタイル: centered(中央寄せ・大きな引用符・名言風) ------- */
+.quoteStyle_centered {
+  position: relative;
+  text-align: center;
+  border-left: none;
+  padding: 32px 24px;
+  margin: 36px 0;
+  background: transparent;
+}
+
+/* 大きな引用符マーク(centered) */
+.quoteStyle_centered .quoteMark {
+  display: block;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 80px;
+  line-height: 0.6;
+  color: var(--quote-mark-color, rgba(0, 0, 0, 0.12));
+  margin-bottom: 16px;
+  user-select: none;
+}
+
+.quoteStyle_centered .quoteText {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.8;
+  color: var(--ink);
+  font-style: italic;
+  margin: 0 auto;
+  max-width: 540px;
+}
+
+.quoteStyle_centered .quoteSource {
+  display: block;
+  margin-top: 20px;
+  font-size: 14px;
+  font-style: normal;
+  color: var(--quote-accent, var(--muted));
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ------- スタイル: card(カード型・大きな引用符・本格的引用向け) ------- */
+.quoteStyle_card {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  border-left: 4px solid var(--quote-accent, var(--ink));
+  background: var(--quote-accent-bg, var(--bg-alt));
+  padding: 28px 28px 24px 28px;
+  margin: 28px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* 大きな引用符マーク(card・左上に配置) */
+.quoteStyle_card .quoteMark {
+  position: absolute;
+  top: 12px;
+  left: 20px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 64px;
+  line-height: 1;
+  color: var(--quote-mark-color, rgba(0, 0, 0, 0.12));
+  user-select: none;
+  pointer-events: none;
+}
+
+.quoteStyle_card .quoteText {
+  position: relative;
+  z-index: 1;
+  padding-left: 36px;
+  padding-top: 8px;
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--ink);
+  font-style: italic;
+}
+
+.quoteStyle_card .quoteSource {
+  display: block;
+  text-align: right;
+  margin-top: 16px;
+  font-size: 13px;
+  font-style: normal;
+  color: var(--quote-accent, var(--muted));
+  font-weight: 600;
+}
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  /* default はそのまま */
+
+  /* centered のスマホ調整 */
+  .quoteStyle_centered {
+    padding: 24px 16px;
+    margin: 28px 0;
+  }
+  .quoteStyle_centered .quoteMark {
+    font-size: 60px;
+  }
+  .quoteStyle_centered .quoteText {
+    font-size: 16px;
+  }
+  .quoteStyle_centered .quoteSource {
+    font-size: 13px;
+  }
+
+  /* card のスマホ調整 */
+  .quoteStyle_card {
+    padding: 24px 18px 20px 18px;
+    margin: 24px 0;
+  }
+  .quoteStyle_card .quoteMark {
+    font-size: 48px;
+    top: 8px;
+    left: 14px;
+  }
+  .quoteStyle_card .quoteText {
+    padding-left: 28px;
+    font-size: 14px;
+  }
+  .quoteStyle_card .quoteSource {
+    font-size: 12px;
+  }
+}
