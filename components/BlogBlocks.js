@@ -318,10 +318,30 @@ function QuoteBlock(props) {
   );
 }
 
+// =============================================================
+// Phase B-5: divider ブロック強化(5スタイル × 5カラー)
+// シンプルな <div> 構造で線そのものを描画
+// =============================================================
 function DividerBlock(props) {
-  const styleType = (props.style && props.style[0]) || props.style || "default";
-  const dividerClass = styles.divider + " " + styles["divider_" + styleType];
-  return <hr className={dividerClass} />;
+  // スタイル(default / gradient / thin / thick / double)
+  let cardStyle = "default";
+  if (props.style) {
+    cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
+  }
+
+  // カラー(neutral / primary / blue / orange / red)
+  let cardColor = "neutral";
+  if (props.color) {
+    cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  const containerClass = [
+    styles.divider,
+    styles[`divider_${cardStyle}`],
+    styles[`dividerColor_${cardColor}`],
+  ].join(" ");
+
+  return <div className={containerClass} role="separator" aria-hidden="true"></div>;
 }
 
 function RelatedLinkBlock(props) {
@@ -1014,7 +1034,14 @@ export default function BlogBlocks(props) {
           );
         }
         if (type === "divider") {
-          return <DividerBlock key={key} style={block.style} />;
+          return (
+            <DividerBlock
+              key={key}
+              style={block.style}
+              color={block.color}
+              icon={block.icon}
+            />
+          );
         }
         if (type === "relatedLink") {
           return <RelatedLinkBlock key={key} title={block.title} text={block.text} url={block.url} />;

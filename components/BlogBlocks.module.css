@@ -542,19 +542,31 @@
   }
 }
 
-/* ========== レスポンシブ:モバイル対応 ========== */
-@media (max-width: 760px) {
-  .callout {
-    padding: 14px 16px;
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  .divider {
+    margin: 28px auto;
   }
-  .calloutIcon {
-    font-size: 16px;
+  .divider_thin {
+    margin: 24px auto;
   }
-  .calloutTitle {
-    font-size: 13px;
+  .divider_thick,
+  .divider_double,
+  .divider_gradient {
+    margin: 32px auto;
   }
-  .calloutContent {
-    font-size: 13px;
+  .divider_extraThick {
+    margin: 36px auto;
+    height: 5px;
+  }
+  .divider_mega {
+    margin: 40px auto;
+    height: 8px;
+  }
+  .divider_block {
+    margin: 44px auto;
+    height: 14px;
+    border-radius: 7px;
   }
 }
 /* ========================================================== */
@@ -3014,4 +3026,130 @@
   .quoteStyle_card .quoteSource {
     font-size: 12px;
   }
+}
+/* =============================================================
+   Phase B-5: divider ブロック強化スタイル
+   5スタイル(default/gradient/thin/thick/double) × 5カラー = 25パターン
+   ============================================================= */
+
+/* ------- カラー変数定義 ------- */
+.dividerColor_neutral {
+  --divider-color: #d1d5db;
+  --divider-color-strong: #6b7280;
+}
+.dividerColor_primary {
+  --divider-color: rgba(34, 197, 94, 0.4);
+  --divider-color-strong: #16a34a;
+}
+.dividerColor_blue {
+  --divider-color: rgba(59, 130, 246, 0.4);
+  --divider-color-strong: #3b82f6;
+}
+.dividerColor_orange {
+  --divider-color: rgba(249, 115, 22, 0.4);
+  --divider-color-strong: #f97316;
+}
+.dividerColor_red {
+  --divider-color: rgba(239, 68, 68, 0.4);
+  --divider-color-strong: #ef4444;
+}
+
+/* ------- 共通ベース ------- */
+.divider {
+  margin: 32px auto;
+  border: none;
+  background: transparent;
+  width: 100%;
+}
+
+/* ------- スタイル: default(標準・1px) ------- */
+.divider_default {
+  height: 1px;
+  background: var(--divider-color, #d1d5db);
+}
+
+/* ------- スタイル: thin(極細・透明度50%) ------- */
+.divider_thin {
+  height: 1px;
+  background: var(--divider-color, #d1d5db);
+  opacity: 0.5;
+  margin: 28px auto;
+}
+
+/* ------- スタイル: thick(太め・3px) ------- */
+.divider_thick {
+  height: 3px;
+  background: var(--divider-color-strong, #6b7280);
+  border-radius: 2px;
+  margin: 36px auto;
+}
+
+/* ------- スタイル: double(二重線・章の終わりに) ------- */
+.divider_double {
+  height: 7px;
+  background: transparent;
+  border-top: 1px solid var(--divider-color-strong, #6b7280);
+  border-bottom: 1px solid var(--divider-color-strong, #6b7280);
+  margin: 36px auto;
+}
+
+/* ------- スタイル: gradient(中央が濃いグラデーション) ------- */
+.divider_gradient {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--divider-color-strong, #6b7280) 50%,
+    transparent 100%
+  );
+  border-radius: 1px;
+  margin: 36px auto;
+}
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  .divider {
+    margin: 28px auto;
+  }
+  .divider_thin {
+    margin: 24px auto;
+  }
+  .divider_thick,
+  .divider_double,
+  .divider_gradient {
+    margin: 32px auto;
+  }
+}
+/* ------- スタイル: extraThick(超太め・6px) ------- */
+.divider_extraThick {
+  height: 6px;
+  background: var(--divider-color-strong, #6b7280);
+  border-radius: 3px;
+  margin: 40px auto;
+}
+
+/* ------- スタイル: mega(超超太め・10px) ------- */
+.divider_mega {
+  height: 10px;
+  background: var(--divider-color-strong, #6b7280);
+  border-radius: 5px;
+  margin: 44px auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ------- スタイル: block(色付き帯・16px) ------- */
+.divider_block {
+  height: 16px;
+  background: var(--divider-color-strong, #6b7280);
+  border-radius: 8px;
+  margin: 48px auto;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  /* 高級感: わずかなグラデーション */
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  background-color: var(--divider-color-strong, #6b7280);
 }
