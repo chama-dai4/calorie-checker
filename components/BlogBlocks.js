@@ -32,29 +32,76 @@ function ImageBlock(props) {
   );
 }
 
+// =============================================================
+// Phase B-1: CTA ブロック強化(3スタイル × 5カラー)
+// 後方互換性: style/color 未指定なら simple + neutral(既存挙動)
+// =============================================================
 function CtaBlock(props) {
   const url = props.url;
   const isExternal = url && url.startsWith("http");
 
-  if (isExternal) {
-    return (
-      <div className={styles.cta}>
-        {props.title && <div className={styles.ctaTitle}>{props.title}</div>}
-        <a href={url} target="_blank" rel="noopener noreferrer" className={styles.ctaButton}>
-          {props.text}
-          <span className={styles.ctaArrow}>→</span>
-        </a>
-      </div>
-    );
+  // スタイル(simple / gradient / card)
+  let cardStyle = "simple";
+  if (props.style) {
+    cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
   }
 
+  // カラー(neutral / primary / orange / blue / red)
+  let cardColor = "neutral";
+  if (props.color) {
+    cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  const containerClass = [
+    styles.cta,
+    styles[`ctaStyle_${cardStyle}`],
+    styles[`ctaColor_${cardColor}`],
+  ].join(" ");
+
+  const buttonClass = [
+    styles.ctaButton,
+    styles[`ctaButtonStyle_${cardStyle}`],
+    styles[`ctaButtonColor_${cardColor}`],
+  ].join(" ");
+
+  // ボタン部分(内部 or 外部リンクの分岐)
+  const ButtonContent = (
+    <>
+      {props.text}
+      <span className={styles.ctaArrow}>→</span>
+    </>
+  );
+
+  const buttonElement = isExternal ? (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={buttonClass}
+    >
+      {ButtonContent}
+    </a>
+  ) : (
+    <Link href={url} className={buttonClass}>
+      {ButtonContent}
+    </Link>
+  );
+
   return (
-    <div className={styles.cta}>
+    <div className={containerClass}>
       {props.title && <div className={styles.ctaTitle}>{props.title}</div>}
-      <Link href={url} className={styles.ctaButton}>
-        {props.text}
-        <span className={styles.ctaArrow}>→</span>
-      </Link>
+
+      {/* card スタイル時のみ description を表示 */}
+      {cardStyle === "card" && props.description && (
+        <div className={styles.ctaDescription}>{props.description}</div>
+      )}
+
+      {buttonElement}
+
+      {/* card スタイル時のみ subText を表示 */}
+      {cardStyle === "card" && props.subText && (
+        <div className={styles.ctaSubText}>{props.subText}</div>
+      )}
     </div>
   );
 }
@@ -719,23 +766,18 @@ function MenuShowcaseBlock(props) {
   );
 }
 
-// =============================================================
-// Phase C-8: timeline ブロック(時系列イベント)
-// =============================================================
+// ========== Phase C-8: timeline ==========
 function TimelineBlock(props) {
-  // スタイル(vertical / horizontal / compact)
   let cardStyle = "vertical";
   if (props.style) {
     cardStyle = Array.isArray(props.style) ? props.style[0] : props.style;
   }
 
-  // カラー(neutral / blue / green / orange / red)
   let cardColor = "neutral";
   if (props.color) {
     cardColor = Array.isArray(props.color) ? props.color[0] : props.color;
   }
 
-  // 最大5イベントを収集(event1Title が必須・空はスキップ)
   const events = [];
   for (let i = 1; i <= 5; i++) {
     const title = props[`event${i}Title`];
@@ -748,7 +790,6 @@ function TimelineBlock(props) {
     }
   }
 
-  // イベントが1つもなければ描画しない
   if (events.length === 0) return null;
 
   return (
@@ -763,7 +804,6 @@ function TimelineBlock(props) {
           <div key={idx} className={styles.timelineItem}>
             <div className={styles.timelineMarker}>
               <div className={styles.timelineDot} aria-hidden="true"></div>
-              {/* 最後以外は接続線を表示 */}
               {idx < events.length - 1 && (
                 <div className={styles.timelineLine} aria-hidden="true"></div>
               )}
@@ -815,8 +855,20 @@ export default function BlogBlocks(props) {
         if (type === "image") {
           return <ImageBlock key={key} src={block.src} caption={block.caption} />;
         }
+        // ★ Phase B-1: CTA(強化版)
         if (type === "cta") {
-          return <CtaBlock key={key} title={block.title} text={block.text} url={block.url} />;
+          return (
+            <CtaBlock
+              key={key}
+              title={block.title}
+              text={block.text}
+              url={block.url}
+              description={block.description}
+              subText={block.subText}
+              style={block.style}
+              color={block.color}
+            />
+          );
         }
         if (type === "callout") {
           return <CalloutBlock key={key} type={block.type} style={block.style} title={block.title} content={block.content} />;

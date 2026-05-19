@@ -2268,3 +2268,232 @@
     font-size: 13px;
   }
 }
+/* =============================================================
+   Phase B-1: CTA ブロック強化スタイル
+   3スタイル(simple/gradient/card) × 5カラー(neutral/primary/orange/blue/red)
+   ※ 既存の .cta / .ctaTitle / .ctaButton / .ctaArrow はそのまま残し、
+     追加スタイルで上書き・拡張する設計
+   ============================================================= */
+
+/* ------- カラー変数定義 ------- */
+.ctaColor_neutral {
+  --cta-accent: #0a0a0a;
+  --cta-accent-hover: #1f1f1f;
+  --cta-accent-text: #ffffff;
+  --cta-grad-start: #1f1f1f;
+  --cta-grad-end: #4a4a4a;
+  --cta-bg-soft: rgba(10, 10, 10, 0.04);
+}
+.ctaColor_primary {
+  --cta-accent: #16a34a;
+  --cta-accent-hover: #15803d;
+  --cta-accent-text: #ffffff;
+  --cta-grad-start: #22c55e;
+  --cta-grad-end: #16a34a;
+  --cta-bg-soft: rgba(34, 197, 94, 0.08);
+}
+.ctaColor_orange {
+  --cta-accent: #f97316;
+  --cta-accent-hover: #ea580c;
+  --cta-accent-text: #ffffff;
+  --cta-grad-start: #fb923c;
+  --cta-grad-end: #f97316;
+  --cta-bg-soft: rgba(249, 115, 22, 0.08);
+}
+.ctaColor_blue {
+  --cta-accent: #3b82f6;
+  --cta-accent-hover: #2563eb;
+  --cta-accent-text: #ffffff;
+  --cta-grad-start: #60a5fa;
+  --cta-grad-end: #3b82f6;
+  --cta-bg-soft: rgba(59, 130, 246, 0.08);
+}
+.ctaColor_red {
+  --cta-accent: #ef4444;
+  --cta-accent-hover: #dc2626;
+  --cta-accent-text: #ffffff;
+  --cta-grad-start: #f87171;
+  --cta-grad-end: #ef4444;
+  --cta-bg-soft: rgba(239, 68, 68, 0.08);
+}
+
+/* ------- スタイル: simple(既存互換・カラーバリエーション対応) ------- */
+/* 既存の .cta / .ctaButton が基本スタイル */
+/* カラー指定された時だけボタンの色を変える */
+.ctaStyle_simple .ctaButton,
+.ctaButtonStyle_simple {
+  background: var(--cta-accent, #0a0a0a);
+  color: var(--cta-accent-text, #ffffff);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.ctaStyle_simple .ctaButton:hover,
+.ctaButtonStyle_simple:hover {
+  background: var(--cta-accent-hover, #1f1f1f);
+  transform: translateY(-1px);
+}
+
+/* ------- スタイル: gradient(目立つグラデーション背景) ------- */
+.ctaStyle_gradient {
+  margin: 32px 0;
+  padding: 28px 24px;
+  border-radius: 14px;
+  background: linear-gradient(
+    135deg,
+    var(--cta-grad-start) 0%,
+    var(--cta-grad-end) 100%
+  );
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* グラデーションスタイル時の装飾(光沢効果) */
+.ctaStyle_gradient::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.ctaStyle_gradient .ctaTitle {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+/* gradient内のボタンは白背景・アクセント色文字 */
+.ctaButtonStyle_gradient {
+  background: #ffffff;
+  color: var(--cta-accent);
+  border: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.ctaButtonStyle_gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* ------- スタイル: card(カード型・description/subText対応) ------- */
+.ctaStyle_card {
+  margin: 32px 0;
+  padding: 28px 24px;
+  border: 2px solid var(--cta-accent);
+  border-radius: 14px;
+  background: var(--bg);
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+.ctaStyle_card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.ctaStyle_card .ctaTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+/* card 専用: 説明文 */
+.ctaDescription {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-bottom: 20px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* card 専用: サブテキスト(ボタンの下) */
+.ctaSubText {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+/* card内のボタン */
+.ctaButtonStyle_card {
+  background: var(--cta-accent);
+  color: var(--cta-accent-text);
+  border: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+.ctaButtonStyle_card:hover {
+  background: var(--cta-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* ------- ボタンの矢印アニメーション(全スタイル共通) ------- */
+.ctaButtonStyle_simple .ctaArrow,
+.ctaButtonStyle_gradient .ctaArrow,
+.ctaButtonStyle_card .ctaArrow {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+.ctaButtonStyle_simple:hover .ctaArrow,
+.ctaButtonStyle_gradient:hover .ctaArrow,
+.ctaButtonStyle_card:hover .ctaArrow {
+  transform: translateX(3px);
+}
+
+/* ------- レスポンシブ(スマホ) ------- */
+@media (max-width: 640px) {
+  .ctaStyle_gradient,
+  .ctaStyle_card {
+    padding: 20px 16px;
+    margin: 24px 0;
+  }
+
+  .ctaStyle_gradient .ctaTitle,
+  .ctaStyle_card .ctaTitle {
+    font-size: 16px;
+  }
+
+  .ctaDescription {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .ctaButtonStyle_gradient,
+  .ctaButtonStyle_card {
+    padding: 12px 24px;
+    font-size: 14px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ctaSubText {
+    font-size: 11px;
+  }
+}
