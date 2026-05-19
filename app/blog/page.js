@@ -3,6 +3,7 @@ import { getBlogPosts } from "@/lib/microcms";
 import PostCard from "@/components/PostCard";
 import styles from "./page.module.css";
 import GlobalNav from "@/components/GlobalNav";
+import BlogScrollAnimator from "@/components/BlogScrollAnimator";
 
 export const metadata = {
   title: "ブログ | カロリーチェッカー",
@@ -17,7 +18,7 @@ export default async function BlogPage() {
 
   return (
     <>
-<GlobalNav />
+      <GlobalNav />
 
       <main className={styles.main}>
         <div className={styles.breadcrumb}>
@@ -26,13 +27,15 @@ export default async function BlogPage() {
           <span>ブログ</span>
         </div>
 
-        <header className={styles.pageHeader}>
-          <div className={styles.pageHeaderLabel}>Blog</div>
-          <h1 className={styles.pageTitle}>ブログ記事一覧</h1>
-          <p className={styles.pageLead}>
-            外食チェーンのカロリー情報、ダイエットのコツ、健康的な食事の選び方など、外食ライフを楽しむためのヒントをお届けします。
-          </p>
-        </header>
+        <BlogScrollAnimator>
+          <header className={styles.pageHeader}>
+            <div className={styles.pageHeaderLabel}>Blog</div>
+            <h1 className={styles.pageTitle}>ブログ記事一覧</h1>
+            <p className={styles.pageLead}>
+              外食チェーンのカロリー情報、ダイエットのコツ、健康的な食事の選び方など、外食ライフを楽しむためのヒントをお届けします。
+            </p>
+          </header>
+        </BlogScrollAnimator>
 
         {posts.length === 0 ? (
           <div className={styles.empty}>
@@ -40,8 +43,10 @@ export default async function BlogPage() {
           </div>
         ) : (
           <div className={styles.grid}>
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} variant="default" />
+            {posts.map((post, index) => (
+              <BlogScrollAnimator key={post.id} delay={index * 80}>
+                <PostCard post={post} variant="default" />
+              </BlogScrollAnimator>
             ))}
           </div>
         )}

@@ -31,7 +31,7 @@
 
 /* ========== メイン ========== */
 .main {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 56px 32px 96px;
   animation: fadeInUp 0.5s ease-out;
@@ -72,39 +72,40 @@
   color: var(--muted-light);
 }
 
-/* ========== ページヘッダー ========== */
+/* ========== ページヘッダー(ヒーロー風・中央寄せ・大きめ) ========== */
 .pageHeader {
-  margin-bottom: 56px;
-  padding-bottom: 32px;
+  margin: 40px 0 80px;
+  padding: 64px 24px;
+  text-align: center;
   border-bottom: 1px solid var(--line);
 }
 
 .pageHeaderLabel {
   font-family: 'Inter', 'Space Grotesk', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
 .pageTitle {
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 36px;
+  font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+  font-size: 56px;
   font-weight: 800;
-  line-height: 1.3;
-  letter-spacing: -0.02em;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
   color: var(--ink);
-  margin: 0 0 16px;
+  margin: 0 0 24px;
 }
 
 .pageLead {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.85;
   color: var(--muted);
   max-width: 640px;
-  margin: 0;
+  margin: 0 auto;
 }
 
 /* ========== グリッド（カード一覧） ========== */
@@ -173,13 +174,17 @@
     gap: 20px;
   }
   .pageTitle {
-    font-size: 24px;
+    font-size: 32px;
   }
   .pageLead {
-    font-size: 13px;
+    font-size: 14px;
   }
   .pageHeader {
-    margin-bottom: 40px;
-    padding-bottom: 24px;
+    margin: 24px 0 48px;
+    padding: 40px 16px;
+  }
+  .pageHeaderLabel {
+    font-size: 11px;
+    margin-bottom: 16px;
   }
 }
