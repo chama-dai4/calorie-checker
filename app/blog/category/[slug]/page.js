@@ -3,11 +3,13 @@ import { notFound } from "next/navigation";
 import { getBlogPosts } from "@/lib/microcms";
 import PostCard from "@/components/PostCard";
 import GlobalNav from "@/components/GlobalNav";
+import BlogScrollAnimator from "@/components/BlogScrollAnimator";
+import BlogHomeSidebar from "@/components/BlogHomeSidebar";
 import styles from "./page.module.css";
 
 export const revalidate = 3600;
 
-// 有効なカテゴリ一覧（microCMSのスキーマと合わせる）
+// 有効なカテゴリ一覧(microCMSのスキーマと合わせる)
 const VALID_CATEGORIES = [
   "期間限定商品レビュー",
   "定番メニュー",
@@ -43,7 +45,7 @@ export default async function CategoryPage({ params }) {
 
   return (
     <>
-<GlobalNav />
+      <GlobalNav />
 
       <main className={styles.main}>
         <div className={styles.breadcrumb}>
@@ -54,26 +56,35 @@ export default async function CategoryPage({ params }) {
           <span>{categoryName}</span>
         </div>
 
-        <header className={styles.pageHeader}>
-          <div className={styles.pageHeaderLabel}>Category</div>
-          <h1 className={styles.pageTitle}>{categoryName}</h1>
-          <p className={styles.pageLead}>
-            {categoryName}カテゴリの記事一覧です。
-          </p>
-        </header>
+        <BlogScrollAnimator>
+          <header className={styles.pageHeader}>
+            <div className={styles.pageHeaderLabel}>Category</div>
+            <h1 className={styles.pageTitle}>{categoryName}</h1>
+            <p className={styles.pageLead}>
+              {categoryName}カテゴリの記事一覧です。
+            </p>
+          </header>
+        </BlogScrollAnimator>
 
-        {posts.length === 0 ? (
-          <div className={styles.empty}>
-            <p>このカテゴリにはまだ記事がありません。</p>
-            <Link href="/blog" className={styles.emptyLink}>← ブログ一覧に戻る</Link>
+        <div className={styles.layoutWrap}>
+          <div className={styles.layoutMain}>
+            {posts.length === 0 ? (
+              <div className={styles.empty}>
+                <p>このカテゴリにはまだ記事がありません。</p>
+                <Link href="/blog" className={styles.emptyLink}>← ブログ一覧に戻る</Link>
+              </div>
+            ) : (
+              <div className={styles.grid}>
+                {posts.map((post, index) => (
+                  <BlogScrollAnimator key={post.id} delay={index * 80}>
+                    <PostCard post={post} variant="default" />
+                  </BlogScrollAnimator>
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <div className={styles.grid}>
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} variant="default" />
-            ))}
-          </div>
-        )}
+          <BlogHomeSidebar recentPosts={data.contents} />
+        </div>
       </main>
 
       <footer className={styles.footer}>
