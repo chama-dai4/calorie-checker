@@ -390,6 +390,63 @@ function RelatedLinkBlock(props) {
   );
 }
 
+// =============================================================
+// Phase D-6: speechBubble(吹き出し)
+// =============================================================
+function SpeechBubbleBlock(props) {
+  let direction = "left";
+  if (props.direction) {
+    direction = Array.isArray(props.direction) ? props.direction[0] : props.direction;
+  }
+
+  let bubbleColor = "green";
+  if (props.color) {
+    bubbleColor = Array.isArray(props.color) ? props.color[0] : props.color;
+  }
+
+  const avatar = props.avatar;
+  const name = props.name;
+  const content = props.content;
+
+  const isImageUrl = avatar && (avatar.startsWith("http") || avatar.startsWith("/"));
+
+  let avatarContent;
+  if (!avatar) {
+    avatarContent = name ? name.charAt(0) : "?";
+  } else if (isImageUrl) {
+    avatarContent = (
+      <img
+        src={avatar}
+        alt={name || "avatar"}
+        className={styles.speechBubbleAvatarImg}
+      />
+    );
+  } else {
+    avatarContent = avatar;
+  }
+
+  const wrapClass = [
+    styles.speechBubbleWrap,
+    direction === "right" ? styles.speechBubbleRight : styles.speechBubbleLeft,
+  ].join(" ");
+
+  const bubbleClass = [
+    styles.speechBubble,
+    styles[`speechBubbleColor_${bubbleColor}`],
+    direction === "right" ? styles.speechBubbleBubbleRight : styles.speechBubbleBubbleLeft,
+  ].join(" ");
+
+  return (
+    <div className={wrapClass}>
+      <div className={styles.speechBubbleAvatarBlock}>
+        <div className={styles.speechBubbleAvatar}>{avatarContent}</div>
+        {name && <div className={styles.speechBubbleName}>{name}</div>}
+      </div>
+      <div className={bubbleClass}>{content}</div>
+    </div>
+  );
+}
+
 // ========== Phase C-1: calorieCard ==========
 function CalorieCardBlock(props) {
   let cardStyle = "default";
@@ -1199,6 +1256,19 @@ export default function BlogBlocks(props) {
               menu3Unit={block.menu3Unit}
               menu3Note={block.menu3Note}
               style={block.style}
+              color={block.color}
+            />
+          );
+        }
+        // ★ Phase D-6: speechBubble(吹き出し)
+        if (type === "speechBubble") {
+          return (
+            <SpeechBubbleBlock
+              key={key}
+              direction={block.direction}
+              avatar={block.avatar}
+              name={block.name}
+              content={block.content}
               color={block.color}
             />
           );

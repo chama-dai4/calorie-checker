@@ -3204,3 +3204,174 @@
     height: 72px;
   }
 }
+/* =========================================================
+   Phase D-6: speechBubble(吹き出し)
+   ========================================================= */
+.speechBubbleWrap {
+  display: flex;
+  gap: 12px;
+  margin: 1.5rem 0;
+  align-items: flex-start;
+}
+
+.speechBubbleLeft {
+  flex-direction: row;
+}
+
+.speechBubbleRight {
+  flex-direction: row-reverse;
+}
+
+.speechBubbleAvatarBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 64px;
+}
+
+.speechBubbleAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  overflow: hidden;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.speechBubbleAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.speechBubbleName {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 6px;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+
+.speechBubble {
+  position: relative;
+  padding: 14px 18px;
+  border-radius: 14px;
+  max-width: 480px;
+  line-height: 1.7;
+  font-size: 15px;
+  border: 1px solid transparent;
+}
+
+.speechBubbleBubbleLeft::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 10px 6px 0;
+  border-color: transparent;
+}
+
+.speechBubbleBubbleRight::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 0 6px 10px;
+  border-color: transparent;
+}
+
+/* グリーン(ダイエットアドバイス向け) */
+.speechBubbleColor_green {
+  background: #EAF3DE;
+  color: #173404;
+  border-color: #C0DD97;
+}
+.speechBubbleColor_green.speechBubbleBubbleLeft::before {
+  border-right-color: #EAF3DE;
+}
+.speechBubbleColor_green.speechBubbleBubbleRight::before {
+  border-left-color: #EAF3DE;
+}
+
+/* オレンジ(注意・解説向け) */
+.speechBubbleColor_orange {
+  background: #FAEEDA;
+  color: #412402;
+  border-color: #FAC775;
+}
+.speechBubbleColor_orange.speechBubbleBubbleLeft::before {
+  border-right-color: #FAEEDA;
+}
+.speechBubbleColor_orange.speechBubbleBubbleRight::before {
+  border-left-color: #FAEEDA;
+}
+
+/* ブルー(情報・補足向け) */
+.speechBubbleColor_blue {
+  background: #E6F1FB;
+  color: #042C53;
+  border-color: #B5D4F4;
+}
+.speechBubbleColor_blue.speechBubbleBubbleLeft::before {
+  border-right-color: #E6F1FB;
+}
+.speechBubbleColor_blue.speechBubbleBubbleRight::before {
+  border-left-color: #E6F1FB;
+}
+
+/* ピンク(共感・励まし向け) */
+.speechBubbleColor_pink {
+  background: #FBEAF0;
+  color: #4B1528;
+  border-color: #F4C0D1;
+}
+.speechBubbleColor_pink.speechBubbleBubbleLeft::before {
+  border-right-color: #FBEAF0;
+}
+.speechBubbleColor_pink.speechBubbleBubbleRight::before {
+  border-left-color: #FBEAF0;
+}
+
+/* ニュートラル(汎用) */
+.speechBubbleColor_neutral {
+  background: var(--bg-alt);
+  color: var(--ink);
+  border-color: var(--line);
+}
+.speechBubbleColor_neutral.speechBubbleBubbleLeft::before {
+  border-right-color: var(--bg-alt);
+}
+.speechBubbleColor_neutral.speechBubbleBubbleRight::before {
+  border-left-color: var(--bg-alt);
+}
+
+/* レスポンシブ(モバイル対応) */
+@media (max-width: 600px) {
+  .speechBubbleAvatarBlock {
+    width: 48px;
+  }
+  .speechBubbleAvatar {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+  .speechBubble {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+}
