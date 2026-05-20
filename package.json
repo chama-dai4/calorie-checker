@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "next build",   ← --webpack を外して元に戻す
     "start": "next start",
     "lint": "eslint"
   },
