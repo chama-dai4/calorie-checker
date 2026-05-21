@@ -2,7 +2,6 @@ import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 // ▼ 変更点1: headers をインポート(追加)
 import { headers } from "next/headers";
-import Script from "next/script";
 
 export const metadata = {
   title: "カロリーチェッカー | 外食チェーンのカロリー計算サイト",
@@ -36,12 +35,11 @@ export default async function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <Script
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2863577913372338"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+        ></script>
       </head>
       <body>
         {children}
