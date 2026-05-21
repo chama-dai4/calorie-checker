@@ -12,6 +12,7 @@ const BILINGUAL_CHAIN_PATHS = [
   "/calorie-checker-starbucks",
   "/calorie-checker-komeda",
   "/calorie-checker-tullys",
+  "/calorie-checker-sanmarc",
   "/calorie-checker-yoshinoya",
   "/calorie-checker-kura",
   "/calorie-checker-freshness",
