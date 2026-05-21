@@ -10,6 +10,8 @@ const BILINGUAL_CHAIN_PATHS = [
   "/calorie-checker-burgerking",
   "/calorie-checker-zetteria",
   "/calorie-checker-starbucks",
+  "/calorie-checker-komeda",
+  "/calorie-checker-tullys",
   "/calorie-checker-yoshinoya",
   "/calorie-checker-kura",
   "/calorie-checker-freshness",
