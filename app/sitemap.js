@@ -17,6 +17,7 @@ const BILINGUAL_CHAIN_PATHS = [
   "/calorie-checker-yoshinoya",
   "/calorie-checker-kura",
   "/calorie-checker-freshness",
+  "/calorie-checker-pizzahut",
 ];
 
 // 日本語/英語両対応の言語マップを生成するヘルパー
