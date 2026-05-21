@@ -3,27 +3,30 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { localizedHref } from "@/lib/i18n/getLocale";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-// === 大区分の定義（4タブ） ===
+// === 大区分の定義（4タブ・ラベルは {ja, en} 形式で辞書不要） ===
 const GROUPS = [
   {
     id: "drink",
-    label: "ドリンク",
+    label: { ja: "ドリンク", en: "Drinks" },
     categories: ["ホットドリンク", "アイスドリンク", "アルコール"],
   },
   {
     id: "dessert",
-    label: "デザート",
+    label: { ja: "デザート", en: "Dessert" },
     categories: ["デザート"],
   },
   {
     id: "bread",
-    label: "パン・サンド",
+    label: { ja: "パン・サンド", en: "Bread & Sandwiches" },
     categories: ["パン", "サンド"],
   },
   {
     id: "food",
-    label: "フード",
+    label: { ja: "フード", en: "Food" },
     categories: ["パスタ", "ドリア", "サイドメニュー", "その他"],
   },
 ];
@@ -80,7 +83,9 @@ function AnimatedNumber({ value, duration = 280 }) {
   return <>{isInteger ? Math.round(displayValue) : displayValue.toFixed(1)}</>;
 }
 
-export default function SanmarcClient({ menus }) {
+export default function SanmarcClient({ menus, locale = "ja" }) {
+  const { t, tCategory, tChain } = useTranslation(locale);
+
   // === ステート定義 ===
   const [activeGroup, setActiveGroup] = useState("drink");        // 大区分タブ
   const [activeCategory, setActiveCategory] = useState("all");    // サブカテゴリチップ
@@ -316,14 +321,22 @@ export default function SanmarcClient({ menus }) {
     setSearch("");
   };
 
+  // === 多言語リンク・表示名 ===
+  const homeHref = localizedHref("/", locale);
+  const categoryHref = localizedHref("/category/cafe", locale);
+  const chainDisplayName = tChain("サンマルクカフェ") || (locale === "en" ? "St. Marc Cafe" : "サンマルクカフェ");
+
   // === JSX ===
   return (
     <div className="page-fade-in">
       {/* トップナビ（sticky） */}
       <nav className={styles.topnav}>
         <div className={styles.topnavInner}>
-          <Link href="/" className="brand-name-large">Calorie Checker</Link>
-          <Link href="/" className={styles.backLink}>← ホームに戻る</Link>
+          <Link href={homeHref} className="brand-name-large">Calorie Checker</Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Link href={homeHref} className={styles.backLink}>{t("common.backToHome")}</Link>
+            <LanguageSwitcher />
+          </div>
         </div>
       </nav>
 
@@ -331,21 +344,21 @@ export default function SanmarcClient({ menus }) {
         {/* ページヘッダー（パンくず + タイトル） */}
         <header className={styles.header}>
           <div className={styles.breadcrumb}>
-            <Link href="/">ホーム</Link>
+            <Link href={homeHref}>{t("common.home")}</Link>
             <span className={styles.sep}>/</span>
-            <Link href="/category/cafe">カフェ</Link>
-            <span className={styles.sep}>/</span>サンマルクカフェ
+            <Link href={categoryHref}>{tCategory("カフェ") || (locale === "en" ? "Cafe / カフェ" : "カフェ")}</Link>
+            <span className={styles.sep}>/</span>{chainDisplayName}
           </div>
-          <h1>サンマルクカフェ</h1>
-          <p className={styles.subtitle}>メニューを選ぶだけで、合計カロリーとアレルゲンが分かります。</p>
+          <h1>{chainDisplayName}</h1>
+          <p className={styles.subtitle}>{locale === "en" ? "Calculate calories & check allergens for all St. Marc Cafe menu items. Size options supported." : "メニューを選ぶだけで、合計カロリーとアレルゲンが分かります。"}</p>
         </header>
 
         {/* アレルゲン注意バナー */}
         <div className={styles.allergyNotice}>
-          <strong>⚠️ アレルゲン情報について</strong>
-          本サービスのアレルゲン情報は参考値です。アレルギーをお持ちの方は、必ず
-          <a href="https://www.saint-marc-hd.com/cafe/" target="_blank" rel="noopener">サンマルクカフェ公式サイト</a>
-          の最新情報をご確認ください。
+          <strong>{t("chain.allergenNoticeTitle")}</strong>
+          {t("chain.allergenNotice")}
+          <a href="https://www.saint-marc-hd.com/cafe/" target="_blank" rel="noopener">{locale === "en" ? "St. Marc Cafe " : "サンマルクカフェ"}{t("chain.officialSite")}</a>
+          {t("chain.allergenNoticeSuffix")}
         </div>
 
         {/* 2カラムレイアウト（PC: 左メニュー + 右サイドバー、モバイル: 1カラム） */}
@@ -359,7 +372,7 @@ export default function SanmarcClient({ menus }) {
                   className={`${styles.genreTab} ${activeGroup === g.id ? styles.active : ""}`}
                   onClick={() => handleGroupChange(g.id)}
                 >
-                  {g.label}
+                  {g.label[locale] || g.label.ja}
                   <span className={styles.num}>{groupCounts[g.id] || 0}</span>
                 </button>
               ))}
@@ -371,7 +384,7 @@ export default function SanmarcClient({ menus }) {
                 className={`${styles.subCatChip} ${activeCategory === "all" ? styles.subCatActive : ""}`}
                 onClick={() => setActiveCategory("all")}
               >
-                すべて <span className={styles.subCatNum}>{categoryCounts["all"] || 0}</span>
+                {t("chain.all")} <span className={styles.subCatNum}>{categoryCounts["all"] || 0}</span>
               </button>
               {currentGroup.categories.map((cat) => {
                 const count = categoryCounts[cat] || 0;
@@ -382,7 +395,7 @@ export default function SanmarcClient({ menus }) {
                     className={`${styles.subCatChip} ${activeCategory === cat ? styles.subCatActive : ""}`}
                     onClick={() => setActiveCategory(cat)}
                   >
-                    {cat} <span className={styles.subCatNum}>{count}</span>
+                    {tCategory(cat) || cat} <span className={styles.subCatNum}>{count}</span>
                   </button>
                 );
               })}
@@ -397,7 +410,7 @@ export default function SanmarcClient({ menus }) {
               <input
                 type="text"
                 className={styles.searchInput}
-                placeholder="メニュー名で検索"
+                placeholder={t("chain.searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -406,7 +419,7 @@ export default function SanmarcClient({ menus }) {
             {/* メニュー一覧 */}
             <div className={styles.menuStack}>
               {visibleMenus.length === 0 ? (
-                <div className={styles.emptyState}>該当するメニューがありません</div>
+                <div className={styles.emptyState}>{t("chain.noResults")}</div>
               ) : (
                 visibleMenus.map((item) => {
                   const sel = selections[item.id];
@@ -431,15 +444,15 @@ export default function SanmarcClient({ menus }) {
                       <div className={styles.info}>
                         <div className={styles.name}>{item.name}</div>
                         <div className={styles.pfc}>
-                          たんぱく質 {Math.round(itemNutri.protein * 10) / 10}g · 脂質 {Math.round(itemNutri.fat * 10) / 10}g · 炭水化物 {Math.round(itemNutri.carb * 10) / 10}g
+                          {t("chain.protein")} {Math.round(itemNutri.protein * 10) / 10}g · {t("chain.fat")} {Math.round(itemNutri.fat * 10) / 10}g · {t("chain.carbs")} {Math.round(itemNutri.carb * 10) / 10}g
                         </div>
                         {/* アレルゲンタグ */}
                         <div className={styles.allergenLine}>
                           {containsCount === 0 ? (
-                            <span className={styles.allergenNone}>特定アレルゲンなし</span>
+                            <span className={styles.allergenNone}>{t("chain.allergenNone")}</span>
                           ) : (
                             <>
-                              <span className={styles.allergenLabel}>含む:</span>
+                              <span className={styles.allergenLabel}>{t("chain.allergenContainsLabel")}</span>
                               {allergens.contains.slice(0, 5).map((a) => (
                                 <span key={a} className={styles.allergenTag}>{a}</span>
                               ))}
@@ -450,10 +463,10 @@ export default function SanmarcClient({ menus }) {
                           )}
                         </div>
                         {isSelected && sel.sizeName && (
-                          <span className={styles.sizeBadge}>サイズ: {sel.sizeName}</span>
+                          <span className={styles.sizeBadge}>{t("chain.sizeLabel")} {sel.sizeName}</span>
                         )}
                         {item.hasSizeOption && !isSelected && (
-                          <span className={styles.sizeHint}>サイズ選択あり</span>
+                          <span className={styles.sizeHint}>{locale === "en" ? "Size options" : "サイズ選択あり"}</span>
                         )}
                       </div>
                       <div className={styles.right}>
@@ -469,16 +482,16 @@ export default function SanmarcClient({ menus }) {
 
             {/* ページ最下部の補足 */}
             <div className={styles.pageFooter}>
-              数値は <a href="https://www.saint-marc-hd.com/cafe/" target="_blank" rel="noopener">サンマルクカフェ公式サイト</a> の成分情報を参照した参考値です。<br />
-              本サービスはサンマルクカフェと提携・関係ありません。最新かつ正確な情報は公式サイトをご確認ください。
+              {t("chain.disclaimerPrefix")}<a href="https://www.saint-marc-hd.com/cafe/" target="_blank" rel="noopener">{locale === "en" ? "St. Marc Cafe " : "サンマルクカフェ"}{t("chain.officialSite")}</a>{t("chain.disclaimerSuffix")}<br />
+              {t("chain.disclaimerAffiliation")}{locale === "en" ? "St. Marc Cafe" : "サンマルクカフェ"}{t("chain.disclaimerAffiliationSuffix")}
             </div>
           </div>
 
           {/* PC右サイドバー（合計カード + 選択中リスト） */}
           <aside className={styles.rightCol}>
             <div className={styles.totalCardPc}>
-              <div className={styles.label}>合計</div>
-              <div className={styles.countLine}>{totals.count} 品 選択中</div>
+              <div className={styles.label}>{t("chain.total")}</div>
+              <div className={styles.countLine}>{totals.count} {t("chain.itemsSelected")}</div>
               <div className={styles.kcalBig}>
                 <AnimatedNumber value={totals.calorie} />
                 <span className={styles.u}>kcal</span>
@@ -486,21 +499,21 @@ export default function SanmarcClient({ menus }) {
               <hr className={styles.divider} />
               <div className={styles.nutriList}>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>たんぱく質</span>
+                  <span className={styles.nutriName}>{t("chain.protein")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.protein} />
                     <span className={styles.u}>g</span>
                   </span>
                 </div>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>脂質</span>
+                  <span className={styles.nutriName}>{t("chain.fat")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.fat} />
                     <span className={styles.u}>g</span>
                   </span>
                 </div>
                 <div className={styles.nutriRow}>
-                  <span className={styles.nutriName}>炭水化物</span>
+                  <span className={styles.nutriName}>{t("chain.carbs")}</span>
                   <span className={styles.nutriValue}>
                     <AnimatedNumber value={totals.carbohydrate} />
                     <span className={styles.u}>g</span>
@@ -510,7 +523,7 @@ export default function SanmarcClient({ menus }) {
               {/* 選択中アレルゲン集計 */}
               {selectedAllergens.length > 0 && (
                 <div className={styles.allergenSummary}>
-                  <div className={styles.allergenSummaryLabel}>含まれるアレルゲン</div>
+                  <div className={styles.allergenSummaryLabel}>{t("chain.allergenContainsHeading")}</div>
                   <div className={styles.allergenSummaryTags}>
                     {selectedAllergens.map((a) => (
                       <span key={a} className={styles.allergenTag}>{a}</span>
@@ -519,14 +532,14 @@ export default function SanmarcClient({ menus }) {
                 </div>
               )}
               <button className={styles.clearBtnPc} onClick={clearSelection} disabled={totals.count === 0}>
-                選択をクリア
+                {t("chain.clearSelection")}
               </button>
             </div>
 
             {/* 選択中のメニュー一覧（スクロール可能） */}
             {selectedItems.length > 0 && (
               <div className={styles.selectedListCard}>
-                <div className={styles.selectedListLabel}>選択中のメニュー</div>
+                <div className={styles.selectedListLabel}>{t("chain.selectedItems")}</div>
                 <div className={styles.selectedList}>
                   {selectedItems.map((it) => (
                     <div key={it.id} className={styles.selectedItem}>
@@ -540,7 +553,7 @@ export default function SanmarcClient({ menus }) {
                       <button
                         className={styles.removeBtn}
                         onClick={() => removeSelection(it.id)}
-                        aria-label={`${it.name}を解除`}
+                        aria-label={`${it.name}${t("chain.removeAria")}`}
                       >
                         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                           <path d="m4 4 8 8M12 4l-8 8" />
@@ -564,9 +577,9 @@ export default function SanmarcClient({ menus }) {
         >
           <div className={styles.mobileTop}>
             <div className={styles.mobileMeta}>
-              <div className={styles.mobileLabel}>合計</div>
+              <div className={styles.mobileLabel}>{t("chain.total")}</div>
               <div className={styles.mobileCount}>
-                {totals.count} 品 選択中{totals.count > 0 && <span className={styles.expandHint}> · タップで詳細</span>}
+                {totals.count} {t("chain.itemsSelected")}{totals.count > 0 && <span className={styles.expandHint}>{t("chain.tapForDetails")}</span>}
               </div>
             </div>
             <div className={styles.kcalNum}>
@@ -576,21 +589,21 @@ export default function SanmarcClient({ menus }) {
           </div>
           <div className={styles.nutrients}>
             <div className={styles.nCell}>
-              <div className={styles.nL}>たんぱく質</div>
+              <div className={styles.nL}>{t("chain.protein")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.protein} />
                 <span className={styles.u}>g</span>
               </div>
             </div>
             <div className={styles.nCell}>
-              <div className={styles.nL}>脂質</div>
+              <div className={styles.nL}>{t("chain.fat")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.fat} />
                 <span className={styles.u}>g</span>
               </div>
             </div>
             <div className={styles.nCell}>
-              <div className={styles.nL}>炭水化物</div>
+              <div className={styles.nL}>{t("chain.carbs")}</div>
               <div className={styles.nV}>
                 <AnimatedNumber value={totals.carbohydrate} />
                 <span className={styles.u}>g</span>
@@ -605,8 +618,8 @@ export default function SanmarcClient({ menus }) {
         <div className={styles.sheetOverlay} onClick={() => setSheetOpen(false)}>
           <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
             <div className={styles.sheetHeader}>
-              <div className={styles.sheetTitle}>選択中のメニュー</div>
-              <button className={styles.sheetCloseBtn} onClick={() => setSheetOpen(false)} aria-label="閉じる">
+              <div className={styles.sheetTitle}>{t("chain.selectedItems")}</div>
+              <button className={styles.sheetCloseBtn} onClick={() => setSheetOpen(false)} aria-label={t("chain.close")}>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="m4 4 8 8M12 4l-8 8" />
                 </svg>
@@ -614,7 +627,7 @@ export default function SanmarcClient({ menus }) {
             </div>
             <div className={styles.sheetBody}>
               {selectedItems.length === 0 ? (
-                <div className={styles.sheetEmpty}>選択されたメニューはありません</div>
+                <div className={styles.sheetEmpty}>{t("chain.noSelectedItems")}</div>
               ) : (
                 selectedItems.map((it) => (
                   <div key={it.id} className={styles.sheetItem}>
@@ -628,7 +641,7 @@ export default function SanmarcClient({ menus }) {
                     <button
                       className={styles.removeBtn}
                       onClick={() => removeSelection(it.id)}
-                      aria-label={`${it.name}を解除`}
+                      aria-label={`${it.name}${t("chain.removeAria")}`}
                     >
                       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                         <path d="m4 4 8 8M12 4l-8 8" />
@@ -640,24 +653,24 @@ export default function SanmarcClient({ menus }) {
             </div>
             <div className={styles.sheetFooter}>
               <div className={styles.sheetTotalLine}>
-                <span>合計</span>
+                <span>{t("chain.total")}</span>
                 <span className={styles.sheetTotalKcal}>
                   <AnimatedNumber value={totals.calorie} />
                   <span className={styles.u}>kcal</span>
                 </span>
               </div>
               <div className={styles.sheetNutri}>
-                <div>たんぱく質 <strong><AnimatedNumber value={totals.protein} /></strong>g</div>
-                <div>脂質 <strong><AnimatedNumber value={totals.fat} /></strong>g</div>
-                <div>炭水化物 <strong><AnimatedNumber value={totals.carbohydrate} /></strong>g</div>
+                <div>{t("chain.protein")} <strong><AnimatedNumber value={totals.protein} /></strong>g</div>
+                <div>{t("chain.fat")} <strong><AnimatedNumber value={totals.fat} /></strong>g</div>
+                <div>{t("chain.carbs")} <strong><AnimatedNumber value={totals.carbohydrate} /></strong>g</div>
               </div>
               {selectedAllergens.length > 0 && (
                 <div className={styles.sheetAllergens}>
-                  含むアレルゲン: {selectedAllergens.join("、")}
+                  {t("chain.allergenContainsHeading")}: {selectedAllergens.join("、")}
                 </div>
               )}
               <button className={styles.sheetClearBtn} onClick={clearSelection} disabled={totals.count === 0}>
-                選択をクリア
+                {t("chain.clearSelection")}
               </button>
             </div>
           </div>
@@ -670,7 +683,7 @@ export default function SanmarcClient({ menus }) {
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.modalTitle}>{modalItem.name}</div>
-              <div className={styles.modalSubtitle}>サイズを選択してください</div>
+              <div className={styles.modalSubtitle}>{t("chain.chooseSize")}</div>
             </div>
             <div className={styles.modalBody}>
               <div className={styles.sizeList}>
@@ -689,11 +702,11 @@ export default function SanmarcClient({ menus }) {
             <div className={styles.modalFooter}>
               {isEditing && (
                 <button className={styles.modalBtn} onClick={deleteFromModal} style={{ marginRight: 'auto', color: '#c33', borderColor: '#e7baba' }}>
-                  選択を解除
+                  {locale === "en" ? "Remove" : "選択を解除"}
                 </button>
               )}
-              <button className={styles.modalBtn} onClick={closeModal}>キャンセル</button>
-              <button className={styles.modalBtnPrimary} onClick={confirmModal}>完了</button>
+              <button className={styles.modalBtn} onClick={closeModal}>{locale === "en" ? "Cancel" : "キャンセル"}</button>
+              <button className={styles.modalBtnPrimary} onClick={confirmModal}>{locale === "en" ? "Done" : "完了"}</button>
             </div>
           </div>
         </div>
@@ -705,18 +718,18 @@ export default function SanmarcClient({ menus }) {
           <div>
             <p className={styles.siteFooterText}>
               <span className={styles.brandName}>Calorie Checker</span>
-              数値は各社の公式情報を参照した参考値です。本サービスは各チェーン店と提携・関係ありません。
+              {t("footer.siteFooterText")}
             </p>
           </div>
           <div className={styles.siteFooterLinks}>
-            <Link href="/blog">ブログ</Link>
-            <Link href="/about">運営者情報</Link>
-            <Link href="/privacy">プライバシーポリシー</Link>
-            <Link href="/contact">お問い合わせ</Link>
+            <Link href={localizedHref("/blog", locale)}>{t("footer.blog")}</Link>
+            <Link href={localizedHref("/about", locale)}>{t("footer.about")}</Link>
+            <Link href={localizedHref("/privacy", locale)}>{t("footer.privacy")}</Link>
+            <Link href={localizedHref("/contact", locale)}>{t("footer.contact")}</Link>
           </div>
         </div>
         <div className={styles.siteFooterCopy}>
-          © 2026 CHAMANO. All rights reserved.
+          {t("footer.copyright")}
         </div>
       </footer>
     </div>

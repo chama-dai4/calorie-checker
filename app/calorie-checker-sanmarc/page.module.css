@@ -29,6 +29,10 @@
   border-color: var(--ink);
   color: var(--ink);
 }
+/* モバイルでは「ホームに戻る」を隠し、右上は言語切替のみにする */
+@media (max-width: 760px) {
+  .backLink { display: none; }
+}
 
 .wrapper {
   max-width: 1200px;
