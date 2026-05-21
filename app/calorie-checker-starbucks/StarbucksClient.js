@@ -116,7 +116,17 @@ function findVariation(item, size, temp, milk) {
 }
 
 export default function StarbucksClient({ menus, locale = "ja" }) {
-  const { t, tCategory, tChain } = useTranslation(locale);
+  const { t, tCategory, tChain, tName } = useTranslation(locale);
+
+  // 商品名の「表示」用（英語: nameEn → 辞書tName → 日本語名）。
+  // ※ detectTempFromName など内部ロジックには使わず item.name を使うこと。
+  const displayName = (item) => {
+    if (locale !== "en") return item.name;
+    if (item.nameEn && item.nameEn.trim()) return item.nameEn;
+    const dict = tName(item.name);
+    if (dict && dict !== item.name) return dict;
+    return item.name;
+  };
 
   const [activeGenre, setActiveGenre] = useState("季節のおすすめ");
   const [search, setSearch] = useState("");
@@ -239,7 +249,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
           : 0;
         return {
           id: itemId,
-          name: item.name,
+          name: displayName(item),
           size: sel.size,
           milkType: sel.milkType,
           customCount,
@@ -510,7 +520,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
                         </svg>
                       </div>
                       <div className={styles.info}>
-                        <div className={styles.name}>{item.name}</div>
+                        <div className={styles.name}>{displayName(item)}</div>
                         <div className={styles.pfc}>
                           {t("chain.protein")} {Math.round(itemNutri.protein * 10) / 10}g · {t("chain.fat")} {Math.round(itemNutri.fat * 10) / 10}g · {t("chain.carbs")} {Math.round(itemNutri.carb * 10) / 10}g
                         </div>
@@ -722,7 +732,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <div className={styles.modalTitle}>{modalItem.name}</div>
+              <div className={styles.modalTitle}>{displayName(modalItem)}</div>
               <div className={styles.modalSubtitle}>{t("chain.chooseSize")}</div>
             </div>
             <div className={styles.modalBody}>
@@ -768,7 +778,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <div className={styles.modalTitle}>{modalItem.name}</div>
+              <div className={styles.modalTitle}>{displayName(modalItem)}</div>
               <div className={styles.modalSubtitle}>{t("chain.chooseMilk")}</div>
             </div>
             <div className={styles.modalBody}>
@@ -808,7 +818,7 @@ export default function StarbucksClient({ menus, locale = "ja" }) {
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <div className={styles.modalTitle}>{modalItem.name}</div>
+              <div className={styles.modalTitle}>{displayName(modalItem)}</div>
               <div className={styles.modalSubtitle}>
                 {t("chain.chooseCustom")}
               </div>
