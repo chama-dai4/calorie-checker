@@ -78,6 +78,12 @@ function AnimatedNumber({ value, duration = 280 }) {
 export default function PizzahutClient({ menus, locale = "ja" }) {
   const { t, tCategory, tChain } = useTranslation(locale);
 
+  // 商品名の表示（英語ページで nameEn があればそれを、無ければ日本語名を返す）
+  const displayName = (item) => {
+    if (locale === "en" && item.nameEn && item.nameEn.trim()) return item.nameEn;
+    return item.name;
+  };
+
   // === ステート定義 ===
   const [activeGroup, setActiveGroup] = useState("pizza");        // 大区分タブ
   const [activeCategory, setActiveCategory] = useState("all");    // サブカテゴリチップ
@@ -194,7 +200,7 @@ export default function PizzahutClient({ menus, locale = "ja" }) {
         const n = calcItemNutrition(item, sel.sizeName, sel.pieces);
         return {
           id: itemId,
-          name: item.name,
+          name: displayName(item),
           sizeName: sel.sizeName,
           pieces: isPiecePizza(item) ? sel.pieces : null,
           calorie: Math.round(n.kcal),
@@ -453,7 +459,7 @@ export default function PizzahutClient({ menus, locale = "ja" }) {
                         </svg>
                       </div>
                       <div className={styles.info}>
-                        <div className={styles.name}>{item.name}</div>
+                        <div className={styles.name}>{displayName(item)}</div>
                         {isSelected && sel.sizeName && (
                           <span className={styles.sizeBadge}>
                             {sel.sizeName}
@@ -620,7 +626,7 @@ export default function PizzahutClient({ menus, locale = "ja" }) {
             {modalState.step === "size" && (
               <>
                 <div className={styles.modalHeader}>
-                  <div className={styles.modalTitle}>{modalItem.name}</div>
+                  <div className={styles.modalTitle}>{displayName(modalItem)}</div>
                   <div className={styles.modalSubtitle}>
                     {modalIsPiecePizza
                       ? (locale === "en" ? "Step 1 / 2 · Choose crust" : "ステップ 1/2 ・ 生地を選択")
@@ -659,7 +665,7 @@ export default function PizzahutClient({ menus, locale = "ja" }) {
             {modalState.step === "pieces" && (
               <>
                 <div className={styles.modalHeader}>
-                  <div className={styles.modalTitle}>{modalItem.name}</div>
+                  <div className={styles.modalTitle}>{displayName(modalItem)}</div>
                   <div className={styles.modalSubtitle}>
                     {locale === "en" ? "Step 2 / 2 · Number of slices" : "ステップ 2/2 ・ 食べる枚数"}
                     <span className={styles.modalCrustTag}>{modalState.tempSizeName}</span>
