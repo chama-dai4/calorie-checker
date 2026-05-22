@@ -29,6 +29,9 @@
   border-color: var(--ink);
   color: var(--ink);
 }
+@media (max-width: 760px) {
+  .backLink { display: none; }
+}
 
 .wrapper {
   max-width: 1200px;

@@ -7,7 +7,7 @@ export default function AuthorCard() {
       <div className={styles.authorLabel}>About the author</div>
       <div className={styles.authorBody}>
         <div className={styles.authorAvatar}>
-          <img src="/author-avatar.png" alt="CHAMANO" />
+          <img src="https://images.microcms-assets.io/assets/e8cf4ad8c286451ea6f2b70e4d204219/1b888e60993245a88c75e6f69375e749/chamano-logo.png.png" alt="CHAMANO" />
         </div>
         <div className={styles.authorInfo}>
           <div className={styles.authorName}>CHAMANO</div>
