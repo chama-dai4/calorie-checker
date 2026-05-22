@@ -29,6 +29,9 @@
   border-color: var(--ink);
   color: var(--ink);
 }
+@media (max-width: 760px) {
+  .backLink { display: none; }
+}
 
 .wrapper {
   max-width: 1200px;
@@ -106,22 +109,20 @@
 
 .genreBar {
   display: flex;
-  gap: 0;
+  flex-wrap: wrap;
+  gap: 4px 0;
   border-bottom: 1px solid var(--line);
   margin-bottom: 18px;
-  overflow-x: auto;
-  scrollbar-width: none;
 }
-.genreBar::-webkit-scrollbar { display: none; }
 .genreTab {
   flex: 0 0 auto;
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  padding: 10px 16px 12px;
+  padding: 10px 12px 12px;
   font-family: inherit;
   font-weight: 500;
-  font-size: 13px;
+  font-size: 12.5px;
   cursor: pointer;
   color: var(--muted);
   white-space: nowrap;
