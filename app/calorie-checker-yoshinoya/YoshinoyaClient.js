@@ -63,7 +63,16 @@ function AnimatedNumber({ value, duration = 280 }) {
 }
 
 export default function YoshinoyaClient({ menus, locale = "ja" }) {
-  const { t, tCategory, tChain } = useTranslation(locale);
+  const { t, tCategory, tChain, tName, tOption } = useTranslation(locale);
+
+  // 商品名の表示（英語: nameEn → 辞書tName → 日本語名 の優先順）
+  const displayName = (item) => {
+    if (locale !== "en") return item.name;
+    if (item.nameEn && item.nameEn.trim()) return item.nameEn;
+    const dict = tName(item.name);
+    if (dict && dict !== item.name) return dict;
+    return item.name;
+  };
 
   const [activeGroup, setActiveGroup] = useState("main");
   const [activeCategory, setActiveCategory] = useState("all");
@@ -160,7 +169,7 @@ export default function YoshinoyaClient({ menus, locale = "ja" }) {
         const n = calcItemNutrition(item, sel.sizeName);
         return {
           id: itemId,
-          name: item.name,
+          name: displayName(item),
           sizeName: sel.sizeName,
           calorie: Math.round(n.kcal),
         };
@@ -374,12 +383,12 @@ export default function YoshinoyaClient({ menus, locale = "ja" }) {
                         </svg>
                       </div>
                       <div className={styles.info}>
-                        <div className={styles.name}>{item.name}</div>
+                        <div className={styles.name}>{displayName(item)}</div>
                         <div className={styles.pfc}>
                           {t("chain.protein")} {Math.round(itemNutri.protein * 10) / 10}g · {t("chain.fat")} {Math.round(itemNutri.fat * 10) / 10}g · {t("chain.carbs")} {Math.round(itemNutri.carb * 10) / 10}g
                         </div>
                         {isSelected && sel.sizeName && (
-                          <span className={styles.sizeBadge}>{t("chain.sizeLabel")} {sel.sizeName}</span>
+                          <span className={styles.sizeBadge}>{t("chain.sizeLabel")} {tOption(sel.sizeName)}</span>
                         )}
                         {item.hasSizeOption && !isSelected && (
                           <span className={styles.sizeHint}>{t("chain.sizeOptionsAvailable")}</span>
@@ -448,7 +457,7 @@ export default function YoshinoyaClient({ menus, locale = "ja" }) {
                       <div className={styles.selectedItemInfo}>
                         <div className={styles.selectedItemName}>{it.name}</div>
                         <div className={styles.selectedItemMeta}>
-                          {it.sizeName && <span>{it.sizeName} · </span>}
+                          {it.sizeName && <span>{tOption(it.sizeName)} · </span>}
                           <span>{it.calorie} kcal</span>
                         </div>
                       </div>
@@ -534,7 +543,7 @@ export default function YoshinoyaClient({ menus, locale = "ja" }) {
                     <div className={styles.sheetItemInfo}>
                       <div className={styles.sheetItemName}>{it.name}</div>
                       <div className={styles.sheetItemMeta}>
-                        {it.sizeName && <span>{it.sizeName} · </span>}
+                        {it.sizeName && <span>{tOption(it.sizeName)} · </span>}
                         <span>{it.calorie} kcal</span>
                       </div>
                     </div>
@@ -576,7 +585,7 @@ export default function YoshinoyaClient({ menus, locale = "ja" }) {
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <div className={styles.modalTitle}>{modalItem.name}</div>
+              <div className={styles.modalTitle}>{displayName(modalItem)}</div>
               <div className={styles.modalSubtitle}>{t("chain.chooseSize")}</div>
             </div>
             <div className={styles.modalBody}>
@@ -587,7 +596,7 @@ export default function YoshinoyaClient({ menus, locale = "ja" }) {
                     className={`${styles.sizeOption} ${modalState.tempSizeName === s.name ? styles.selected : ''}`}
                     onClick={() => handleSizeSelect(s.name)}
                   >
-                    <span className={styles.sizeName}>{s.name}</span>
+                    <span className={styles.sizeName}>{tOption(s.name)}</span>
                     <span className={styles.sizeKcal}>{s.calorie} kcal</span>
                   </div>
                 ))}
