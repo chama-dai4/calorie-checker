@@ -76,11 +76,14 @@ function AnimatedNumber({ value, duration = 280 }) {
 }
 
 export default function PizzahutClient({ menus, locale = "ja" }) {
-  const { t, tCategory, tChain } = useTranslation(locale);
+  const { t, tCategory, tChain, tOption, tName } = useTranslation(locale);
 
-  // 商品名の表示（英語ページで nameEn があればそれを、無ければ日本語名を返す）
+  // 商品名の表示（英語: nameEn → 辞書tName → 日本語名 の優先順）
   const displayName = (item) => {
-    if (locale === "en" && item.nameEn && item.nameEn.trim()) return item.nameEn;
+    if (locale !== "en") return item.name;
+    if (item.nameEn && item.nameEn.trim()) return item.nameEn;
+    const dict = tName(item.name);
+    if (dict && dict !== item.name) return dict;
     return item.name;
   };
 
@@ -462,7 +465,7 @@ export default function PizzahutClient({ menus, locale = "ja" }) {
                         <div className={styles.name}>{displayName(item)}</div>
                         {isSelected && sel.sizeName && (
                           <span className={styles.sizeBadge}>
-                            {sel.sizeName}
+                            {tOption(sel.sizeName)}
                             {isPiecePizza(item) && sel.pieces ? (locale === "en" ? ` × ${sel.pieces} slices` : ` × ${sel.pieces}ピース`) : ""}
                           </span>
                         )}
@@ -519,7 +522,7 @@ export default function PizzahutClient({ menus, locale = "ja" }) {
                       <div className={styles.selectedItemInfo}>
                         <div className={styles.selectedItemName}>{it.name}</div>
                         <div className={styles.selectedItemMeta}>
-                          {it.sizeName && <span>{it.sizeName}{it.pieces ? (locale === "en" ? ` ×${it.pieces}` : ` ×${it.pieces}ピース`) : ""} · </span>}
+                          {it.sizeName && <span>{tOption(it.sizeName)}{it.pieces ? (locale === "en" ? ` ×${it.pieces}` : ` ×${it.pieces}ピース`) : ""} · </span>}
                           <span>{it.calorie} kcal</span>
                         </div>
                       </div>
@@ -584,7 +587,7 @@ export default function PizzahutClient({ menus, locale = "ja" }) {
                     <div className={styles.sheetItemInfo}>
                       <div className={styles.sheetItemName}>{it.name}</div>
                       <div className={styles.sheetItemMeta}>
-                        {it.sizeName && <span>{it.sizeName}{it.pieces ? (locale === "en" ? ` ×${it.pieces}` : ` ×${it.pieces}ピース`) : ""} · </span>}
+                        {it.sizeName && <span>{tOption(it.sizeName)}{it.pieces ? (locale === "en" ? ` ×${it.pieces}` : ` ×${it.pieces}ピース`) : ""} · </span>}
                         <span>{it.calorie} kcal</span>
                       </div>
                     </div>
@@ -641,7 +644,7 @@ export default function PizzahutClient({ menus, locale = "ja" }) {
                         className={`${styles.sizeOption} ${modalState.tempSizeName === s.name ? styles.selected : ''}`}
                         onClick={() => handleSizeSelect(s.name)}
                       >
-                        <span className={styles.sizeName}>{s.name}</span>
+                        <span className={styles.sizeName}>{tOption(s.name)}</span>
                         <span className={styles.sizeKcal}>{s.calorie} kcal{modalIsPiecePizza ? (locale === "en" ? " / slice" : " / 1ピース") : ""}</span>
                       </div>
                     ))}
@@ -668,7 +671,7 @@ export default function PizzahutClient({ menus, locale = "ja" }) {
                   <div className={styles.modalTitle}>{displayName(modalItem)}</div>
                   <div className={styles.modalSubtitle}>
                     {locale === "en" ? "Step 2 / 2 · Number of slices" : "ステップ 2/2 ・ 食べる枚数"}
-                    <span className={styles.modalCrustTag}>{modalState.tempSizeName}</span>
+                    <span className={styles.modalCrustTag}>{tOption(modalState.tempSizeName)}</span>
                   </div>
                 </div>
                 <div className={styles.modalBody}>
