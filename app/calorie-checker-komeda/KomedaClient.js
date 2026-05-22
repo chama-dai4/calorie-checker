@@ -82,7 +82,16 @@ function parseAllergens(allergensStr) {
 }
 
 export default function KomedaClient({ menus, locale = "ja" }) {
-  const { t, tCategory, tChain } = useTranslation(locale);
+  const { t, tCategory, tChain, tName } = useTranslation(locale);
+
+  // 商品名の表示（英語: nameEn → 辞書tName → 日本語名 の優先順）
+  const displayName = (item) => {
+    if (locale !== "en") return item.name;
+    if (item.nameEn && item.nameEn.trim()) return item.nameEn;
+    const dict = tName(item.name);
+    if (dict && dict !== item.name) return dict;
+    return item.name;
+  };
 
   const [activeGroup, setActiveGroup] = useState("food");
   const [activeCategory, setActiveCategory] = useState("all");
@@ -143,7 +152,7 @@ export default function KomedaClient({ menus, locale = "ja" }) {
       .filter((m) => selectedIds.has(m.id))
       .map((m) => ({
         id: m.id,
-        name: m.name,
+        name: displayName(m),
         calorie: Math.round(m.calorie || 0),
       }));
   }, [selectedIds, menus]);
@@ -316,7 +325,7 @@ export default function KomedaClient({ menus, locale = "ja" }) {
                         </svg>
                       </div>
                       <div className={styles.info}>
-                        <div className={styles.name}>{item.name}</div>
+                        <div className={styles.name}>{displayName(item)}</div>
                         <div className={styles.allergenLine}>
                           {containsCount === 0 ? (
                             <span className={styles.allergenNone}>{t("chain.allergenNone")}</span>
