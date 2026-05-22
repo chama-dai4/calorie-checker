@@ -12,7 +12,7 @@
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Beef, Coffee, Pizza, Soup, Fish, Wheat, UtensilsCrossed } from "lucide-react";
+import { Beef, Coffee, Pizza, Soup, Fish, Wheat, UtensilsCrossed, Users } from "lucide-react";
 import styles from "@/app/category/[slug]/page.module.css";
 import homeStyles from "@/app/page.module.css";
 import { getCategoryBySlug } from "@/lib/chains";
@@ -28,6 +28,7 @@ const ICONS = {
   Fish,
   Wheat,
   UtensilsCrossed,
+  Users,
 };
 
 export default function CategoryContent({ slug, locale = "ja" }) {

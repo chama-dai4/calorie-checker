@@ -14,7 +14,7 @@
 // =====================================================
 
 import Link from "next/link";
-import { Beef, Coffee, Pizza, Soup, Fish, Wheat, UtensilsCrossed } from "lucide-react";
+import { Beef, Coffee, Pizza, Soup, Fish, Wheat, UtensilsCrossed, Users } from "lucide-react";
 import styles from "@/app/page.module.css";
 import { CATEGORIES, getAvailableCount } from "@/lib/chains";
 import { getDictionary } from "@/lib/i18n/dictionary";
@@ -30,6 +30,7 @@ const ICONS = {
   Fish,
   Wheat,
   UtensilsCrossed,
+  Users,
 };
 
 export default function HomeContent({ locale = "ja" }) {
