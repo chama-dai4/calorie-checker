@@ -125,7 +125,7 @@ function findVariation(item, size, temp, milk) {
 }
 
 export default function TullysClient({ menus, locale = "ja" }) {
-  const { t, tCategory, tChain, tName } = useTranslation(locale);
+  const { t, tCategory, tChain, tName, tOption } = useTranslation(locale);
 
   // 商品名の「表示」用（英語: nameEn → 辞書tName → 日本語名）。
   // ※ detectTempFromName など内部ロジックには使わず item.name を使うこと。
@@ -570,10 +570,10 @@ export default function TullysClient({ menus, locale = "ja" }) {
                           {t("chain.protein")} {Math.round(itemNutri.protein * 10) / 10}g · {t("chain.fat")} {Math.round(itemNutri.fat * 10) / 10}g · {t("chain.carbs")} {Math.round(itemNutri.carb * 10) / 10}g
                         </div>
                         {isSelected && sel.size && (
-                          <span className={styles.milkBadge}>{t("chain.sizeLabel")} {sel.size}</span>
+                          <span className={styles.milkBadge}>{t("chain.sizeLabel")} {tOption(sel.size)}</span>
                         )}
                         {isSelected && sel.milkType && (
-                          <span className={styles.milkBadge} style={{ marginLeft: 6 }}>{t("chain.milkLabel")} {sel.milkType}</span>
+                          <span className={styles.milkBadge} style={{ marginLeft: 6 }}>{t("chain.milkLabel")} {tOption(sel.milkType)}</span>
                         )}
                         {isSelected && customCount > 0 && (
                           <span className={styles.milkBadge} style={{ marginLeft: 6 }}>
@@ -793,7 +793,7 @@ export default function TullysClient({ menus, locale = "ja" }) {
                       className={`${styles.milkOption} ${modalState.tempSize === size ? styles.selected : ''}`}
                       onClick={() => handleSizeSelect(size)}
                     >
-                      <span className={styles.milkName}>{size}</span>
+                      <span className={styles.milkName}>{tOption(size)}</span>
                       <span className={styles.milkKcal}>{v ? `${Math.round(v.calorie)} kcal` : ''}</span>
                     </div>
                   );
@@ -834,7 +834,7 @@ export default function TullysClient({ menus, locale = "ja" }) {
                     className={`${styles.milkOption} ${modalState.tempMilkType === m.type ? styles.selected : ''}`}
                     onClick={() => handleMilkSelect(m.type)}
                   >
-                    <span className={styles.milkName}>{m.type}</span>
+                    <span className={styles.milkName}>{tOption(m.type)}</span>
                     <span className={styles.milkKcal}>{m.kcal} kcal</span>
                   </div>
                 ))}
@@ -874,15 +874,15 @@ export default function TullysClient({ menus, locale = "ja" }) {
                 if (items.length === 0) return null;
                 return (
                   <div key={cat} className={styles.customSection}>
-                    <div className={styles.customSectionTitle}>{cat}</div>
+                    <div className={styles.customSectionTitle}>{tOption(cat)}</div>
                     {items.map((c) => {
                       const count = modalState.tempCustomizations[c.id] || 0;
                       return (
                         <div key={c.id} className={styles.customItem}>
                           <div className={styles.customInfo}>
-                            <div className={styles.customName}>{c.name}</div>
+                            <div className={styles.customName}>{tOption(c.name)}</div>
                             <div className={styles.customKcal}>
-                              +{c.kcal} kcal / {c.unit}
+                              +{c.kcal} kcal / {tOption(c.unit)}
                             </div>
                           </div>
                           <div className={styles.qtyControl}>
