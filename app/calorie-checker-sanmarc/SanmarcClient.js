@@ -84,7 +84,7 @@ function AnimatedNumber({ value, duration = 280 }) {
 }
 
 export default function SanmarcClient({ menus, locale = "ja" }) {
-  const { t, tCategory, tChain, tName, tOption } = useTranslation(locale);
+  const { t, tCategory, tChain, tName, tOption, tAllergen } = useTranslation(locale);
 
   // 商品名の表示（英語: nameEn → 辞書tName → 日本語名 の優先順）
   const displayName = (item) => {
@@ -463,7 +463,7 @@ export default function SanmarcClient({ menus, locale = "ja" }) {
                             <>
                               <span className={styles.allergenLabel}>{t("chain.allergenContainsLabel")}</span>
                               {allergens.contains.slice(0, 5).map((a) => (
-                                <span key={a} className={styles.allergenTag}>{a}</span>
+                                <span key={a} className={styles.allergenTag}>{tAllergen(a)}</span>
                               ))}
                               {allergens.contains.length > 5 && (
                                 <span className={styles.allergenMore}>+{allergens.contains.length - 5}</span>
@@ -535,7 +535,7 @@ export default function SanmarcClient({ menus, locale = "ja" }) {
                   <div className={styles.allergenSummaryLabel}>{t("chain.allergenContainsHeading")}</div>
                   <div className={styles.allergenSummaryTags}>
                     {selectedAllergens.map((a) => (
-                      <span key={a} className={styles.allergenTag}>{a}</span>
+                      <span key={a} className={styles.allergenTag}>{tAllergen(a)}</span>
                     ))}
                   </div>
                 </div>
@@ -675,7 +675,7 @@ export default function SanmarcClient({ menus, locale = "ja" }) {
               </div>
               {selectedAllergens.length > 0 && (
                 <div className={styles.sheetAllergens}>
-                  {t("chain.allergenContainsHeading")}: {selectedAllergens.join("、")}
+                  {t("chain.allergenContainsHeading")}: {selectedAllergens.map((a) => tAllergen(a)).join(locale === "en" ? ", " : "、")}
                 </div>
               )}
               <button className={styles.sheetClearBtn} onClick={clearSelection} disabled={totals.count === 0}>

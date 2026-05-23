@@ -77,7 +77,7 @@ function parseAllergens(allergensStr) {
 }
 
 export default function KuraClient({ menus, locale = "ja" }) {
-  const { t, tCategory, tChain, tName } = useTranslation(locale);
+  const { t, tCategory, tChain, tName, tAllergen } = useTranslation(locale);
 
   // 商品名の表示（英語: nameEn → 辞書tName → 日本語名 の優先順）
   const displayName = (item) => {
@@ -310,7 +310,7 @@ export default function KuraClient({ menus, locale = "ja" }) {
                             <>
                               <span className={styles.allergenLabel}>{t("chain.allergenContainsLabel")}</span>
                               {allergens.contains.slice(0, 5).map((a) => (
-                                <span key={a} className={styles.allergenTag}>{a}</span>
+                                <span key={a} className={styles.allergenTag}>{tAllergen(a)}</span>
                               ))}
                               {allergens.contains.length > 5 && (
                                 <span className={styles.allergenMore}>+{allergens.contains.length - 5}</span>
@@ -358,7 +358,7 @@ export default function KuraClient({ menus, locale = "ja" }) {
                     ) : (
                       <div className={styles.allergenTagList}>
                         {selectedAllergens.contains.map((a) => (
-                          <span key={a} className={styles.allergenTag}>{a}</span>
+                          <span key={a} className={styles.allergenTag}>{tAllergen(a)}</span>
                         ))}
                       </div>
                     )}
@@ -367,7 +367,7 @@ export default function KuraClient({ menus, locale = "ja" }) {
                         <div className={styles.allergenSummaryLabel} style={{ marginTop: 10 }}>{t("chain.allergenSameLineHeading")}</div>
                         <div className={styles.allergenTagList}>
                           {selectedAllergens.sameLine.map((a) => (
-                            <span key={a} className={styles.allergenTagSub}>{a}</span>
+                            <span key={a} className={styles.allergenTagSub}>{tAllergen(a)}</span>
                           ))}
                         </div>
                       </>
@@ -431,7 +431,7 @@ export default function KuraClient({ menus, locale = "ja" }) {
           </div>
           {totals.count > 0 && selectedAllergens.contains.length > 0 && (
             <div className={styles.mobileAllergenPreview}>
-              {t("chain.allergenContainsPreview")} {selectedAllergens.contains.slice(0, 5).join("・")}
+              {t("chain.allergenContainsPreview")} {selectedAllergens.contains.slice(0, 5).map((a) => tAllergen(a)).join(locale === "en" ? ", " : "・")}
               {selectedAllergens.contains.length > 5 && ` +${selectedAllergens.contains.length - 5}`}
             </div>
           )}
@@ -487,7 +487,7 @@ export default function KuraClient({ menus, locale = "ja" }) {
                   <div className={styles.sheetAllergenLabel}>{t("chain.allergenContainsHeading")}</div>
                   <div className={styles.allergenTagList}>
                     {selectedAllergens.contains.map((a) => (
-                      <span key={a} className={styles.allergenTag}>{a}</span>
+                      <span key={a} className={styles.allergenTag}>{tAllergen(a)}</span>
                     ))}
                   </div>
                 </div>
@@ -497,7 +497,7 @@ export default function KuraClient({ menus, locale = "ja" }) {
                   <div className={styles.sheetAllergenLabel}>{t("chain.allergenSameLineHeading")}</div>
                   <div className={styles.allergenTagList}>
                     {selectedAllergens.sameLine.map((a) => (
-                      <span key={a} className={styles.allergenTagSub}>{a}</span>
+                      <span key={a} className={styles.allergenTagSub}>{tAllergen(a)}</span>
                     ))}
                   </div>
                 </div>

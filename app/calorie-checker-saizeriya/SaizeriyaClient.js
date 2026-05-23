@@ -8,26 +8,36 @@ import { localizedHref } from "@/lib/i18n/getLocale";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // === 大区分の定義(4タブ構成) ===
+// categories の値は microCMS の category と完全一致させること(不一致だと商品が表示されない)
 const GROUPS = [
   {
     id: "food",
-    labelKey: "group.food",
-    categories: ["サンドイッチ", "ハンバーガー", "プレート", "スパゲッティ", "ホットスナック", "サラダ"],
-  },
-  {
-    id: "drink",
-    labelKey: "group.drink",
-    categories: ["ホットドリンク", "コールドドリンク", "ジュース"],
-  },
-  {
-    id: "dessert",
-    labelKey: "group.dessert",
-    categories: ["デザート", "おやつ"],
+    labelKey: "group.saizeriyaFood",
+    categories: [
+      "パスタ・洋食",
+      "ピザ",
+      "ドリア",
+      "ハンバーグ・ステーキ",
+      "サラダ・サイド",
+      "スープ",
+      "パン",
+      "トッピング",
+    ],
   },
   {
     id: "morning",
-    labelKey: "group.morning",
-    categories: ["モーニング", "お子様セット"],
+    labelKey: "group.saizeriyaMorning",
+    categories: ["モーニング"],
+  },
+  {
+    id: "dessert",
+    labelKey: "group.saizeriyaDessert",
+    categories: ["デザート・ドリンク"],
+  },
+  {
+    id: "takeout",
+    labelKey: "group.saizeriyaTakeout",
+    categories: ["テイクアウト専門"],
   },
 ];
 
@@ -81,7 +91,7 @@ function parseAllergens(allergensStr) {
   }
 }
 
-export default function KomedaClient({ menus, locale = "ja" }) {
+export default function SaizeriyaClient({ menus, locale = "ja" }) {
   const { t, tCategory, tChain, tName, tAllergen } = useTranslation(locale);
 
   // 商品名の表示（英語: nameEn → 辞書tName → 日本語名 の優先順）
@@ -199,23 +209,25 @@ export default function KomedaClient({ menus, locale = "ja" }) {
 
   // 言語別のリンク先
   const homeHref = localizedHref("/", locale);
-  const categoryHref = localizedHref("/category/cafe", locale);
+  const categoryHref = localizedHref("/category/famires", locale);
 
   // チェーン名の表示
-  const chainDisplayName = tChain("コメダ珈琲店") || "コメダ珈琲店";
+  const chainDisplayName = tChain("サイゼリヤ") || "サイゼリヤ";
 
   // タブのラベル(i18n未対応分はフォールバック)
   const groupLabel = (g) => {
     const translated = t(g.labelKey);
     if (translated && translated !== g.labelKey) return translated;
-    // フォールバック(日本語)
+    // フォールバック(日本語 / 英語)
     const fallback = {
-      food: "フード",
-      drink: "ドリンク",
-      dessert: "デザート・おやつ",
-      morning: "モーニング・お子様",
+      food: { ja: "フード", en: "Food" },
+      morning: { ja: "モーニング", en: "Morning" },
+      dessert: { ja: "デザート・ドリンク", en: "Dessert & Drinks" },
+      takeout: { ja: "お持ち帰り", en: "Takeout" },
     };
-    return fallback[g.id] || g.id;
+    const f = fallback[g.id];
+    if (!f) return g.id;
+    return locale === "en" ? f.en : f.ja;
   };
 
   return (
@@ -235,21 +247,21 @@ export default function KomedaClient({ menus, locale = "ja" }) {
           <div className={styles.breadcrumb}>
             <Link href={homeHref}>{t("common.home")}</Link>
             <span className={styles.sep}>/</span>
-            <Link href={categoryHref}>{tCategory("カフェ") || (locale === "en" ? "Cafe / カフェ" : "カフェ")}</Link>
+            <Link href={categoryHref}>{tCategory("ファミレス") || (locale === "en" ? "Family Restaurant / ファミレス" : "ファミレス")}</Link>
             <span className={styles.sep}>/</span>{chainDisplayName}
           </div>
           <h1>{chainDisplayName}</h1>
           <p className={styles.subtitle}>
-            {t("chain.subtitleKomeda") !== "chain.subtitleKomeda"
-              ? t("chain.subtitleKomeda")
-              : "シロノワール・モーニング・サンドイッチも。コメダ珈琲店の全メニューを選ぶだけで合計カロリーを瞬時に算出。アレルゲン情報も一目で確認できます。"}
+            {t("chain.subtitleSaizeriya") !== "chain.subtitleSaizeriya"
+              ? t("chain.subtitleSaizeriya")
+              : "パスタ・ピザ・ミラノ風ドリア・ハンバーグも。サイゼリヤの全メニューを選ぶだけで合計カロリーを瞬時に算出。アレルゲン情報も一目で確認できます。"}
           </p>
         </header>
 
         <div className={styles.allergyNotice}>
           <strong>{t("chain.allergenNoticeTitle")}</strong>
           {t("chain.allergenNotice")}
-          <a href="https://www.komeda.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Komeda Coffee " : "コメダ珈琲店"}{t("chain.officialSite")}</a>
+          <a href="https://www.saizeriya.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Saizeriya " : "サイゼリヤ"}{t("chain.officialSite")}</a>
           {t("chain.allergenNoticeSuffix")}
         </div>
 
@@ -357,10 +369,10 @@ export default function KomedaClient({ menus, locale = "ja" }) {
             </div>
 
             <div className={styles.pageFooter}>
-              {t("chain.disclaimerPrefix")}<a href="https://www.komeda.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Komeda Coffee " : "コメダ珈琲店"}{t("chain.officialSite")}</a>{t("chain.disclaimerSuffix")}<br />
-              {t("chain.komedaDisclaimerAffiliation") !== "chain.komedaDisclaimerAffiliation"
-                ? t("chain.komedaDisclaimerAffiliation")
-                : "※当サイトは株式会社コメダおよびコメダ珈琲店とは一切関係のない非公式のカロリー計算ツールです。"}
+              {t("chain.disclaimerPrefix")}<a href="https://www.saizeriya.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Saizeriya " : "サイゼリヤ"}{t("chain.officialSite")}</a>{t("chain.disclaimerSuffix")}<br />
+              {t("chain.saizeriyaDisclaimerAffiliation") !== "chain.saizeriyaDisclaimerAffiliation"
+                ? t("chain.saizeriyaDisclaimerAffiliation")
+                : "※当サイトは株式会社サイゼリヤとは一切関係のない非公式のカロリー計算ツールです。"}
             </div>
           </div>
 
