@@ -21,6 +21,7 @@ const BILINGUAL_CHAIN_PATHS = [
   "/calorie-checker-gusto",
   "/calorie-checker-saizeriya",
   "/calorie-checker-hidakaya",
+  "/calorie-checker-dennys",
 ];
 
 // 日本語/英語両対応の言語マップを生成するヘルパー
