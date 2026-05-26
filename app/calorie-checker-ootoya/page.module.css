@@ -1190,3 +1190,32 @@
   line-height: 1.6;
   color: var(--muted, #777);
 }
+
+/* ========== モバイル: メニュー行の商品名つぶれ対策 ========== */
+/* 右列(カロリー/PFC)が幅を取りすぎて商品名が1文字ずつ縦折りになるのを防ぐ */
+@media (max-width: 760px) {
+  .menuRow {
+    align-items: flex-start;
+    gap: 10px;
+  }
+  /* 商品名の列は必ず一定幅を確保する */
+  .info {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .name {
+    /* 1文字ずつの縦折りを禁止し、単語/文節単位で折り返す */
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+  /* 右列が広がりすぎないよう上限を設ける */
+  .right {
+    max-width: 42%;
+    flex: 0 1 auto;
+  }
+  /* PFCは改行禁止を解除して右列の中で折り返す */
+  .itemPfc {
+    white-space: normal;
+    line-height: 1.5;
+  }
+}

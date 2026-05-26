@@ -72,7 +72,7 @@ export default function CategoryContent({ slug, locale = "ja" }) {
       <nav className={homeStyles.topnav}>
         <div className={homeStyles.topnavInner}>
           <Link href={homeHref} className="brand-name-large">Calorie Checker</Link>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div className={styles.navActions} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <Link href={homeHref} style={{
               display: "inline-flex",
               alignItems: "center",

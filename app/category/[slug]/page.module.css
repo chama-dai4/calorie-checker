@@ -258,3 +258,7 @@
   letter-spacing: 0.05em;
   text-align: center;
 }
+/* ========== モバイル: ヘッダー右側(ホームに戻る + Language)を隠す ========== */
+@media (max-width: 760px) {
+  .navActions { display: none; }
+}
