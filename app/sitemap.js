@@ -28,6 +28,7 @@ const BILINGUAL_CHAIN_PATHS = [
   "/calorie-checker-mistd",
   "/calorie-checker-tenya",
   "/calorie-checker-ootoya",
+  "/calorie-checker-hanamaru",
 ];
 
 // 日本語/英語両対応の言語マップを生成するヘルパー
