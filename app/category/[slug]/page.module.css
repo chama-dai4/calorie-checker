@@ -258,7 +258,18 @@
   letter-spacing: 0.05em;
   text-align: center;
 }
-/* ========== モバイル: ヘッダー右側(ホームに戻る + Language)を隠す ========== */
+/* ========== モバイル: ヘッダー右側(ホームに戻る + Language)を隠す & ロゴの折り返し防止 ========== */
 @media (max-width: 760px) {
-  .navActions { display: none; }
+  /* ホームに戻る + Language を非表示(!importantでインラインスタイルに勝つ) */
+  .navActions { display: none !important; }
+}
+
+/* PC(761px以上)では従来通り全て表示 */
+@media (min-width: 761px) {
+  .navActions { display: flex !important; }
+}
+
+/* ロゴ「Calorie Checker」がモバイルで折り返さないように */
+:global(.brand-name-large) {
+  white-space: nowrap;
 }
