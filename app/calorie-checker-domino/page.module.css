@@ -1,0 +1,1103 @@
+/* ========== ドミノ・ピザカラー（このページ内のみ・他チェーンに影響しない） ========== */
+/* サイト共通の --accent 系をドミノの青×赤で上書き */
+/* メインアクセント=ドミノブルー #006491、補助=ドミノレッド #E31837 */
+.topnav,
+.wrapper,
+.totalCardMobile,
+.sheetOverlay,
+.modalOverlay {
+  --dm-blue: #006491;
+  --dm-red: #E31837;
+  --dm-blue-soft: #E3F0F6;
+  --accent: #006491;
+  --accent-soft: #E3F0F6;
+  /* 旧ピザハット変数名のエイリアス（CSS本体の var(--ph-red) 参照を有効化） */
+  /* ボタン・バッジ等のアクセントはドミノレッドを使用 */
+  --ph-red: #E31837;
+  --ph-red-soft: #FDE7EB;
+}
+
+/* ========== 共通レイアウト ========== */
+.topnav {
+  border-bottom: 1px solid var(--line);
+  padding: 14px 0;
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 50;
+}
+.topnavInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.backLink {
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px solid var(--line-strong);
+  padding: 5px 12px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+.backLink:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+/* モバイルでは「ホームに戻る」を隠し、右上は言語切替のみにする */
+@media (max-width: 760px) {
+  .backLink { display: none; }
+}
+
+.wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 24px 0;
+}
+@media (max-width: 760px) {
+  .wrapper { padding: 20px 20px 0; }
+}
+
+.header {
+  margin-bottom: 28px;
+}
+.breadcrumb {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.breadcrumb a { color: var(--muted); }
+.breadcrumb a:hover { color: var(--ink); }
+.sep { margin: 0 6px; opacity: 0.5; }
+.header h1 {
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.subtitle {
+  font-size: 14px;
+  color: var(--muted);
+}
+@media (max-width: 760px) {
+  .header h1 { font-size: 26px; }
+  .subtitle { font-size: 13px; }
+}
+
+/* ========== アレルゲン注意バナー（サンマルク赤系） ========== */
+.allergyNotice {
+  background: #fdeced;
+  border: 1px solid #e8a9ad;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #8a1219;
+  margin-bottom: 28px;
+}
+.allergyNotice strong {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.allergyNotice a {
+  color: #8a1219;
+  text-decoration: underline;
+}
+.allergyNotice a:hover { color: #C8102E; }
+
+/* PC 2カラム / モバイル 1カラム */
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 40px;
+  align-items: start;
+  padding-bottom: 80px;
+}
+@media (max-width: 900px) {
+  .mainLayout {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding-bottom: 200px;
+  }
+}
+.leftCol { min-width: 0; }
+
+/* ========== 大区分タブ ========== */
+.genreBar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.genreBar::-webkit-scrollbar { display: none; }
+.genreTab {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 16px 12px;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+.genreTab:first-child { padding-left: 0; }
+.genreTab:hover { color: var(--ink); }
+.genreTab.active {
+  color: var(--ink);
+  font-weight: 600;
+  border-bottom-color: var(--ink);
+}
+.num {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  margin-left: 5px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* ========== サブカテゴリチップ ========== */
+.subCatBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.subCatChip {
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.subCatChip:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.subCatActive {
+  background: var(--ph-red);
+  border-color: var(--ph-red);
+  color: #fff;
+}
+.subCatActive .subCatNum {
+  color: rgba(255, 255, 255, 0.7);
+}
+.subCatNum {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  margin-left: 4px;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+/* ========== 検索ボックス ========== */
+.searchWrap {
+  margin-bottom: 16px;
+  position: relative;
+}
+.searchInput {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  padding: 10px 14px 10px 36px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  transition: border-color 0.15s;
+}
+.searchInput::placeholder { color: var(--muted); }
+.searchInput:focus { outline: none; border-color: var(--ink); }
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+}
+
+/* ========== 商品一覧 ========== */
+.menuStack {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+}
+.menuRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  gap: 14px;
+  transition: background 0.12s;
+}
+.menuRow:hover { background: var(--bg-alt); }
+.menuRow.selected { background: var(--accent-soft); }
+
+.check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.check svg {
+  width: 12px;
+  height: 12px;
+  color: var(--bg);
+  opacity: 0;
+}
+.menuRow.selected .check {
+  background: var(--ph-red);
+  border-color: var(--ph-red);
+}
+.menuRow.selected .check svg { opacity: 1; }
+
+.sizeBadge {
+  font-size: 10px;
+  color: var(--muted);
+  background: var(--bg-alt);
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-top: 4px;
+  display: inline-block;
+}
+.sizeHint {
+  font-size: 10px;
+  color: var(--muted);
+  background: var(--bg-alt);
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-top: 4px;
+  display: inline-block;
+  border: 1px dashed var(--line-strong);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.info { flex: 1; min-width: 0; }
+.name {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.pfc {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'Inter', sans-serif;
+}
+.right { text-align: right; flex-shrink: 0; }
+.kcal {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  white-space: nowrap;
+}
+.u {
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: 2px;
+  font-weight: 400;
+}
+
+/* ========== アレルゲンタグ ========== */
+.allergenLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+.allergenLabel {
+  font-size: 10px;
+  color: var(--muted);
+  margin-right: 2px;
+}
+.allergenTag {
+  display: inline-block;
+  font-size: 10px;
+  color: #C8102E;
+  background: #fdeced;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+.allergenMore {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'Inter', sans-serif;
+}
+.allergenNone {
+  font-size: 11px;
+  color: #2a7a4c;
+  font-weight: 500;
+}
+
+.pageFooter {
+  margin-top: 28px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.pageFooter a {
+  color: var(--muted);
+  text-decoration: underline;
+}
+.pageFooter a:hover { color: var(--ink); }
+
+/* ========== PC右サイドバー（合計カード） ========== */
+.rightCol {
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (max-width: 900px) {
+  .rightCol { display: none; }
+}
+
+.totalCardPc {
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 20px 18px 18px;
+  background: var(--bg);
+}
+.label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.countLine {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.kcalBig {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+.kcalBig .u { font-size: 12px; margin-left: 4px; }
+.divider {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 12px 0 14px;
+}
+.nutriList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.nutriRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+}
+.nutriName { color: var(--muted); }
+.nutriValue {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+/* 選択中アレルゲン集計（PC） */
+.allergenSummary {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  margin-bottom: 16px;
+}
+.allergenSummaryLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.allergenSummaryTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+/* 同ライン製造タグ（枠線のみ・控えめ） */
+.allergenTagSame {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 400;
+}
+/* モバイルシート内アレルゲン集計 */
+.sheetAllergen {
+  padding: 12px 16px 4px;
+  border-top: 1px solid var(--line);
+}
+
+.clearBtnPc {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.clearBtnPc:hover:not(:disabled) {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.clearBtnPc:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ========== PC選択中メニューカード ========== */
+.selectedListCard {
+  margin-top: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 16px 14px 14px;
+  background: var(--bg);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.selectedListLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.selectedList {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+.selectedList::-webkit-scrollbar { width: 6px; }
+.selectedList::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 3px;
+}
+.selectedList::-webkit-scrollbar-track { background: transparent; }
+.selectedItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.selectedItem:last-child { border-bottom: none; padding-bottom: 0; }
+.selectedItem:first-child { padding-top: 0; }
+.selectedItemInfo { flex: 1; min-width: 0; }
+.selectedItemName {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  margin-bottom: 2px;
+  word-break: break-word;
+}
+.selectedItemMeta {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'Inter', sans-serif;
+}
+.removeBtn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: all 0.15s;
+  padding: 0;
+}
+.removeBtn:hover {
+  border-color: #c33;
+  color: #c33;
+}
+.removeBtn svg { width: 10px; height: 10px; }
+
+/* ========== モバイル下部固定カード ========== */
+.totalCardMobile { display: none; }
+@media (max-width: 900px) {
+  .totalCardMobile {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--line-strong);
+    padding: 12px 16px 14px;
+    z-index: 40;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+  }
+}
+.mobileExpandBtn {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.mobileExpandBtn:disabled { cursor: default; }
+.expandHint { opacity: 0.7; }
+.mobileTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+.mobileMeta { display: flex; flex-direction: column; }
+.mobileLabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1;
+}
+.mobileCount {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.kcalNum {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.nutrients {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.nCell {
+  border-left: 1px solid var(--line);
+  padding-left: 8px;
+}
+.nCell:first-child { border-left: none; padding-left: 0; }
+.nL {
+  font-size: 9px;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+.nV {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+}
+.nV .u { font-size: 9px; }
+
+/* ========== モバイル展開シート ========== */
+.sheetOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 90;
+  animation: fadeIn 0.15s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.sheet {
+  background: var(--bg);
+  width: 100%;
+  max-width: 600px;
+  border-radius: 14px 14px 0 0;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUpSheet 0.22s ease;
+}
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.sheetTitle { font-size: 14px; font-weight: 600; }
+.sheetCloseBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0;
+}
+.sheetCloseBtn svg { width: 12px; height: 12px; }
+.sheetBody {
+  padding: 8px 18px;
+  overflow-y: auto;
+  flex: 1;
+}
+.sheetEmpty {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.sheetItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.sheetItem:last-child { border-bottom: none; }
+.sheetItemInfo { flex: 1; min-width: 0; }
+.sheetItemName {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 2px;
+  word-break: break-word;
+}
+.sheetItemMeta {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'Inter', sans-serif;
+}
+.sheetFooter {
+  padding: 14px 18px 18px;
+  border-top: 1px solid var(--line);
+  background: var(--bg-alt);
+}
+.sheetTotalLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.sheetTotalKcal {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+}
+.sheetNutri {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.sheetNutri strong {
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+  font-weight: 600;
+  margin: 0 2px;
+}
+.sheetAllergens {
+  font-size: 11px;
+  color: #8a1219;
+  background: #fdeced;
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.sheetClearBtn {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sheetClearBtn:hover:not(:disabled) {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.sheetClearBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ========== モーダル共通（サイズ選択用） ========== */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+  animation: fadeIn 0.15s ease;
+}
+.modal {
+  background: var(--bg);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.2s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.modalHeader {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.modalTitle {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.modalSubtitle {
+  font-size: 11px;
+  color: var(--muted);
+}
+.modalBody {
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+.modalFooter {
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.modalBtn {
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.modalBtn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.modalBtnPrimary {
+  background: var(--ph-red);
+  border: 1px solid var(--ph-red);
+  border-radius: 4px;
+  padding: 8px 18px;
+  font-family: inherit;
+  font-size: 12px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.modalBtnPrimary:hover {
+  opacity: 0.85;
+  border-color: var(--ph-red);
+}
+
+/* サイズ選択リスト */
+.sizeList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sizeOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.12s;
+  background: var(--bg);
+}
+.sizeOption:hover {
+  border-color: var(--ink);
+}
+.sizeOption.selected {
+  border-color: var(--ph-red);
+  background: var(--accent-soft);
+}
+.sizeName {
+  font-size: 14px;
+  font-weight: 500;
+}
+.sizeKcal {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--muted);
+}
+.sizeOption.selected .sizeKcal {
+  color: var(--ink);
+}
+
+/* ========== サイトフッター ========== */
+.siteFooter {
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  padding: 32px 0;
+  margin-top: 40px;
+}
+@media (max-width: 900px) {
+  .siteFooter { margin-bottom: 140px; }
+}
+.siteFooterInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.siteFooterText {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 540px;
+}
+.brandName {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  color: var(--ink);
+  margin-right: 8px;
+}
+.siteFooterLinks {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.siteFooterLinks a {
+  font-size: 11px;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+.siteFooterLinks a:hover { color: var(--ink); }
+.siteFooterCopy {
+  max-width: 1200px;
+  margin: 16px auto 0;
+  padding: 0 24px;
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'Inter', sans-serif;
+}
+
+/* ========== ピザハット専用: ピース数カウンター ========== */
+
+/* 生地タグ（ピース選択モーダルのサブタイトル内に表示） */
+.modalCrustTag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 10px;
+  background: var(--ph-red-soft);
+  color: var(--ph-red);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+/* ピース数カウンター本体（－ 数値 ＋） */
+.pieceCounter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px 0 8px;
+}
+
+/* －ボタン（赤） */
+.pieceMinus,
+.piecePlus {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s, opacity 0.15s, box-shadow 0.15s;
+  color: #fff;
+  font-family: inherit;
+}
+.pieceMinus {
+  background: #E53935; /* 赤 */
+  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.35);
+}
+.piecePlus {
+  background: #2E9E5B; /* 緑 */
+  box-shadow: 0 2px 8px rgba(46, 158, 91, 0.35);
+}
+.pieceMinus:hover:not(:disabled),
+.piecePlus:hover:not(:disabled) {
+  transform: scale(1.08);
+}
+.pieceMinus:active:not(:disabled),
+.piecePlus:active:not(:disabled) {
+  transform: scale(0.95);
+}
+.pieceMinus:disabled {
+  background: #e0c4c2;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* 中央の数値表示 */
+.pieceValue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+.pieceNum {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  font-family: 'Space Grotesk', sans-serif;
+}
+.pieceUnit {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* 合計プレビュー（生地kcal × 枚数 ＝ 合計） */
+.piecePreview {
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+  padding: 12px 0 4px;
+}
+.piecePreview strong {
+  color: var(--ph-red);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ピース数の注記（Mは8ピース中、Lは12ピース中…） */
+.pieceNote {
+  margin: 12px 16px 4px;
+  padding: 10px 14px;
+  background: #faf7f0;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* メニュー行の「/ 1ピース」注記 */
+.perPieceNote {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* モバイルではボタンを少し小さく */
+@media (max-width: 760px) {
+  .pieceMinus,
+  .piecePlus {
+    width: 48px;
+    height: 48px;
+    font-size: 26px;
+  }
+  .pieceNum {
+    font-size: 36px;
+  }
+}

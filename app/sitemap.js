@@ -18,6 +18,7 @@ const BILINGUAL_CHAIN_PATHS = [
   "/calorie-checker-kura",
   "/calorie-checker-freshness",
   "/calorie-checker-pizzahut",
+  "calorie-checker-domino",
   "/calorie-checker-gusto",
   "/calorie-checker-saizeriya",
   "/calorie-checker-hidakaya",
