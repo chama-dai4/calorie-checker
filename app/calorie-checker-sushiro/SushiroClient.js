@@ -76,7 +76,7 @@ function parseAllergens(allergensStr) {
   }
 }
 
-export default function KuraClient({ menus, locale = "ja" }) {
+export default function SushiroClient({ menus, locale = "ja" }) {
   const { t, tCategory, tChain, tName, tAllergen } = useTranslation(locale);
 
   // 商品名の表示（英語: nameEn → 辞書tName → 日本語名 の優先順）
@@ -160,6 +160,7 @@ export default function KuraClient({ menus, locale = "ja" }) {
           count,                                     // 個数（皿数）
           unitCalorie: Math.round(m.calorie || 0),   // 1皿あたり
           calorie: Math.round((m.calorie || 0) * count), // 小計
+          per100ml: m.tempSizeVariations === 'per100ml',
         };
       });
   }, [selections, menus]);
@@ -226,7 +227,7 @@ export default function KuraClient({ menus, locale = "ja" }) {
   const categoryHref = localizedHref("/category/sushi", locale);
 
   // チェーン名の表示（英語版は併記）
-  const chainDisplayName = tChain("くら寿司");
+  const chainDisplayName = tChain("スシロー");
 
   return (
     <div className="page-fade-in">
@@ -249,13 +250,13 @@ export default function KuraClient({ menus, locale = "ja" }) {
             <span className={styles.sep}>/</span>{chainDisplayName}
           </div>
           <h1>{chainDisplayName}</h1>
-          <p className={styles.subtitle}>{t("chain.subtitleKura")}</p>
+          <p className={styles.subtitle}>{t("chain.subtitleSushiro")}</p>
         </header>
 
         <div className={styles.allergyNotice}>
           <strong>{t("chain.allergenNoticeTitle")}</strong>
           {t("chain.allergenNotice")}
-          <a href="https://www.kurasushi.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Kura Sushi Japan " : "くら寿司"}{t("chain.officialSite")}</a>
+          <a href="https://www.akindo-sushiro.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Sushiro Japan " : "スシロー"}{t("chain.officialSite")}</a>
           {t("chain.allergenNoticeSuffix")}
         </div>
 
@@ -350,6 +351,11 @@ export default function KuraClient({ menus, locale = "ja" }) {
                         <div className={styles.kcal}>
                           {isSelected ? Math.round((item.calorie || 0) * count) : item.calorie}<span className={styles.u}>kcal</span>
                         </div>
+                        {item.tempSizeVariations === 'per100ml' && (
+                          <div className={styles.perVolumeNote}>
+                            {locale === "en" ? "per 100ml" : "100mlあたり"}
+                          </div>
+                        )}
                         <div className={styles.countControls}>
                           <button
                             type="button"
@@ -375,8 +381,8 @@ export default function KuraClient({ menus, locale = "ja" }) {
             </div>
 
             <div className={styles.pageFooter}>
-              {t("chain.disclaimerPrefix")}<a href="https://www.kurasushi.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Kura Sushi Japan " : "くら寿司"}{t("chain.officialSite")}</a>{t("chain.disclaimerSuffix")}<br />
-              {t("chain.kuraDisclaimerAffiliation")}
+              {t("chain.disclaimerPrefix")}<a href="https://www.akindo-sushiro.co.jp/" target="_blank" rel="noopener">{locale === "en" ? "Sushiro Japan " : "スシロー"}{t("chain.officialSite")}</a>{t("chain.disclaimerSuffix")}<br />
+              {t("chain.sushiroDisclaimerAffiliation")}
             </div>
           </div>
 
