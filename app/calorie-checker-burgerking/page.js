@@ -2,7 +2,7 @@ import { getMenusByChain } from "@/lib/microcms";
 import BurgerKingClient from "./BurgerKingClient";
 
 export const metadata = {
-title: "バーガーキング カロリー計算|ワッパー全メニュー&PFC",
+  title: "バーガーキング カロリー計算|ワッパー全メニュー&PFC",
   description:
     "バーガーキングの全メニューのカロリー・PFCをワンタップで合計。ワッパーやチーズワッパーなど人気メニューを低カロリー順に並び替えも可能。ダイエット中の食事選びにも役立つ無料ツール。",
   keywords: [
