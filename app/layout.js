@@ -2,6 +2,7 @@ import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { headers } from "next/headers";
 import { Inter, Noto_Sans_JP, Space_Grotesk } from "next/font/google";
+import Script from "next/script";
 
 // Inter: 英数字用(本文・UI)
 const inter = Inter({
@@ -49,14 +50,15 @@ export default async function RootLayout({ children }) {
         <meta name="color-scheme" content="light only" />
         <meta name="supported-color-schemes" content="light" />
         <meta name="theme-color" content="#ffffff" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2863577913372338"
-          crossOrigin="anonymous"
-        ></script>
       </head>
       <body>
         {children}
+         <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2863577913372338"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
       {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
     </html>
