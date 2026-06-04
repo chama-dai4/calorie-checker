@@ -1,7 +1,31 @@
 import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
-// ▼ 変更点1: headers をインポート(追加)
 import { headers } from "next/headers";
+import { Inter, Noto_Sans_JP, Space_Grotesk } from "next/font/google";
+
+// Inter: 英数字用(本文・UI)
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+// Noto Sans JP: 日本語用(本文)
+const notoSansJP = Noto_Sans_JP({
+  weight: ["400", "500", "700"],
+  display: "swap",
+  variable: "--font-noto-sans-jp",
+  preload: false,
+});
+
+// Space Grotesk: 見出し・ブランド用
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+  variable: "--font-space-grotesk",
+});
 
 export const metadata = {
   title: "カロリーチェッカー | 外食チェーンのカロリー計算サイト",
@@ -11,30 +35,20 @@ export const metadata = {
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
-// ▼ 変更点2: function → async function(変更)
 export default async function RootLayout({ children }) {
-  // ▼ 変更点3: proxy.js が付与した x-pathname を読み取って lang を判定(追加)
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "";
   const lang = pathname.startsWith("/en") ? "en" : "ja";
 
   return (
-    // ▼ 変更点4: <html lang="ja"> → <html lang={lang}>(変更)
-    <html lang={lang}>
+    <html
+      lang={lang}
+      className={`${inter.variable} ${notoSansJP.variable} ${spaceGrotesk.variable}`}
+    >
       <head>
         <meta name="color-scheme" content="light only" />
         <meta name="supported-color-schemes" content="light" />
         <meta name="theme-color" content="#ffffff" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2863577913372338"
