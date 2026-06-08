@@ -1,5 +1,5 @@
 import "./globals.css";
-import { GoogleAnalytics } from "@next/third-parties/google";
+// この行を完全に削除する
 import { headers } from "next/headers";
 import { Inter, Noto_Sans_JP, Space_Grotesk } from "next/font/google";
 import Script from "next/script";
@@ -53,14 +53,29 @@ export default async function RootLayout({ children }) {
       </head>
       <body>
         {children}
-         <Script
+        <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2863577913372338"
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="lazyOnload"
+            />
+            <Script id="google-analytics" strategy="lazyOnload">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_ID}');
+              `}
+            </Script>
+          </>
+        )}
       </body>
-      {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
     </html>
   );
 }
